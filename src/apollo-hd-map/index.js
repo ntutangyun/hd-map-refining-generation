@@ -16,8 +16,6 @@ graphData = Graphs.Graph.deserializeBinary(graphData);
 
 const graph = new Graph("original_graph").init(graphData.toObject(), mapData.toObject());
 
-console.log(graph);
-
 const junctionGroups = initJunctionGroups(graph);
 
 console.log(junctionGroups);

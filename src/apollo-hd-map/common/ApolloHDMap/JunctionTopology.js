@@ -103,73 +103,15 @@ function analyzeJunctionTopoVector(junction) {
     junction.topoRoadList = roadList;
 }
 
-function getTopologyComplexity(junction) {
-    const inRoadTrees = [];
-
-    junction.getIncomingList().forEach(inRoad => {
-        junction.getOutgoingList().forEach(outRoad => {
-
-            let matchedJLanes = {};
-
-            junction.getLaneList().forEach(jLane => {
-                const inLanes = jLane.getIncomingLaneList();
-                const outLanes = jLane.getOutgoingLaneList();
-
-                let inMatched = false;
-                let outMatched = false;
-
-                inLanes.forEach(inLane => {
-                    if (inLane.road !== null) {
-                        if (inLane.road.id === inRoad.id) {
-                            inMatched = true;
-                        }
-                    }
-                });
-
-                outLanes.forEach(outLane => {
-                    if (outLane.road !== null) {
-                        if (outLane.road.id === outRoad.id) {
-                            outMatched = true;
-                        }
-                    }
-                });
-
-                if (inMatched && outMatched) {
-                    matchedJLanes[jLane.id] = jLane;
-                }
-            });
-
-            if (Object.values(matchedJLanes).length > 0) {
-                inRoadTrees.push({
-                    inLaneCount: inRoad.getLaneList().length,
-                    junctionLaneCount: Object.values(matchedJLanes).length,
-                    outLaneCount: outRoad.getLaneList().length
-                });
-            }
-        });
-    });
-
-    // console.log(`Junction ${junction.id} in road trees for topo Complexity:`);
-    // console.log(inRoadTrees);
-
-    let maxInLane = 0;
-    let maxJLane = 0;
-    let maxOutLane = 0;
-
-    inRoadTrees.forEach(tree => {
-        maxInLane = tree.inLaneCount > maxInLane ? tree.inLaneCount : maxInLane;
-        maxJLane = tree.junctionLaneCount > maxJLane ? tree.junctionLaneCount : maxJLane;
-        maxOutLane = tree.outLaneCount > maxOutLane ? tree.outLaneCount : maxOutLane;
-    });
-
-    junction.topoComplexity = {
-        maxInLane: maxInLane,
-        maxJLane: maxJLane,
-        maxOutLane: maxOutLane
+function analyzeJunctionFeatureVector(junction) {
+    junction.featureVector = {
+        hasStopSign: junction.getStopSignList().length > 0,
+        hasSignal: junction.getSignalList().length > 0,
+        hasCrosswalk: junction.getCrosswalkList().length > 0
     };
 }
 
 module.exports = {
-    getTopologyComplexity,
-    analyzeJunctionTopoVector
+    analyzeJunctionTopoVector,
+    analyzeJunctionFeatureVector
 };

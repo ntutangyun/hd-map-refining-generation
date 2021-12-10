@@ -13,21 +13,14 @@ class Junction {
         this.incoming = {};
         this.outgoing = {};
 
-        // BASE TESTING GENERATION RELATED
         this.junctionGroup = null;
-        this.envVector = null;
-        this.envCapacity = null;
         this.topoVector = null;
-        this.topoComplexity = null;
-        this.baseTests = {};        // Base tests, indexed by the testID
-        this.envKeys = {};          // Base Env Keys
-        this.baseRoutes = {};       // Base routes, links between tests and env keys
+        this.featureVector = null;
 
         // if junction contains any invalid lanes without incoming lanes or outgoing lanes,
         // junction will be marked as invalid and won't be tested for now.
         this.valid = true;
 
-        // junction obstacle test
         this.topoRoadList = null;
     }
 
@@ -161,6 +154,27 @@ class Junction {
         });
 
         return {x: x / this.pointList.length, y: y / this.pointList.length, z: 0};
+    }
+
+    // get all the overlapping crosswalks of junction's incoming lanes and outgoing lanes
+    getCrosswalkList() {
+        let junctionLaneList = this.getLaneList();
+        let crosswalkList = {};
+
+        junctionLaneList.forEach(jLane => {
+            const incomingLane = jLane.getIncomingLaneList();
+            const outgoingLane = jLane.getOutgoingLaneList();
+
+            incomingLane.forEach(inLane => {
+                inLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
+            });
+
+            outgoingLane.forEach(outLane => {
+                outLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
+            });
+        });
+
+        return Object.values(crosswalkList);
     }
 }
 
