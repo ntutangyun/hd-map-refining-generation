@@ -1,4 +1,4 @@
 process.on("SIGINT", () => {
-    console.log("[PROCESS] Terminating ...");
+    global.logI("PROCESS", "[PROCESS] Terminating ...");
     process.exit(0);
 });
