@@ -106,6 +106,18 @@ class JunctionGroup {
         this.junctionList[junction.id] = junction;
         return true;
     }
+
+    getJunctionList() {
+        return Object.values(this.junctionList);
+    }
+
+    selectJunction(random = true) {
+        if (random) {
+            return this.getJunctionList().random();
+        }
+
+        return this.getJunctionList()[0];
+    }
 }
 
 

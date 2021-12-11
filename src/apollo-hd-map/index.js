@@ -1,3 +1,5 @@
+require("./common/setup");
+
 const fs = require("fs");
 const Maps = require("./protobuf_out/modules/map/proto/map_pb");
 const Graphs = require("./protobuf_out/modules/routing/proto/topo_graph_pb");
@@ -19,3 +21,7 @@ const graph = new Graph("original_graph").init(graphData.toObject(), mapData.toO
 const junctionGroups = initJunctionGroups(graph);
 
 console.log(junctionGroups);
+
+const selectedJunction = junctionGroups.map(junctionGroup => junctionGroup.selectJunction());
+
+console.log(selectedJunction);
