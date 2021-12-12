@@ -7,8 +7,11 @@ class Crosswalk {
     }
 
     init(crossWalkData) {
-        console.log(crossWalkData)
-        this.id = crossWalkData.id.id;
+        if (crossWalkData.id) {
+            this.id = crossWalkData.id.id;
+        } else {
+            this.id = `CW_${this.graph.getCrosswalkList().length}`;
+        }
         this.pointList = crossWalkData.polygon.pointList;
         crossWalkData.overlapIdList.forEach(o => {
             const laneId = this.extractLaneId(o.id);
