@@ -156,23 +156,28 @@ class Junction {
         return {x: x / this.pointList.length, y: y / this.pointList.length, z: 0};
     }
 
-    // get all the overlapping crosswalks of junction's incoming lanes and outgoing lanes
+    // get all the overlapping crosswalks of junction's lanes
     getCrosswalkList() {
         let junctionLaneList = this.getLaneList();
         let crosswalkList = {};
 
         junctionLaneList.forEach(jLane => {
-            const incomingLane = jLane.getIncomingLaneList();
-            const outgoingLane = jLane.getOutgoingLaneList();
-
-            incomingLane.forEach(inLane => {
-                inLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
-            });
-
-            outgoingLane.forEach(outLane => {
-                outLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
-            });
+            jLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
         });
+
+        console.log(`====== crosswalk list: ${Object.values(crosswalkList).length}`);
+        // junctionLaneList.forEach(jLane => {
+        //     const incomingLane = jLane.getIncomingLaneList();
+        //     const outgoingLane = jLane.getOutgoingLaneList();
+        //
+        //     incomingLane.forEach(inLane => {
+        //         inLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
+        //     });
+        //
+        //     outgoingLane.forEach(outLane => {
+        //         outLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
+        //     });
+        // });
 
         return Object.values(crosswalkList);
     }

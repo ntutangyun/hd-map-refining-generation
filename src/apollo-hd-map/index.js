@@ -22,6 +22,6 @@ const junctionGroups = initJunctionGroups(graph);
 
 console.log(junctionGroups);
 
-const selectedJunction = junctionGroups.map(junctionGroup => junctionGroup.selectJunction());
+const selectedJunction = junctionGroups.map(junctionGroup => junctionGroup.selectJunction(false));
 
 console.log(selectedJunction);

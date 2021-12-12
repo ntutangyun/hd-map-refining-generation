@@ -7,6 +7,7 @@ class Crosswalk {
     }
 
     init(crossWalkData) {
+        console.log(crossWalkData)
         this.id = crossWalkData.id.id;
         this.pointList = crossWalkData.polygon.pointList;
         crossWalkData.overlapIdList.forEach(o => {

@@ -59,7 +59,7 @@ class Graph {
             mapData.signalList.forEach(s => this.addSignal(new Signal(this).init(s)));
 
             // add crosswalk
-            // mapData.crosswalkList.forEach(c => this.addCrosswalk(new Crosswalk(this).init(c)));
+            mapData.crosswalkList.forEach(c => this.addCrosswalk(new Crosswalk(this).init(c)));
 
             // add stop signs
             mapData.stopSignList.forEach(s => this.addStopSign(new StopSign(this).init(s)));
