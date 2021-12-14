@@ -87,6 +87,8 @@ class JunctionGroup {
         this.junctionList[firstJunction.id] = firstJunction;
         this.topoVector = firstJunction.topoVector;
         this.featureVector = firstJunction.featureVector;
+
+        firstJunction.junctionGroup = this;
     }
 
     addJunction(junction) {
@@ -104,6 +106,7 @@ class JunctionGroup {
 
         // add junction
         this.junctionList[junction.id] = junction;
+        junction.junctionGroup = this;
         return true;
     }
 

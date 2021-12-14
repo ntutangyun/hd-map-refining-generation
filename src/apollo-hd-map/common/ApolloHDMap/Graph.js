@@ -228,6 +228,8 @@ class Graph {
             }
         }
 
+        this.getCrosswalkList().forEach(cw => cw.fixLaneOverlaps());
+
         // console.log(this);
         return this;
     }

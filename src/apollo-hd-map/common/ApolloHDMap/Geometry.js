@@ -221,6 +221,17 @@ function findLaneIntersect(lane1, lane2) {
     return null;
 }
 
+function getPolygonPointsSegmentList(points) {
+    const segList = [];
+    for (let i = 0; i < points.length - 1; i++) {
+        segList.push({
+            start: points[i],
+            end: points[i + 1]
+        });
+    }
+    return segList;
+}
+
 
 module.exports = {
     norm,
@@ -230,6 +241,7 @@ module.exports = {
     minDistToLineSegment,
     pointSegmentProjection,
     checkLineSegmentIntersect,
+    getPolygonPointsSegmentList,
     findLineSegmentIntersect,
     findLaneIntersect
 };

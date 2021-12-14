@@ -166,18 +166,6 @@ class Junction {
         });
 
         console.log(`====== crosswalk list: ${Object.values(crosswalkList).length}`);
-        // junctionLaneList.forEach(jLane => {
-        //     const incomingLane = jLane.getIncomingLaneList();
-        //     const outgoingLane = jLane.getOutgoingLaneList();
-        //
-        //     incomingLane.forEach(inLane => {
-        //         inLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
-        //     });
-        //
-        //     outgoingLane.forEach(outLane => {
-        //         outLane.getCrosswalkList().forEach(cw => crosswalkList[cw.id] = cw);
-        //     });
-        // });
 
         return Object.values(crosswalkList);
     }

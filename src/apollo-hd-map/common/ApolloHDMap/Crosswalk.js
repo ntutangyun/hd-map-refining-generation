@@ -1,3 +1,5 @@
+const {getPolygonPointsSegmentList, checkLineSegmentIntersect} = require("./Geometry");
+
 class Crosswalk {
     constructor(graph) {
         this.id = null;
@@ -38,6 +40,28 @@ class Crosswalk {
             return str.replace(`overlap_${this.id}_`, "");
         }
         return null;
+    }
+
+    fixLaneOverlaps() {
+        this.graph.getLaneList().forEach(lane => {
+            const laneSegList = lane.getLaneSegmentList();
+            const cwSegList = getPolygonPointsSegmentList(this.pointList);
+
+            let intersect = false;
+            for (let i = 0; i < laneSegList.length; i++) {
+                for (let j = 0; j < cwSegList.length; j++) {
+                    if (checkLineSegmentIntersect(laneSegList[i], cwSegList[j])) {
+                        intersect = true;
+                        break;
+                    }
+                }
+            }
+
+            if (intersect && !this.laneList.hasOwnProperty(lane.id)) {
+                this.laneList[lane.id] = lane;
+                lane.addCrosswalk(this);
+            }
+        });
     }
 }
 
