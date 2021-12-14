@@ -1,12 +1,12 @@
-require("./common/setup");
+require("../common/setup");
 
 const fs = require("fs");
-const Maps = require("./protobuf_out/modules/map/proto/map_pb");
-const Graphs = require("./protobuf_out/modules/routing/proto/topo_graph_pb");
+const Maps = require("../protobuf_out/modules/map/proto/map_pb");
+const Graphs = require("../protobuf_out/modules/routing/proto/topo_graph_pb");
 
-const Graph = require("./common/ApolloHDMap/Graph");
-const {initJunctionGroups} = require("./common/ApolloHDMap/JunctionGroup");
-const {pointDist} = require("./common/ApolloHDMap/Geometry");
+const Graph = require("../common/ApolloHDMap/Graph");
+const {initJunctionGroups} = require("../common/ApolloHDMap/JunctionGroup");
+const {pointDist} = require("../common/ApolloHDMap/Geometry");
 
 const baseMapBin = process.argv[2];
 const routingMapBin = process.argv[3];
