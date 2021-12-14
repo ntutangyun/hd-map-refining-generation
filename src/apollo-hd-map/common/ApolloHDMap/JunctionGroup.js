@@ -48,7 +48,7 @@ function initJunctionGroups(graph) {
     }
 
     // select valid junctions without lane errors.
-    const junctionList = graph.getJunctionList().filter(j => j.valid).filter(j => j.getSignalList().length > 0);
+    const junctionList = graph.getJunctionList().filter(j => j.valid);
     if (junctionList.length === 0) {
         return;
     }
