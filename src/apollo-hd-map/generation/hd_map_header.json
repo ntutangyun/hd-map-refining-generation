@@ -1,0 +1,16 @@
+{
+  "version": "MS41MDAwMDA=",
+  "date": "MjAxOC0wMy0yM1QxMzoyNzo1NA==",
+  "projection": {
+    "proj": "+proj=utm +zone=10 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+  },
+  "district": "MA==",
+  "generation": "",
+  "revMajor": "MQ==",
+  "revMinor": "MA==",
+  "left": -122.39949797829956,
+  "top": 37.7882039998496,
+  "right": -122.39949797829956,
+  "bottom": 37.7882039998496,
+  "vendor": "TEdTVkw="
+}
