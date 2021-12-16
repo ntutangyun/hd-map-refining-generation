@@ -1,10 +1,4 @@
-class MapPoint {
-    constructor(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-}
+const {Point} = require("./geometryUtils");
 
 /*
     JUNCTION GRID
@@ -46,7 +40,7 @@ class MapGrid {
         this.grid_points = [];
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
-                this.grid_points.push(new MapPoint(this.base_offset.x + j * this.width_gap, this.base_offset.y + i * this.height_gap, 0));
+                this.grid_points.push(new Point(this.base_offset.x + j * this.width_gap, this.base_offset.y + i * this.height_gap, 0));
             }
         }
     }
@@ -54,5 +48,4 @@ class MapGrid {
 
 module.exports = {
     MapGrid,
-    MapPoint
 };

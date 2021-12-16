@@ -47,12 +47,22 @@ function bound(val, min, max) {
     return val;
 }
 
+function square(v) {
+    return Math.pow(v, 2);
+}
+
+function cube(v) {
+    return Math.pow(v, 3);
+}
+
 module.exports = {
     bound,
     getRandomIntInclusive,
     getRandomInRange,
     gaussianSample,
     gaussianRandom,
-    normalSample
+    normalSample,
+    square,
+    cube
 };
 
