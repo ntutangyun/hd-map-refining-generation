@@ -6,6 +6,13 @@ class Point {
         this.y = y;
         this.z = z;
     }
+
+    moveTowards(heading, distance) {
+        const deltaX = distance * Math.cos(heading);
+        const deltaY = distance * Math.sin(heading);
+
+        return new Point(this.x + deltaX, this.y + deltaY, this.z);
+    }
 }
 
 class BezierCurve {
@@ -37,8 +44,39 @@ class BezierCurve {
         }
     }
 
+    static buildBezierCurve({
+                                startPoint,
+                                startHeading,
+                                endPoint,
+                                endHeading,
+                            }) {
+        const startLine = new StraightLine(startPoint, null, startHeading);
+        const endLine = new StraightLine(endPoint, null, endHeading);
+        const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
+
+        if (intersectPoint === null) {
+            // road to create is a straight line with only two control points
+            return new BezierCurve([startPoint, endPoint]);
+        } else {
+            // road to create is a curve controlled by three control points
+            return new BezierCurve([startPoint, intersectPoint, endPoint]);
+        }
+    }
+
     get name() {
         return this.constructor.name;
+    }
+
+    pointAt(t) {
+        return new Point(this.x(t), this.y(t), 0);
+    }
+
+    sample(count) {
+        const points = [];
+        for (let i = 0; i < count; i++) {
+            points.push(new Point(this.x(i / (count - 1)), this.y(i / (count - 1))));
+        }
+        return points;
     }
 }
 
