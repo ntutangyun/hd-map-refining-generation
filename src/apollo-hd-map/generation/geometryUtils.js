@@ -34,7 +34,7 @@ class BezierCurve {
             this.y = (t) => square(1 - t) * p1.y + 2 * (1 - t) * t * p2.y + square(t) * p3.y;
         } else if (controlPoints.length === 4) {
             const [p1, p2, p3, p4] = this.controlPoints;
-            // P = (1−t)^3 P1 + 3(1−t)^2 t P2 +3(1−t)t^2 P3 + t^3                           P4
+            // P = (1−t)^3 P1 + 3(1−t)^2 t P2 +3(1−t)t^2 P3 + t^3 P4
             this.x = (t) => cube(1 - t) * p1.x + 3 * square(1 - t) * t * p2.x + 3 * (1 - t) * square(t) * p3.x + cube(t) * p4.x;
             this.y = (t) => cube(1 - t) * p1.y + 3 * square(1 - t) * t * p2.y + 3 * (1 - t) * square(t) * p3.y + cube(t) * p4.y;
         } else {
