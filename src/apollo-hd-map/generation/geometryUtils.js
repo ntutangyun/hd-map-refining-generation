@@ -1,4 +1,7 @@
 const {square, cube} = require("../common/mathUtils");
+const MapGeoProto = require("../protobuf_out/modules/map/proto/map_geometry_pb");
+const CommonGeoProto = require("../protobuf_out/modules/common/proto/geometry_pb");
+const {pointDist} = require("../common/ApolloHDMap/Geometry");
 
 class Point {
     constructor(x, y, z) {
@@ -16,8 +19,9 @@ class Point {
 }
 
 class BezierCurve {
-    constructor(controlPoints) {
+    constructor(controlPoints, startHeading) {
         this.controlPoints = controlPoints;
+        this.startHeading = startHeading;
 
         this.x = null;
         this.y = null;
@@ -56,10 +60,10 @@ class BezierCurve {
 
         if (intersectPoint === null) {
             // road to create is a straight line with only two control points
-            return new BezierCurve([startPoint, endPoint]);
+            return new BezierCurve([startPoint, endPoint], startHeading);
         } else {
             // road to create is a curve controlled by three control points
-            return new BezierCurve([startPoint, intersectPoint, endPoint]);
+            return new BezierCurve([startPoint, intersectPoint, endPoint], startHeading);
         }
     }
 
@@ -77,6 +81,39 @@ class BezierCurve {
             points.push(new Point(this.x(i / (count - 1)), this.y(i / (count - 1))));
         }
         return points;
+    }
+
+    // using the Curve class defined in map_geometry.proto
+    serializeToProtobuf() {
+        const curve = new MapGeoProto.Curve();
+        const segment = curve.addSegment();
+        segment.setS(0);
+
+        const start_position = new CommonGeoProto.PointENU()
+            .setX(this.controlPoints.first().x)
+            .setY(this.controlPoints.first().y)
+            .setZ(this.controlPoints.first().z);
+        segment.setStartPosition(start_position);
+        segment.setHeading(this.startHeading);
+        segment.setLength(this.approximateLength());
+
+        const line_segment = new MapGeoProto.LineSegment();
+        segment.setLineSegment(line_segment);
+
+        this.sample(10).forEach(p => {
+            line_segment.addPoint().setX(p.x).setY(p.y).setZ(p.z);
+        });
+
+        return curve;
+    }
+
+    approximateLength() {
+        const points = this.sample(100);
+        let length = 0;
+        for (let i = 0; i < points.length - 1; i++) {
+            length += pointDist(points[i], points[i + 1]);
+        }
+        return length;
     }
 }
 

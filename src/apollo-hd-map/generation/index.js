@@ -26,5 +26,9 @@ const map = mapGenerator.generate();
 
 console.log(map);
 
+const fs = require("fs");
+
+fs.writeFileSync("./index.bin", map.serializeBinary());
+
 
 

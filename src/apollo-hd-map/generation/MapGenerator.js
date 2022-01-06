@@ -1,4 +1,4 @@
-const MapProto = require("../../../protobuf_out/modules/map/proto/map_pb");
+const MapProto = require("../protobuf_out/modules/map/proto/map_pb");
 const RoadGenerator = require("./RoadGenerator");
 const {Point} = require("./geometryUtils");
 
@@ -36,6 +36,11 @@ class MapGenerator {
                 endHeading
             }
         );
+
+        road.getLaneList().forEach(lane => {
+            console.log(lane);
+            this.map.addLane(lane.serializeToProtobuf());
+        });
 
         this.map.addRoad(road.serializeToProtobuf());
     }
