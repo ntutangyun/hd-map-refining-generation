@@ -25,6 +25,10 @@ class Lane {
                     rightBoundaryType = LaneProto.LaneBoundaryType.Type.UNKNOWN,
                     type = LaneProto.Lane.LaneType.CITY_DRIVING,
                     turn = LaneProto.Lane.LaneTurn.NO_TURN,
+                    startPoint,
+                    startHeading,
+                    endPoint,
+                    endHeading
                 }) {
         this.id = id;
         this.laneWidth = laneWidth;
@@ -37,9 +41,14 @@ class Lane {
         this.speedLimit = speedLimit;
         this.type = type;
         this.turn = turn;
+        this.startPoint = startPoint;
+        this.startHeading = startHeading;
+        this.endPoint = endPoint;
+        this.endHeading = endHeading;
     }
 
-    serializeToProtobuf() {
+
+    serializeToProtobuf(curveSampleCount) {
         const lane = new LaneProto.Lane();
         lane.setId((new MapIDProto.Id().setId(this.id)));
         lane.setSpeedLimit(this.speedLimit);
@@ -47,12 +56,12 @@ class Lane {
         lane.setTurn(this.turn);
         lane.setDirection(this.isForward ? LaneProto.Lane.LaneDirection.FORWARD : LaneProto.Lane.LaneDirection.BACKWARD);
 
-        lane.setCentralCurve(this.centralCurve.serializeToProtobuf());
+        lane.setCentralCurve(this.centralCurve.serializeToProtobuf(curveSampleCount));
 
         const leftLaneBoundaryType = new LaneProto.LaneBoundaryType().setS(0);
         leftLaneBoundaryType.addTypes(this.leftBoundaryType);
         const leftBoundary = new LaneProto.LaneBoundary()
-            .setCurve(this.leftBoundaryCurve.serializeToProtobuf())
+            .setCurve(this.leftBoundaryCurve.serializeToProtobuf(curveSampleCount))
             .setLength(this.leftBoundaryCurve.approximateLength());
         leftBoundary.addBoundaryType(leftLaneBoundaryType);
         lane.setLeftBoundary(leftBoundary);
@@ -60,7 +69,7 @@ class Lane {
         const rightLaneBoundaryType = new LaneProto.LaneBoundaryType().setS(0);
         rightLaneBoundaryType.addTypes(this.rightBoundaryType);
         const rightBoundary = new LaneProto.LaneBoundary()
-            .setCurve(this.rightBoundaryCurve.serializeToProtobuf())
+            .setCurve(this.rightBoundaryCurve.serializeToProtobuf(curveSampleCount))
             .setLength(this.rightBoundaryCurve.approximateLength());
         rightBoundary.addBoundaryType(rightLaneBoundaryType);
         lane.setRightBoundary(rightBoundary);
@@ -76,8 +85,7 @@ class LaneGenerator {
                             endPoint,
                             endHeading,
                             id,
-                            laneWidth,
-                            curveSampleCount = 11,
+                            laneWidth = 3.5,
                             isForward = undefined,
                             speedLimit = 10,
                         }) {
@@ -113,7 +121,11 @@ class LaneGenerator {
             speedLimit,
             centralCurve,
             leftBoundaryCurve,
-            rightBoundaryCurve
+            rightBoundaryCurve,
+            startPoint,
+            startHeading,
+            endPoint,
+            endHeading
         });
     }
 }

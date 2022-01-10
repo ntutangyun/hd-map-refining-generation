@@ -14,19 +14,29 @@ const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
 //      one right boundary (i.e. right most boundary of all reverse lanes)
 
 class Road {
-    constructor({id, centralCurve, forwardLaneList, backwardLaneList, type = RoadProto.Road.Type.CITY_ROAD}) {
+    constructor({
+                    id,
+                    centralCurve,
+                    forwardLaneList,
+                    backwardLaneList,
+                    type = RoadProto.Road.Type.CITY_ROAD,
+                    startPoint,
+                    endPoint
+                }) {
         this.id = id;
         this.type = type;
         this.centralCurve = centralCurve;
         this.forwardLaneList = forwardLaneList;
         this.backwardLaneList = backwardLaneList;
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
     }
 
     getLaneList() {
         return [...this.forwardLaneList, ...this.backwardLaneList];
     }
 
-    serializeToProtobuf() {
+    serializeToProtobuf(curveSampleCount) {
         const roadProto = new RoadProto.Road();
         roadProto.setType(this.type);
         roadProto.setId((new MapIDProto.Id()).setId(this.id));
@@ -51,18 +61,18 @@ class Road {
 
         outer_polygon.addEdge()
             .setType(RoadProto.BoundaryEdge.Type.RIGHT_BOUNDARY)
-            .setCurve(this.forwardLaneList.last().rightBoundaryCurve.serializeToProtobuf());
+            .setCurve(this.forwardLaneList.last().rightBoundaryCurve.serializeToProtobuf(curveSampleCount));
         outer_polygon.addEdge()
             .setType(RoadProto.BoundaryEdge.Type.LEFT_BOUNDARY)
-            .setCurve(this.forwardLaneList.first().leftBoundaryCurve.serializeToProtobuf());
+            .setCurve(this.forwardLaneList.first().leftBoundaryCurve.serializeToProtobuf(curveSampleCount));
 
         if (this.backwardLaneList.length > 0) {
             outer_polygon.addEdge()
                 .setType(RoadProto.BoundaryEdge.Type.LEFT_BOUNDARY)
-                .setCurve(this.backwardLaneList.first().leftBoundaryCurve.serializeToProtobuf());
+                .setCurve(this.backwardLaneList.first().leftBoundaryCurve.serializeToProtobuf(curveSampleCount));
             outer_polygon.addEdge()
                 .setType(RoadProto.BoundaryEdge.Type.RIGHT_BOUNDARY)
-                .setCurve(this.backwardLaneList.last().rightBoundaryCurve.serializeToProtobuf());
+                .setCurve(this.backwardLaneList.last().rightBoundaryCurve.serializeToProtobuf(curveSampleCount));
         }
 
         return roadProto;
@@ -71,13 +81,12 @@ class Road {
 
 
 class RoadGenerator {
-    static generate({
+    static generateRoad({
                         roadId,
                         startPoint,
                         startHeading,
                         endPoint,
                         endHeading,
-                        curveSampleCount = 11,
                         laneWidth = 3.5,
                         forwardLaneCount = 2,
                         backwardLaneCount = 2,
@@ -107,7 +116,6 @@ class RoadGenerator {
                     endHeading,
                     id: `lane_${lane_count++}_${roadId}`,
                     laneWidth,
-                    curveSampleCount,
                     speedLimit: forwardSpeedLimit,
                     isForward: true
                 });
@@ -127,7 +135,6 @@ class RoadGenerator {
                     endHeading: startHeading + Math.PI,
                     id: `lane_${lane_count++}_${roadId}`,
                     laneWidth,
-                    curveSampleCount,
                     speedLimit: backwardSpeedLimit,
                     isForward: false
                 });
@@ -136,7 +143,14 @@ class RoadGenerator {
             }
         }
 
-        return new Road({id: roadId, centralCurve: roadCentralCurve, forwardLaneList, backwardLaneList});
+        return new Road({
+            id: roadId,
+            centralCurve: roadCentralCurve,
+            forwardLaneList,
+            backwardLaneList,
+            startPoint,
+            endPoint
+        });
     }
 }
 

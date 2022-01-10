@@ -4,6 +4,10 @@ const CommonGeoProto = require("../protobuf_out/modules/common/proto/geometry_pb
 const {pointDist} = require("../common/ApolloHDMap/Geometry");
 
 class Point {
+    static fromXYZObj({x, y, z}) {
+        return new Point(x, y, z);
+    }
+
     constructor(x, y, z) {
         this.x = x;
         this.y = y;
@@ -16,12 +20,17 @@ class Point {
 
         return new Point(this.x + deltaX, this.y + deltaY, this.z);
     }
+
+    equalTo(point) {
+        return this.x === point.x && this.y === point.y && this.z === point.z;
+    }
 }
 
 class BezierCurve {
-    constructor(controlPoints, startHeading) {
+    constructor(controlPoints, startHeading, endHeading) {
         this.controlPoints = controlPoints;
         this.startHeading = startHeading;
+        this.endHeading = endHeading;
 
         this.x = null;
         this.y = null;
@@ -48,23 +57,37 @@ class BezierCurve {
         }
     }
 
+    // by default create a cubic Bézier curve with following control points
+    //      * start point
+    //      * start point move to start heading of length (start_point - end_point) / 4
+    //      * end point move to the opposite of end heading of length (start_point - end_point) / 4
     static buildBezierCurve({
                                 startPoint,
                                 startHeading,
                                 endPoint,
                                 endHeading,
                             }) {
-        const startLine = new StraightLine(startPoint, null, startHeading);
-        const endLine = new StraightLine(endPoint, null, endHeading);
-        const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
+        console.assert(startPoint && endPoint, "start point and end point cannot be undefined or null");
+        console.assert(!isNaN(startHeading) && !isNaN(endHeading), "start heading and end heading should be defined");
+        console.assert(!startPoint.equalTo(endPoint), "Start point shall not equal to the end point");
 
-        if (intersectPoint === null) {
-            // road to create is a straight line with only two control points
-            return new BezierCurve([startPoint, endPoint], startHeading);
-        } else {
-            // road to create is a curve controlled by three control points
-            return new BezierCurve([startPoint, intersectPoint, endPoint], startHeading);
-        }
+        const segmentDist = pointDist(startPoint, endPoint);
+        const startOffsetCtrlPoint = startPoint.moveTowards(startHeading, segmentDist / 2);
+        const endOffsetCtrlPoint = endPoint.moveTowards(endHeading + Math.PI, segmentDist / 2);
+        return new BezierCurve([startPoint, startOffsetCtrlPoint, endOffsetCtrlPoint, endPoint], startHeading, endHeading);
+        //
+        // const startLine = new StraightLine(startPoint, null, startHeading);
+        // const endLine = new StraightLine(endPoint, null, endHeading);
+        //
+        // const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
+
+        // if (intersectPoint === null) {
+        //     road to create is a straight line with only two control points
+        // return new BezierCurve([startPoint, endPoint], startHeading);
+        // } else {
+        //     road to create is a curve controlled by three control points
+        // return new BezierCurve([startPoint, intersectPoint, endPoint], startHeading);
+        // }
     }
 
     get name() {
@@ -84,7 +107,7 @@ class BezierCurve {
     }
 
     // using the Curve class defined in map_geometry.proto
-    serializeToProtobuf() {
+    serializeToProtobuf(curveSampleCount = 10) {
         const curve = new MapGeoProto.Curve();
         const segment = curve.addSegment();
         segment.setS(0);
@@ -100,7 +123,7 @@ class BezierCurve {
         const line_segment = new MapGeoProto.LineSegment();
         segment.setLineSegment(line_segment);
 
-        this.sample(10).forEach(p => {
+        this.sample(curveSampleCount).forEach(p => {
             line_segment.addPoint().setX(p.x).setY(p.y).setZ(p.z);
         });
 
@@ -118,8 +141,9 @@ class BezierCurve {
 }
 
 /*
-    p: {x, y}
-    heading: east to north in degrees
+    p1: {x, y},
+    p2: {x, y},
+    headingRadian: east to north in radian
  */
 class StraightLine {
     constructor(p1, p2 = null, headingRadian = null) {
@@ -134,10 +158,16 @@ class StraightLine {
             this.b = p1.x - p2.x;
             this.c = (p1.y - p2.y) * p1.x + (p1.x - p2.x) * p1.y;
         } else if (headingRadian !== null) {
-            const slope = Math.tan(headingRadian);
-            this.a = slope;
-            this.b = -1;
-            this.c = p1.y - slope * p1.x;
+            if (headingRadian === Math.PI / 2) {
+                this.a = 1;
+                this.b = 0;
+                this.c = -1 * p1.x;
+            } else {
+                const slope = Math.tan(headingRadian);
+                this.a = slope;
+                this.b = -1;
+                this.c = p1.y - slope * p1.x;
+            }
         } else {
             console.log(p2, headingRadian);
             global.logE(this.name, "p2 and headingRadian are not defined. cannot create straight line");
@@ -160,6 +190,17 @@ class StraightLine {
         }
 
         return new Point((b1 * c2 - b2 * c1) / denorm, (c1 * a2 - c2 * a1) / denorm, 0);
+    }
+
+    static isOverlap(line1, line2) {
+        console.assert(!(line1.a === 0 && line1.b === 0), "line1.a and line.b cannot be both zero");
+        if (line1.a !== 0) {
+            const factor = line2.a / line1.a; // a2 / a1
+            return (line1.b * factor === line2.b) && (line1.c * factor === line2.c);
+        } else if (line1.b !== 0) {
+            const factor = line2.b / line1.b;
+            return (line1.a * factor === line2.a) && (line1.c * factor === line2.c);
+        }
     }
 }
 
