@@ -59,12 +59,14 @@ class Road {
         const outer_polygon = new RoadProto.BoundaryPolygon();
         boundary.setOuterPolygon(outer_polygon);
 
-        outer_polygon.addEdge()
-            .setType(RoadProto.BoundaryEdge.Type.RIGHT_BOUNDARY)
-            .setCurve(this.forwardLaneList.last().rightBoundaryCurve.serializeToProtobuf(curveSampleCount));
-        outer_polygon.addEdge()
-            .setType(RoadProto.BoundaryEdge.Type.LEFT_BOUNDARY)
-            .setCurve(this.forwardLaneList.first().leftBoundaryCurve.serializeToProtobuf(curveSampleCount));
+        if (this.forwardLaneList.length > 0) {
+            outer_polygon.addEdge()
+                .setType(RoadProto.BoundaryEdge.Type.RIGHT_BOUNDARY)
+                .setCurve(this.forwardLaneList.last().rightBoundaryCurve.serializeToProtobuf(curveSampleCount));
+            outer_polygon.addEdge()
+                .setType(RoadProto.BoundaryEdge.Type.LEFT_BOUNDARY)
+                .setCurve(this.forwardLaneList.first().leftBoundaryCurve.serializeToProtobuf(curveSampleCount));
+        }
 
         if (this.backwardLaneList.length > 0) {
             outer_polygon.addEdge()
@@ -82,17 +84,17 @@ class Road {
 
 class RoadGenerator {
     static generateRoad({
-                        roadId,
-                        startPoint,
-                        startHeading,
-                        endPoint,
-                        endHeading,
-                        laneWidth = 3.5,
-                        forwardLaneCount = 2,
-                        backwardLaneCount = 2,
-                        forwardSpeedLimit = 10,
-                        backwardSpeedLimit = 10,
-                    }) {
+                            roadId,
+                            startPoint,
+                            startHeading,
+                            endPoint,
+                            endHeading,
+                            laneWidth = 3.5,
+                            forwardLaneCount = 2,
+                            backwardLaneCount = 2,
+                            forwardSpeedLimit = 10,
+                            backwardSpeedLimit = 10,
+                        }) {
         // generating road central curve
         const roadCentralCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
         // const roadCentralCurvePoints = roadCentralCurve.sample(centralCurveSamples);

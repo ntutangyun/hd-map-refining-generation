@@ -2,6 +2,9 @@ const {Point} = require("./geometryUtils");
 const RoadGenerator = require("./RoadGenerator");
 const {pointDist, vector, angleBetween} = require("../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");
+const JunctionProto = require("../protobuf_out/modules/map/proto/map_junction_pb");
+const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
+const MapGeoProto = require("../protobuf_out/modules/map/proto/map_geometry_pb");
 
 class Junction {
     constructor({junctionId, center_point}) {
@@ -13,8 +16,16 @@ class Junction {
         this.polygonPointList = [];
     }
 
+    getLaneList() {
+        return [...this.laneList];
+    }
+
     connectRoad(road) {
         this.connectedRoadList.push(road);
+    }
+
+    getConnectedRoadList() {
+        return [...this.connectedRoadList];
     }
 
     generateJunctionLanes() {
@@ -36,20 +47,20 @@ class Junction {
 
                 // from roadI to roadJ
                 if (roadIOutgoing) {
-                    incomingLaneList = [...roadI.backwardLaneList.reverse()];
+                    incomingLaneList = [...roadI.backwardLaneList].reverse();
 
                     if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList.reverse()];
+                        outgoingLaneList = [...roadJ.forwardLaneList].reverse();
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList.reverse()];
+                        outgoingLaneList = [...roadJ.backwardLaneList].reverse();
                     }
                 } else {
-                    incomingLaneList = [...roadI.forwardLaneList.reverse()];
+                    incomingLaneList = [...roadI.forwardLaneList].reverse();
 
                     if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList.reverse()];
+                        outgoingLaneList = [...roadJ.forwardLaneList].reverse();
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList.reverse()];
+                        outgoingLaneList = [...roadJ.backwardLaneList].reverse();
                     }
                 }
 
@@ -136,7 +147,20 @@ class Junction {
     }
 
     serializeToProtobuf() {
-        return null;
+        const junctionProto = new JunctionProto.Junction();
+        junctionProto.setId((new MapIDProto.Id()).setId(this.id));
+
+        const junctionPolygon = new MapGeoProto.Polygon();
+        this.polygonPointList.forEach(point => {
+            junctionPolygon.addPoint().setX(point.x).setY(point.y).setZ(point.z);
+        });
+        junctionProto.setPolygon(junctionPolygon);
+
+        this.laneList.forEach(jLane => {
+            junctionProto.addOverlapId().setId(jLane.id);
+        });
+
+        return junctionProto;
     }
 }
 
@@ -158,7 +182,7 @@ class JunctionGenerator {
             const startPoint = junction.centerPoint.moveTowards(junction_center_angle, junction_center_distance);
             const startHeading = junction_center_angle + self_rotation;
 
-            const endPoint = startPoint.moveTowards(startHeading, 50);
+            const endPoint = startPoint.moveTowards(startHeading, 20);
             const endHeading = startHeading;
 
             const road = RoadGenerator.generateRoad({
