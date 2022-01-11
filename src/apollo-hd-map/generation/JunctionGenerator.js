@@ -1,4 +1,4 @@
-const {Point} = require("./geometryUtils");
+const {Point} = require("../common/ApolloHDMap/Geometry");
 const RoadGenerator = require("./RoadGenerator");
 const {pointDist, vector, angleBetween} = require("../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");

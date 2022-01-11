@@ -1,4 +1,4 @@
-const {Point} = require("./geometryUtils");
+const {Point} = require("../common/ApolloHDMap/Geometry");
 
 /*
     JUNCTION GRID

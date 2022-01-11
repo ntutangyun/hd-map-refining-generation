@@ -1,4 +1,4 @@
-const {BezierCurve} = require("./geometryUtils");
+const {BezierCurve} = require("../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");
 const RoadProto = require("../protobuf_out/modules/map/proto/map_road_pb");
 const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
