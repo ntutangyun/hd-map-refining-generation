@@ -1,20 +1,10 @@
-require("../common/setup");
+const graphData = require("../common/ApolloHDMap/jsons/routing_maps/san_francisco_roadonly.json");
+const mapData = require("../common/ApolloHDMap/jsons/base_maps/san_francisco_roadonly.json");
 
-const MapGenerator = require("./MapGenerator");
+const Graph = require("../common/ApolloHDMap/Graph");
 
-const config = {
-    hd_map_header_path: "../common/hd_map_header.json",
-    junction_samples: require("./obsolete/junction_samples"),
-    curveSampleCount: 100
-};
+const graph = new Graph("san_francisco_roadonly");
 
-const mapGenerator = new MapGenerator(config);
+graph.init(graphData, mapData);
 
-const map = mapGenerator.generate();
-
-const fs = require("fs");
-
-fs.writeFileSync("./index.bin", map.serializeBinary());
-
-
-
+console.log(graph);

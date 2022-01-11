@@ -1,6 +1,6 @@
 const mapBinaryPath = "../data/apollo/san_francisco_base_map.bin";
 
-const MapProto = require("../protobuf_out/modules/map/proto/map_pb");
+const MapProto = require("../src/apollo-hd-map/protobuf_out/modules/map/proto/map_pb");
 
 const fs = require("fs");
 
