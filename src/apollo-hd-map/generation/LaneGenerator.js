@@ -1,7 +1,6 @@
 const {BezierCurve} = require("./geometryUtils");
 const LaneProto = require("../protobuf_out/modules/map/proto/map_lane_pb");
 const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
-const {pointDist} = require("../common/ApolloHDMap/Geometry");
 
 
 // lane boundary ====

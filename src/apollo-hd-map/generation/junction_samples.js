@@ -121,4 +121,80 @@ module.exports = [
             },
         ]
     },
+    {
+        junctionId: "J_85",
+        center_point: {
+            x: 225,
+            y: 0,
+            z: 0
+        },
+        road_links: [
+            {
+                roadId: "R_11",
+                junction_center_angle: degreeToRad(0),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(0),   // anti-clockwise in radian
+                outgoing_lane_count: 2,
+                incoming_lane_count: 2
+            },
+            {
+                roadId: "R_12",
+                junction_center_angle: degreeToRad(90),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(0),   // clockwise in radian
+                outgoing_lane_count: 2,
+                incoming_lane_count: 2
+            },
+            {
+                roadId: "R_13",
+                junction_center_angle: degreeToRad(180),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(0),   // clockwise in radian
+                outgoing_lane_count: 2,
+                incoming_lane_count: 2
+            },
+            {
+                roadId: "R_14",
+                junction_center_angle: degreeToRad(-90),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(0),   // clockwise in radian
+                outgoing_lane_count: 2,
+                incoming_lane_count: 2
+            },
+        ]
+    },
+    {
+        junctionId: "J_76",
+        center_point: {
+            x: 0,
+            y: -75,
+            z: 0
+        },
+        road_links: [
+            {
+                roadId: "R_15",
+                junction_center_angle: degreeToRad(30),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(-30),   // anti-clockwise in radian
+                outgoing_lane_count: 4,
+                incoming_lane_count: 0
+            },
+            {
+                roadId: "R_16",
+                junction_center_angle: degreeToRad(150),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(30),   // clockwise in radian
+                outgoing_lane_count: 0,
+                incoming_lane_count: 4
+            },
+            {
+                roadId: "R_17",
+                junction_center_angle: degreeToRad(-90),
+                junction_center_distance: 15,
+                self_rotation: degreeToRad(0),   // clockwise in radian
+                outgoing_lane_count: 2,
+                incoming_lane_count: 2
+            },
+        ]
+    },
 ];
