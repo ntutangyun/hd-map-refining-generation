@@ -3,8 +3,8 @@ require("../common/setup");
 const MapGenerator = require("./MapGenerator");
 
 const config = {
-    hd_map_header_path: "./hd_map_header.json",
-    junction_samples: require("./junction_samples"),
+    hd_map_header_path: "../common/hd_map_header.json",
+    junction_samples: require("./obsolete/junction_samples"),
     curveSampleCount: 100
 };
 

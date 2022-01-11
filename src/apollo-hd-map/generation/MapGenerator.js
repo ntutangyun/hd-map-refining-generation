@@ -36,30 +36,6 @@ class MapGenerator {
             this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
         });
     }
-
-    // generateRoads() {
-    //     const roadSamples = this.config.road_samples;
-    //
-    //     roadSamples.forEach((roadSample, roadI) => {
-    //
-    //         const startPoint = new Point(roadSample.startPoint.x, roadSample.startPoint.y, roadSample.startPoint.z);
-    //         const startHeading = roadSample.startHeading; // east to north in degrees
-    //
-    //         const endPoint = new Point(roadSample.endPoint.x, roadSample.endPoint.y, roadSample.endPoint.z);
-    //         const endHeading = roadSample.endHeading; // east to north in degrees
-    //
-    //         const road = RoadGenerator.generateRoad({
-    //             roadId: `road_${roadI}`, startPoint, startHeading, endPoint, endHeading
-    //         });
-    //
-    //         road.getLaneList().forEach(lane => {
-    //             console.log(lane);
-    //             this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-    //         });
-    //
-    //         this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
-    //     });
-    // }
 }
 
 module.exports = MapGenerator;

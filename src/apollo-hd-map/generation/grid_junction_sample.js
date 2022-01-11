@@ -13,7 +13,7 @@ const config = {
     grid_width_gap: 100,
     grid_height_gap: 100,
 
-    hd_map_header: require("./hd_map_header.json")
+    hd_map_header: require("../common/hd_map_header.json")
 };
 
 const mapGrid = new MapGrid(config);
