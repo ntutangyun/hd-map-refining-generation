@@ -77,10 +77,10 @@ class Junction {
 
                 let intersect = false;
                 const l1SegList = lane1.getLaneSegmentList();
-                const l2Segment = lane2.getLaneSegmentList();
+                const l2SegList = lane2.getLaneSegmentList();
                 for (let i = 0; i < l1SegList.length; i++) {
-                    for (let j = 0; j < l2Segment.length; j++) {
-                        if (checkLineSegmentIntersect(l1SegList[i], l2Segment[j])) {
+                    for (let j = 0; j < l2SegList.length; j++) {
+                        if (checkLineSegmentIntersect(l1SegList[i], l2SegList[j])) {
                             intersect = true;
                             break;
                         }

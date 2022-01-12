@@ -8,7 +8,7 @@
  */
 const {pointDist} = require("../../common/ApolloHDMap/Geometry");
 
-class Road {
+class OneWayRoad {
     constructor(graph) {
         this.id = "road";
         this.graph = graph;
@@ -130,4 +130,4 @@ class Road {
     }
 }
 
-module.exports = Road;
+module.exports = OneWayRoad;

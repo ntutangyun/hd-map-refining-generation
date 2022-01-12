@@ -1,6 +1,7 @@
 const Lane = require("./Lane");
 const {Edge, EDGE_DIRECTION_FORWARD} = require("./Edge");
-const Road = require("./Road");
+const OneWayRoad = require("./OneWayRoad");
+const TwoWayRoad = require("./TwoWayRoad");
 const Junction = require("./Junction");
 const Signal = require("./Signal");
 const Crosswalk = require("./Crosswalk");
@@ -64,6 +65,15 @@ class Graph {
             // add stop signs
             mapData.stopSignList.forEach(s => this.addStopSign(new StopSign(this).init(s)));
 
+            // add two-way roads instead of one way roads
+            mapData.roadList.forEach(r => {
+                // ignore those single lane roads in junctions
+                if (r.hasOwnProperty("junctionId")) {
+                    return;
+                }
+                this.addRoad(new TwoWayRoad(this).init(r));
+            });
+
             // those lanes without junction, are road lanes
             mapData.laneList.forEach(l => {
                 const lane = this.getLaneById(l.id.id);
@@ -82,7 +92,7 @@ class Graph {
                 }
 
                 // left-most lane in its direction
-                let road = new Road(this);
+                let road = new OneWayRoad(this);
                 let lanesToAdd = [lane];
 
                 while (lanesToAdd.length > 0) {
