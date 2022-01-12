@@ -73,36 +73,36 @@ class Graph {
                 }
                 this.addRoad(new TwoWayRoad(this).init(r));
             });
-
-            // those lanes without junction, are road lanes
-            mapData.laneList.forEach(l => {
-                const lane = this.getLaneById(l.id.id);
-
-                if (lane === null) {
-                    return;
-                }
-
-                if (lane.junction !== null || lane.road !== null) {
-                    return;
-                }
-                // assume simple cases where lanes only have single left / right neighbors.
-                // always create a new road with left-most lane
-                if (lane.getLeftNeighborLanes().length > 0) {
-                    return;
-                }
-
-                // left-most lane in its direction
-                let road = new OneWayRoad(this);
-                let lanesToAdd = [lane];
-
-                while (lanesToAdd.length > 0) {
-                    const laneToAdd = lanesToAdd.shift();
-                    laneToAdd.getRightNeighborLanes().forEach(rn => lanesToAdd.push(rn));
-                    road.addLane(laneToAdd);
-                }
-
-                this.addRoad(road);
-            });
+            //
+            // // those lanes without junction, are road lanes
+            // mapData.laneList.forEach(l => {
+            //     const lane = this.getLaneById(l.id.id);
+            //
+            //     if (lane === null) {
+            //         return;
+            //     }
+            //
+            //     if (lane.junction !== null || lane.road !== null) {
+            //         return;
+            //     }
+            //     // assume simple cases where lanes only have single left / right neighbors.
+            //     // always create a new road with left-most lane
+            //     if (lane.getLeftNeighborLanes().length > 0) {
+            //         return;
+            //     }
+            //
+            //     // left-most lane in its direction
+            //     let road = new OneWayRoad(this);
+            //     let lanesToAdd = [lane];
+            //
+            //     while (lanesToAdd.length > 0) {
+            //         const laneToAdd = lanesToAdd.shift();
+            //         laneToAdd.getRightNeighborLanes().forEach(rn => lanesToAdd.push(rn));
+            //         road.addLane(laneToAdd);
+            //     }
+            //
+            //     this.addRoad(road);
+            // });
 
             this.getEdgeList().forEach(edge => {
                 // update road / junction level connection

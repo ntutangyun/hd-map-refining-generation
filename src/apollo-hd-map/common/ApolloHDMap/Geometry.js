@@ -32,6 +32,11 @@ function angleBetween(v1, v2) {
     return angle;   // in radian
 }
 
+function vectorHeading(v) {
+    const east = {x: 1, y: 0};
+    return angleBetween(east, v);
+}
+
 function cross(v1, v2) {
     return v1.x * v2.y - v1.y * v2.x;
 }
@@ -484,4 +489,5 @@ module.exports = {
     BezierCurve,
     StraightLine,
     getNearestRelativeLane,
+    vectorHeading,
 };

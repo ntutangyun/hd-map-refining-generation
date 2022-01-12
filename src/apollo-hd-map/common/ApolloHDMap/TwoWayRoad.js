@@ -1,3 +1,5 @@
+const {vector, vectorHeading} = require("./Geometry");
+
 class TwoWayRoad {
     constructor(graph) {
         this.id = null;
@@ -8,6 +10,11 @@ class TwoWayRoad {
         // for two-way roads, one junction may appear in both incoming and outgoing list
         this.incoming = {};
         this.outgoing = {};
+
+        this.startPoint = null;
+        this.startHeading = null;
+        this.endPoint = null;
+        this.endHeading = null;
     }
 
     get name() {
@@ -15,6 +22,7 @@ class TwoWayRoad {
     }
 
     init(roadData) {
+        this.id = roadData.id.id;
         if (roadData.sectionList.length !== 1) {
             global.logE("TwoWayRoad", "road have multiple sections.: ");
             console.log(roadData);
@@ -25,33 +33,36 @@ class TwoWayRoad {
         const roadSection = roadData.sectionList[0];
         const laneList = roadSection.laneIdList.map(id => this.graph.getLaneById(id.id));
 
-        const forwardLaneList = laneList.filter(lane => lane.direction === "FORWARD");
-        const backwardLaneList = laneList.filter(lane => lane.direction === "BACKWARD");
+        laneList.forEach(lane => lane.road = this);
 
-        // forward lane List
-        const forwardLeftMostLanes = forwardLaneList.filter(lane => lane.getLeftNeighborLanes().length === 0);
-        if (forwardLeftMostLanes.length === 0) {
+        const leftMostLanes = laneList.filter(lane => lane.getLeftNeighborLanes().length === 0);
+        if (leftMostLanes.length === 0) {
             global.logE(this.name, "Cannot find the left most lane");
             process.exit(-1);
-        } else if (forwardLeftMostLanes.length > 1) {
-            global.logE(this.name, "Found multiple left most lane");
+        }
+
+        if (leftMostLanes.length > 2) {
+            global.logE(this.name, "Find more than two left most lanes...");
+            console.log(leftMostLanes.map(lane => lane.id));
             process.exit(-1);
         }
-        this.forwardLaneList = [forwardLeftMostLanes[0], ...forwardLeftMostLanes[0].getAllRightSideLanesInArray()];
 
-        // backward lane List
-        const backwardLeftMostLanes = backwardLaneList.filter(lane => lane.getLeftNeighborLanes().length === 0);
-        if (backwardLeftMostLanes.length === 0) {
-            global.logE(this.name, "Cannot find the left most lane");
-            process.exit(-1);
-        } else if (backwardLeftMostLanes.length > 1) {
-            global.logE(this.name, "Found multiple left most lane");
-            process.exit(-1);
+        if (leftMostLanes.length === 1) {
+            this.forwardLaneList = [leftMostLanes[0], ...leftMostLanes[0].getAllRightSideLanesInArray()];
+            this.backwardLaneList = [];
+        } else if (leftMostLanes.length === 2) {
+            this.forwardLaneList = [leftMostLanes[0], ...leftMostLanes[0].getAllRightSideLanesInArray()];
+            this.backwardLaneList = [leftMostLanes[1], ...leftMostLanes[1].getAllRightSideLanesInArray()];
         }
-        this.backwardLaneList = [backwardLeftMostLanes[0], ...backwardLeftMostLanes[0].getAllRightSideLanesInArray()];
 
-        this.forwardLaneList.forEach(lane => lane.road = this);
-        this.backwardLaneList.forEach(lane => lane.road = this);
+        // use the forwards lanes to calculate the road start point, start heading, end point and end heading.
+        const pList = this.forwardLaneList[0].getLeftBoundaryPoints();
+        this.startPoint = pList[0];
+        this.endPoint = pList.last();
+        this.startHeading = vectorHeading(vector(pList[0], pList[1]));
+        this.endHeading = vectorHeading(vector(pList[pList.length - 2], pList[pList.length - 1]));
+
+        return this;
     }
 
     getLaneList() {

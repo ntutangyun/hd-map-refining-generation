@@ -26,12 +26,14 @@ const LANE_DIRECTION = {
 class Lane {
     constructor(graph) {
         this.graph = graph;
-        this.id = null;             // currently laneID is used as main ID, as it's universal unique.
+        this.id = null;             // Currently, laneID is used as main ID, as it's universal unique.
         this.length = null;
         this.speedLimit = null;
         this.type = null;           // one of LANE_TYPES
         this.turn = null;           // one of LANE_TURNS
         this.direction = null;      // one of LANE_DIRECTION
+        this.leftBoundaryCurve = null;
+        this.rightBoundaryCurve = null;
 
         this.leftOutList = null;
         this.rightOutList = null;
@@ -163,6 +165,18 @@ class Lane {
         return this.centralCurve.getMinXY();
     }
 
+    getLeftBoundaryFirstPoint() {
+        return this.leftBoundaryCurve.getFirstPoint();
+    }
+
+    getLeftBoundaryPoints() {
+        return this.leftBoundaryCurve.getAllPoints();
+    }
+
+    getLeftBoundaryLastPoint() {
+        return this.leftBoundaryCurve.getLastPoint();
+    }
+
     addIncomingLane(lane) {
         this.incomingLanes[lane.id] = lane;
     }
@@ -290,6 +304,9 @@ class Lane {
         this.type = LANE_TYPES[laneObj.type];
         this.turn = LANE_TURN[laneObj.turn];
         this.direction = LANE_DIRECTION[laneObj.direction];
+
+        this.leftBoundaryCurve = new Curve(this).init(laneObj.leftBoundary.curve);
+        this.rightBoundaryCurve = new Curve(this).init(laneObj.rightBoundary.curve);
 
         laneObj.leftNeighborForwardLaneIdList.forEach(ln => this.addLeftNeighborLane(this.graph.getLaneById(ln.id)));
         laneObj.rightNeighborForwardLaneIdList.forEach(rn => this.addRightNeighborLane(this.graph.getLaneById(rn.id)));
