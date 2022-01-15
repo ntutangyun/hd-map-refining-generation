@@ -87,6 +87,7 @@ class LaneGenerator {
                             laneWidth = 3.5,
                             isForward = undefined,
                             speedLimit = 10,
+                            turn = undefined
                         }) {
 
         const centralCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
@@ -124,7 +125,8 @@ class LaneGenerator {
             startPoint,
             startHeading,
             endPoint,
-            endHeading
+            endHeading,
+            turn
         });
     }
 }

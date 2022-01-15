@@ -1,10 +1,11 @@
-const {Point} = require("../common/ApolloHDMap/Geometry");
+const {Point, angleNormalize} = require("../common/ApolloHDMap/Geometry");
 const RoadGenerator = require("./RoadGenerator");
 const {pointDist, vector, angleBetween} = require("../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");
 const JunctionProto = require("../protobuf_out/modules/map/proto/map_junction_pb");
 const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = require("../protobuf_out/modules/map/proto/map_geometry_pb");
+const LaneProto = require("../protobuf_out/modules/map/proto/map_lane_pb");
 
 class Junction {
     constructor({junctionId, center_point}) {
@@ -37,35 +38,61 @@ class Junction {
                     continue;
                 }
 
+                // from road I to road J
                 const roadI = this.connectedRoadList[i];
                 const roadJ = this.connectedRoadList[j];
 
                 const roadIOutgoing = this.isRoadOutgoing(roadI);
                 const roadJOutgoing = this.isRoadOutgoing(roadJ);
 
+                // find out what turn is this.
+                // assume the turning direction threshold is 45 degrees.
+
+                const roadIHeading = roadIOutgoing ? roadI.startHeading - Math.PI : roadI.endHeading;
+                const roadJHeading = roadJOutgoing ? roadJ.startHeading : roadJ.endHeading + Math.PI;
+
+                const turnAngle = angleNormalize(roadJHeading - roadIHeading);
+
+                // Currently, does not support U-turn here.
+                // If no turn or left turn, match from the road central curve
+                // if right turn, match from the right most lane
+                let turn;
+                if (turnAngle < (-Math.PI / 4)) {
+                    turn = LaneProto.Lane.LaneTurn.RIGHT_TURN;
+                } else if (turnAngle > (Math.PI * 4)) {
+                    turn = LaneProto.Lane.LaneTurn.LEFT_TURN;
+                } else {
+                    turn = LaneProto.Lane.LaneTurn.NO_TURN;
+                }
+
                 let incomingLaneList, outgoingLaneList;
 
                 // from roadI to roadJ
+                // match from road central curve if left turn or no turn
                 if (roadIOutgoing) {
-                    incomingLaneList = [...roadI.backwardLaneList].reverse();
-
+                    incomingLaneList = [...roadI.backwardLaneList];
                     if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList].reverse();
+                        outgoingLaneList = [...roadJ.forwardLaneList];
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList].reverse();
+                        outgoingLaneList = [...roadJ.backwardLaneList];
                     }
                 } else {
-                    incomingLaneList = [...roadI.forwardLaneList].reverse();
+                    incomingLaneList = [...roadI.forwardLaneList];
 
                     if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList].reverse();
+                        outgoingLaneList = [...roadJ.forwardLaneList];
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList].reverse();
+                        outgoingLaneList = [...roadJ.backwardLaneList];
                     }
                 }
-
                 if (incomingLaneList.length === 0 || outgoingLaneList.length === 0) {
                     continue;
+                }
+
+                // if turn right, match from right most lane
+                if (turn === LaneProto.Lane.LaneTurn.RIGHT_TURN) {
+                    incomingLaneList.reverse();
+                    outgoingLaneList.reverse();
                 }
 
                 incomingLaneList.forEach((inLane, inLaneIndex) => {
@@ -76,7 +103,8 @@ class Junction {
                             incomingLane: inLane,
                             endPoint: outgoingLaneList[inLaneIndex].startPoint,
                             endHeading: outgoingLaneList[inLaneIndex].startHeading,
-                            outgoingLane: outgoingLaneList[inLaneIndex]
+                            outgoingLane: outgoingLaneList[inLaneIndex],
+                            turn: turn,
                         });
                     } else {
                         // This is probably not right for multiple lanes to drive into the same lane inside the junction.
@@ -94,7 +122,7 @@ class Junction {
             }
         }
 
-        laneConfigs.forEach(({startPoint, startHeading, incomingLane, endPoint, endHeading, outgoingLane}) => {
+        laneConfigs.forEach(({startPoint, startHeading, incomingLane, endPoint, endHeading, outgoingLane, turn}) => {
             const junctionLane = LaneGenerator.generateLane({
                 startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`,
             });

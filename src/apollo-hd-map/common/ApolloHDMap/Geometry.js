@@ -474,6 +474,16 @@ function pointRotation(point, rotation, offset = null) {
     };
 }
 
+function angleNormalize(angle) {
+    let res = angle % (2 * Math.PI);
+    if (res > Math.PI) {
+        res -= 2 * Math.PI;
+    } else if (res <= -Math.PI) {
+        res += 2 * Math.PI;
+    }
+    return res;
+}
+
 module.exports = {
     norm,
     vector,
@@ -490,4 +500,5 @@ module.exports = {
     StraightLine,
     getNearestRelativeLane,
     vectorHeading,
+    angleNormalize
 };

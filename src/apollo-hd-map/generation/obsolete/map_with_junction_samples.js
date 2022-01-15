@@ -14,7 +14,7 @@ const map = mapGenerator.generate();
 
 const fs = require("fs");
 
-fs.writeFileSync("./index.bin", map.serializeBinary());
+fs.writeFileSync("./map_with_junction_samples.bin", map.serializeBinary());
 
 
 
