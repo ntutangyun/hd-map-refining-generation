@@ -1,7 +1,7 @@
 const Graph = require("../../common/ApolloHDMap/Graph");
 const {MapGrid} = require("../../common/gridUtils");
 const JunctionGenerator = require("junction_generator");
-const LaneGenerator = require("src/apollo-hd-map/generation/LaneGenerator");
+const LaneGenerator = require("src/apollo-hd-map/generation/Generators/LaneGenerator");
 
 const config = {
     grid_width: 9,

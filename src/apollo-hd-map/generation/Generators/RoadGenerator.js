@@ -1,7 +1,7 @@
-const {BezierCurve} = require("../common/ApolloHDMap/Geometry");
+const {BezierCurve} = require("../../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");
-const RoadProto = require("../protobuf_out/modules/map/proto/map_road_pb");
-const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
+const RoadProto = require("../../protobuf_out/modules/map/proto/map_road_pb");
+const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 
 // commonly there is only one road section per road.
 // the road section contains all the lane ids and the road boundary.

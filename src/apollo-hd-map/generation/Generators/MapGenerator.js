@@ -1,4 +1,4 @@
-const MapProto = require("../protobuf_out/modules/map/proto/map_pb");
+const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
 const JunctionGenerator = require("./JunctionGenerator");
 
 class MapGenerator {

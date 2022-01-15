@@ -1,11 +1,11 @@
-const {Point, angleNormalize} = require("../common/ApolloHDMap/Geometry");
+const {Point, angleNormalize} = require("../../common/ApolloHDMap/Geometry");
 const RoadGenerator = require("./RoadGenerator");
-const {pointDist, vector, angleBetween} = require("../common/ApolloHDMap/Geometry");
+const {pointDist, vector, angleBetween} = require("../../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("./LaneGenerator");
-const JunctionProto = require("../protobuf_out/modules/map/proto/map_junction_pb");
-const MapIDProto = require("../protobuf_out/modules/map/proto/map_id_pb");
-const MapGeoProto = require("../protobuf_out/modules/map/proto/map_geometry_pb");
-const LaneProto = require("../protobuf_out/modules/map/proto/map_lane_pb");
+const JunctionProto = require("../../protobuf_out/modules/map/proto/map_junction_pb");
+const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
+const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
+const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
 
 class Junction {
     constructor({junctionId, center_point}) {

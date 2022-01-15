@@ -1,4 +1,5 @@
 const {checkLineSegmentIntersect, pointDist} = require("./Geometry");
+const TwoWayRoad = require("./TwoWayRoad");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
 const JUNCTION_LANE_SAME_END_DIST_THRESHOLD = 1;
@@ -154,6 +155,15 @@ class Junction {
         });
 
         return {x: x / this.pointList.length, y: y / this.pointList.length, z: 0};
+    }
+
+    isRoadOutgoing(road) {
+        const polygonCenter = this.getPolygonCenter();
+        return (pointDist(polygonCenter, road.startPoint) < pointDist(polygonCenter, road.endPoint));
+    }
+
+    getRoadList() {
+        return [...this.getIncomingList(), ...this.getOutgoingList()].filter(r => (r instanceof TwoWayRoad));
     }
 
     // get all the overlapping crosswalks of junction's lanes

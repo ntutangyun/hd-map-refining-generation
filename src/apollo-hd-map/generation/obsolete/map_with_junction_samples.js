@@ -1,6 +1,6 @@
 require("../../common/setup");
 
-const MapGenerator = require("../MapGenerator");
+const MapGenerator = require("../Generators/MapGenerator");
 
 const config = {
     hd_map_header_path: "../common/hd_map_header.json",
