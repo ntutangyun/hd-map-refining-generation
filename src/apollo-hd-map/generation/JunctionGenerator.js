@@ -79,14 +79,16 @@ class Junction {
                             outgoingLane: outgoingLaneList[inLaneIndex]
                         });
                     } else {
-                        laneConfigs.push({
-                            startPoint: inLane.endPoint,
-                            startHeading: inLane.endHeading,
-                            incomingLane: inLane,
-                            endPoint: outgoingLaneList.last().startPoint,
-                            endHeading: outgoingLaneList.last().startHeading,
-                            outgoingLane: outgoingLaneList.last()
-                        });
+                        // This is probably not right for multiple lanes to drive into the same lane inside the junction.
+                        // cos it might lead to collision.
+                        // laneConfigs.push({
+                        //     startPoint: inLane.endPoint,
+                        //     startHeading: inLane.endHeading,
+                        //     incomingLane: inLane,
+                        //     endPoint: outgoingLaneList.last().startPoint,
+                        //     endHeading: outgoingLaneList.last().startHeading,
+                        //     outgoingLane: outgoingLaneList.last()
+                        // });
                     }
                 });
             }
