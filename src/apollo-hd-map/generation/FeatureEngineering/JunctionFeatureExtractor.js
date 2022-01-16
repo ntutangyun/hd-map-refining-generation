@@ -1,22 +1,31 @@
+const {vectorHeading, vector} = require("../../common/ApolloHDMap/Geometry");
+const {matchVectorRotation} = require("../../common/arrayUtils");
+
 // junction topology is now represented by the sequence of in-out road types.
 // e.g. [in, in, inout, out] for a four road junction
 // note that all the roads are now two-way roads.
-
-const {angleNormalize, vectorHeading, vector} = require("../../common/ApolloHDMap/Geometry");
-
 class JunctionRoadTopoGroup {
     constructor(firstJunction) {
-        this.junctionList = [firstJunction];
-        this.roadTopo = JunctionRoadTopoGroup.extractRoadTopology(firstJunction);
+        this.junctionList = {[firstJunction.id]: firstJunction};
+        this.roadTopoVec = JunctionRoadTopoGroup.extractRoadTopoVector(firstJunction);
     }
 
     tryAdd(junction) {
-        const roadTopology = JunctionRoadTopoGroup.extractRoadTopology(junction);
-        console.log(roadTopology);
+        if (this.junctionList.hasOwnProperty(junction.id)) {
+            return true;
+        }
+
+        const roadTopoVector = JunctionRoadTopoGroup.extractRoadTopoVector(junction);
+
+        if (matchVectorRotation(this.roadTopoVec, roadTopoVector)) {
+            this.junctionList[junction.id] = junction;
+            return true;
+        }
+
         return false;
     }
 
-    static extractRoadTopology(junction) {
+    static extractRoadTopoVector(junction) {
         const roadList = junction.getRoadList().sort((roadA, roadB) => {
             const junctionCenter = junction.getPolygonCenter();
 
@@ -31,7 +40,6 @@ class JunctionRoadTopoGroup {
 
             return roadARotation - roadBRotation;
         });
-        console.log(roadList);
 
         return roadList.map(road => {
             if (road.incoming.hasOwnProperty(junction.id) && road.outgoing.hasOwnProperty(junction.id)) {
@@ -45,33 +53,28 @@ class JunctionRoadTopoGroup {
             return "IN";
         });
     }
-
 }
 
 class JunctionFeatureExtractor {
-    constructor(graph) {
-        this.graph = graph;
-        this.roadTopoGroupList = [];
-    }
-
-    computeRoadTopoGroups() {
-        console.log(this.graph);
-
-        this.roadTopoGroupList = [];
-        const junctionList = this.graph.getJunctionList();
+    static computeRoadTopoGroups(graph) {
+        const roadTopoGroupList = [];
+        const junctionList = graph.getJunctionList();
         junctionList.forEach(junction => {
             let junctionAdded = false;
-            for (const roadTopoGroup of this.roadTopoGroupList) {
+            for (const roadTopoGroup of roadTopoGroupList) {
                 if (roadTopoGroup.tryAdd(junction)) {
                     junctionAdded = true;
                     break;
                 }
             }
             if (!junctionAdded) {
-                this.roadTopoGroupList.push(new JunctionRoadTopoGroup(junction));
+                roadTopoGroupList.push(new JunctionRoadTopoGroup(junction));
             }
         });
+
+        return roadTopoGroupList;
     }
+
 }
 
 module.exports = JunctionFeatureExtractor;

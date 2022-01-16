@@ -55,6 +55,10 @@ function cube(v) {
     return Math.pow(v, 3);
 }
 
+function degreeToRad(degree) {
+    return degree / 180 * Math.PI;
+}
+
 module.exports = {
     bound,
     getRandomIntInclusive,
@@ -63,6 +67,7 @@ module.exports = {
     gaussianRandom,
     normalSample,
     square,
-    cube
+    cube,
+    degreeToRad
 };
 
