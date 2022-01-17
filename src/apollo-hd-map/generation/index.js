@@ -18,7 +18,7 @@ const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
 
 // sample new junction configurations including road socket information using the clustering results.
 const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
-const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList);
+const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 10);
 
 console.log(junction_samples);
 
