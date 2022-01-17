@@ -9,7 +9,7 @@ class MapGenerator {
 
     generate() {
         this.map = new MapProto.Map();
-        this.map.setHeader(MapProto.Header.fromObject(require(this.config.hd_map_header_path)));
+        this.map.setHeader(MapProto.Header.fromObject(this.config.hd_map_header));
 
         this.generateJunctions();
 

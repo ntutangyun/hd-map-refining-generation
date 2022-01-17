@@ -59,6 +59,10 @@ function degreeToRad(degree) {
     return degree / 180 * Math.PI;
 }
 
+function radToDegree(rad) {
+    return rad / Math.PI * 180;
+}
+
 module.exports = {
     bound,
     getRandomIntInclusive,
@@ -68,6 +72,7 @@ module.exports = {
     normalSample,
     square,
     cube,
-    degreeToRad
+    degreeToRad,
+    radToDegree
 };
 

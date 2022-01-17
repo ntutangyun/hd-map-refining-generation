@@ -21,7 +21,9 @@ class Road {
                     backwardLaneList,
                     type = RoadProto.Road.Type.CITY_ROAD,
                     startPoint,
-                    endPoint
+                    startHeading,
+                    endPoint,
+                    endHeading
                 }) {
         this.id = id;
         this.type = type;
@@ -29,7 +31,9 @@ class Road {
         this.forwardLaneList = forwardLaneList;
         this.backwardLaneList = backwardLaneList;
         this.startPoint = startPoint;
+        this.startHeading = startHeading;
         this.endPoint = endPoint;
+        this.endHeading = endHeading;
     }
 
     getLaneList() {
@@ -84,7 +88,7 @@ class Road {
 
 class RoadGenerator {
     static generateRoad({
-                            roadId,
+                            road_id,
                             startPoint,
                             startHeading,
                             endPoint,
@@ -116,7 +120,7 @@ class RoadGenerator {
                     startHeading,
                     endPoint: laneCentralCurveEndPoint,
                     endHeading,
-                    id: `lane_${lane_count++}_${roadId}`,
+                    id: `lane_${lane_count++}_${road_id}`,
                     laneWidth,
                     speedLimit: forwardSpeedLimit,
                     isForward: true
@@ -135,7 +139,7 @@ class RoadGenerator {
                     startHeading: endHeading + Math.PI,
                     endPoint: laneCentralCurveEndPoint,
                     endHeading: startHeading + Math.PI,
-                    id: `lane_${lane_count++}_${roadId}`,
+                    id: `lane_${lane_count++}_${road_id}`,
                     laneWidth,
                     speedLimit: backwardSpeedLimit,
                     isForward: false
@@ -146,12 +150,14 @@ class RoadGenerator {
         }
 
         return new Road({
-            id: roadId,
+            id: road_id,
             centralCurve: roadCentralCurve,
             forwardLaneList,
             backwardLaneList,
             startPoint,
-            endPoint
+            startHeading,
+            endPoint,
+            endHeading,
         });
     }
 }

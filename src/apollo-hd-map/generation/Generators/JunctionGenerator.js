@@ -8,8 +8,8 @@ const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_p
 const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
 
 class Junction {
-    constructor({junctionId, center_point}) {
-        this.id = junctionId;
+    constructor({junction_id, center_point}) {
+        this.id = junction_id;
         this.centerPoint = center_point;
 
         this.connectedRoadList = [];
@@ -124,7 +124,7 @@ class Junction {
 
         laneConfigs.forEach(({startPoint, startHeading, incomingLane, endPoint, endHeading, outgoingLane, turn}) => {
             const junctionLane = LaneGenerator.generateLane({
-                startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`,
+                startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`, turn
             });
             this.laneList.push(junctionLane);
         });
@@ -195,19 +195,18 @@ class Junction {
 }
 
 class JunctionGenerator {
-    static generateJunction({junctionId, center_point, road_links}) {
-        const junction = new Junction({junctionId, center_point: Point.fromXYZObj(center_point)});
+    static generateJunction({junction_id, center_point, road_sockets}) {
+        const junction = new Junction({junction_id, center_point: Point.fromXYZObj(center_point)});
 
         // convert road_links to actual road
-        road_links.forEach(road_link => {
-            const {
-                roadId,
-                junction_center_angle,
-                junction_center_distance,
-                self_rotation,
-                outgoing_lane_count,
-                incoming_lane_count
-            } = road_link;
+        road_sockets.forEach(({
+                                  road_id,
+                                  junction_center_angle,
+                                  junction_center_distance,
+                                  self_rotation,
+                                  outgoing_lane_count,
+                                  incoming_lane_count
+                              }) => {
 
             const startPoint = junction.centerPoint.moveTowards(junction_center_angle, junction_center_distance);
             const startHeading = junction_center_angle + self_rotation;
@@ -216,7 +215,7 @@ class JunctionGenerator {
             const endHeading = startHeading;
 
             const road = RoadGenerator.generateRoad({
-                roadId,
+                road_id,
                 startPoint,
                 startHeading,
                 endPoint,

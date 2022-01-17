@@ -2,6 +2,8 @@ const {degreeToRad, getRandomIntInclusive} = require("../../common/mathUtils");
 
 const JUNCTION_GRID_WIDTH = 100;
 const MAX_LANE_COUNT_PER_ROAD = 4;
+const DEFAULT_LANE_WIDTH = 3.5;
+const DEFAULT_ROAD_SOCKET_X_OFFSET = 10;
 
 class JunctionConfigSampler {
     // from the road topo groups extracted from the existing map data,
@@ -10,7 +12,7 @@ class JunctionConfigSampler {
     static sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList) {
         let totalRoadCount = 0;
 
-        const junctionConfigs = roadTopoGroupList.map((roadTopoGroup, junctionIndex) => {
+        return roadTopoGroupList.map((roadTopoGroup, junctionIndex) => {
             const junction_id = `J_${junctionIndex}`;
 
             const center_point = {
@@ -21,9 +23,9 @@ class JunctionConfigSampler {
 
             // Equally divide the roads for now.
             const junctionRoadCount = roadTopoGroup.roadTopoVec.length;
-            const roadSocketAngleGap = 360 / junctionRoadCount;
+            const roadSocketAngleGap = degreeToRad(360) / junctionRoadCount;
 
-            const road_sockets = roadTopoGroup.roadTopoVec.map((roadTopoEntry, roadIndex) => {
+            const road_sockets = roadTopoGroup.roadTopoVec.map((roadTopoEntry, roadLocalIndex) => {
                 const road_id = `R_${totalRoadCount++}`;
 
                 let outgoing_lane_count, incoming_lane_count;
@@ -42,15 +44,38 @@ class JunctionConfigSampler {
                     process.exit(-1);
                 }
 
-                const RoadLaneCount = outgoing_lane_count + incoming_lane_count;
+                //                                        y_offset
+                //  junction_center                       |
+                //    * ----------------------------------|
+                //                 x_offset               |
+                //
+                // imagine the x_offset of the road socket is at the distance of DEFAULT_ROAD_SOCKET_X_OFFSET,
+                // then for every forward lane / outgoing lane, the y_offset increases by 0.5,
+                // for every backward lane / incoming lane, the y_offset decreases by 0.5
+                const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                const yOffset = (0.5 * outgoing_lane_count - 0.5 * incoming_lane_count) * DEFAULT_LANE_WIDTH;
 
+                const localCenterAngle = Math.atan2(yOffset, xOffset);
+                const junction_center_angle = roadSocketAngleGap * roadLocalIndex + localCenterAngle;
+                const junction_center_distance = localCenterAngle === 0 ? DEFAULT_ROAD_SOCKET_X_OFFSET : yOffset / Math.sin(localCenterAngle);
+                const self_rotation = -localCenterAngle;
 
-
+                return {
+                    road_id,
+                    junction_center_angle,
+                    junction_center_distance,
+                    self_rotation,
+                    outgoing_lane_count,
+                    incoming_lane_count
+                };
             });
 
+            return {
+                junction_id,
+                center_point,
+                road_sockets
+            };
         });
-
-        return junctionConfigs;
     }
 }
 

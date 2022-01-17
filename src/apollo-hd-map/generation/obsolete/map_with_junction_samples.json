@@ -1,0 +1,495 @@
+{
+  "hd_map_header": {
+    "version": "MS41MDAwMDA=",
+    "date": "MjAxOC0wMy0yM1QxMzoyNzo1NA==",
+    "projection": {
+      "proj": "+proj=utm +zone=10 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+    },
+    "district": "MA==",
+    "generation": "",
+    "revMajor": "MQ==",
+    "revMinor": "MA==",
+    "left": -122.39949797829956,
+    "top": 37.7882039998496,
+    "right": -122.39949797829956,
+    "bottom": 37.7882039998496,
+    "vendor": "TEdTVkw="
+  },
+  "junction_samples": [
+    {
+      "junction_id": "J_0",
+      "center_point": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_0",
+          "junction_center_angle": 0.6107259643892086,
+          "junction_center_distance": 12.206555615733704,
+          "self_rotation": -0.6107259643892086,
+          "outgoing_lane_count": 4,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_1",
+          "junction_center_angle": 2.0542433283620953,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_2",
+          "junction_center_angle": 2.968346987137428,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_3",
+          "junction_center_angle": 4.228941978817491,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": 0.483447001567199,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 3
+        }
+      ]
+    },
+    {
+      "junction_id": "J_1",
+      "center_point": {
+        "x": 100,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_4",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_5",
+          "junction_center_angle": 2.0542433283620953,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_6",
+          "junction_center_angle": 3.4782674729765204,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_7",
+          "junction_center_angle": 4.539143313932325,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        }
+      ]
+    },
+    {
+      "junction_id": "J_2",
+      "center_point": {
+        "x": 200,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_8",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_9",
+          "junction_center_angle": 1.7440419932472615,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_10",
+          "junction_center_angle": 3.141592653589793,
+          "junction_center_distance": 10,
+          "self_rotation": 0,
+          "outgoing_lane_count": 1,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_11",
+          "junction_center_angle": 4.885634646837055,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 1
+        }
+      ]
+    },
+    {
+      "junction_id": "J_3",
+      "center_point": {
+        "x": 300,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_12",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_13",
+          "junction_center_angle": 2.0943951023931953,
+          "junction_center_distance": 10,
+          "self_rotation": 0,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 2
+        },
+        {
+          "road_id": "R_14",
+          "junction_center_angle": 4.1887902047863905,
+          "junction_center_distance": 10,
+          "self_rotation": 0,
+          "outgoing_lane_count": 1,
+          "incoming_lane_count": 1
+        }
+      ]
+    },
+    {
+      "junction_id": "J_4",
+      "center_point": {
+        "x": 400,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_15",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_16",
+          "junction_center_angle": 1.9211494359408303,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_17",
+          "junction_center_angle": 3.8521153853996632,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": 0.33667481938672716,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 2
+        }
+      ]
+    },
+    {
+      "junction_id": "J_5",
+      "center_point": {
+        "x": 500,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_18",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_19",
+          "junction_center_angle": 2.0943951023931953,
+          "junction_center_distance": 10,
+          "self_rotation": 0,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 2
+        },
+        {
+          "road_id": "R_20",
+          "junction_center_angle": 4.1887902047863905,
+          "junction_center_distance": 10,
+          "self_rotation": 0,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 2
+        }
+      ]
+    },
+    {
+      "junction_id": "J_6",
+      "center_point": {
+        "x": 600,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_21",
+          "junction_center_angle": -0.17324566645236494,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_22",
+          "junction_center_angle": 2.5778421039603945,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_23",
+          "junction_center_angle": 4.3620358712387555,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 1,
+          "incoming_lane_count": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "J_7",
+      "center_point": {
+        "x": 700,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_24",
+          "junction_center_angle": 0.483447001567199,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_25",
+          "junction_center_angle": 2.4310699217799225,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_26",
+          "junction_center_angle": 3.8521153853996632,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": 0.33667481938672716,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 2
+        }
+      ]
+    },
+    {
+      "junction_id": "J_8",
+      "center_point": {
+        "x": 800,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_27",
+          "junction_center_angle": -0.6107259643892086,
+          "junction_center_distance": 12.206555615733704,
+          "self_rotation": 0.6107259643892086,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 4
+        },
+        {
+          "road_id": "R_28",
+          "junction_center_angle": 1.9074711461816238,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_29",
+          "junction_center_angle": 2.6581456520225943,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": 0.483447001567199,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 3
+        },
+        {
+          "road_id": "R_30",
+          "junction_center_angle": 4.375714160997963,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": 0.33667481938672716,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 2
+        }
+      ]
+    },
+    {
+      "junction_id": "J_9",
+      "center_point": {
+        "x": 900,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_31",
+          "junction_center_angle": 0.33667481938672716,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_32",
+          "junction_center_angle": 2.26764076884556,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 2,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_33",
+          "junction_center_angle": 3.578064240397182,
+          "junction_center_distance": 12.206555615733704,
+          "self_rotation": 0.6107259643892086,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 4
+        }
+      ]
+    },
+    {
+      "junction_id": "J_10",
+      "center_point": {
+        "x": 1000,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_34",
+          "junction_center_angle": 0.483447001567199,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_35",
+          "junction_center_angle": 2.968346987137428,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        }
+      ]
+    },
+    {
+      "junction_id": "J_11",
+      "center_point": {
+        "x": 1100,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_36",
+          "junction_center_angle": -0.17324566645236494,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_37",
+          "junction_center_angle": 1.7440419932472615,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 1,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_38",
+          "junction_center_angle": 2.5308666892005847,
+          "junction_center_distance": 12.206555615733704,
+          "self_rotation": 0.6107259643892086,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 4
+        },
+        {
+          "road_id": "R_39",
+          "junction_center_angle": 4.885634646837055,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": -0.17324566645236494,
+          "outgoing_lane_count": 1,
+          "incoming_lane_count": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "J_12",
+      "center_point": {
+        "x": 1200,
+        "y": 0,
+        "z": 0
+      },
+      "road_sockets": [
+        {
+          "road_id": "R_40",
+          "junction_center_angle": 0.483447001567199,
+          "junction_center_distance": 11.294356998076516,
+          "self_rotation": -0.483447001567199,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 0
+        },
+        {
+          "road_id": "R_41",
+          "junction_center_angle": 1.9211494359408303,
+          "junction_center_distance": 10.151970252123476,
+          "self_rotation": 0.17324566645236494,
+          "outgoing_lane_count": 0,
+          "incoming_lane_count": 1
+        },
+        {
+          "road_id": "R_42",
+          "junction_center_angle": 4.525465024173117,
+          "junction_center_distance": 10.594810050208547,
+          "self_rotation": -0.33667481938672716,
+          "outgoing_lane_count": 3,
+          "incoming_lane_count": 1
+        }
+      ]
+    }
+  ],
+  "curveSampleCount": 100
+}

@@ -42,8 +42,7 @@ class Junction {
                 lane.junction = this;
 
                 // check validity
-                if (lane.getIncomingLaneList().length === 0 ||
-                    lane.getOutgoingLaneList().length === 0) {
+                if (lane.getIncomingLaneList().length === 0 || lane.getOutgoingLaneList().length === 0) {
                     this.valid = false;
                 }
             }
@@ -163,7 +162,15 @@ class Junction {
     }
 
     getRoadList() {
-        return [...this.getIncomingList(), ...this.getOutgoingList()].filter(r => (r instanceof TwoWayRoad));
+        // remove duplicates
+        const roadList = {};
+        this.getIncomingList().filter(r => (r instanceof TwoWayRoad)).forEach(inRoad => {
+            roadList[inRoad.id] = inRoad;
+        });
+        this.getOutgoingList().filter(r => (r instanceof TwoWayRoad)).forEach(outRoad => {
+            roadList[outRoad.id] = outRoad;
+        });
+        return Object.values(roadList);
     }
 
     // get all the overlapping crosswalks of junction's lanes
