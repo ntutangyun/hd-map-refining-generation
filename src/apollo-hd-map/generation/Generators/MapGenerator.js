@@ -24,6 +24,10 @@ class MapGenerator {
                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
             });
 
+            junction.getOverlapList().forEach(overlap => {
+                this.map.addOverlap(overlap.serializeToProtobuf());
+            });
+
             junction.getConnectedRoadList().forEach(road => {
                 road.getLaneList().forEach(lane => {
                     // console.log(lane);

@@ -46,10 +46,10 @@ class Lane {
         this.endHeading = endHeading;
     }
 
-
     serializeToProtobuf(curveSampleCount) {
         const lane = new LaneProto.Lane();
         lane.setId((new MapIDProto.Id().setId(this.id)));
+        lane.setLength(this.centralCurve.approximateLength());
         lane.setSpeedLimit(this.speedLimit);
         lane.setType(this.type);
         lane.setTurn(this.turn);

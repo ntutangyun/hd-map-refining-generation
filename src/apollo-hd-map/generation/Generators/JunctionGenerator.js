@@ -6,6 +6,7 @@ const JunctionProto = require("../../protobuf_out/modules/map/proto/map_junction
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
 const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
+const OverlapGenerator = require("./OverlapGenerator");
 
 class Junction {
     constructor({junction_id, center_point}) {
@@ -15,10 +16,15 @@ class Junction {
         this.connectedRoadList = [];
         this.laneList = [];
         this.polygonPointList = [];
+        this.overlapList = [];
     }
 
     getLaneList() {
         return [...this.laneList];
+    }
+
+    getOverlapList() {
+        return [...this.overlapList];
     }
 
     connectRoad(road) {
@@ -172,6 +178,12 @@ class Junction {
         this.polygonPointList = polygonPointList;
     }
 
+    generateLaneOverlap() {
+        this.getLaneList().forEach(lane => {
+            this.overlapList.push(OverlapGenerator.generateJunctionLaneOverlap(this, lane));
+        });
+    }
+
     isRoadOutgoing(road) {
         return (pointDist(this.centerPoint, road.startPoint) < pointDist(this.centerPoint, road.endPoint));
     }
@@ -186,8 +198,8 @@ class Junction {
         });
         junctionProto.setPolygon(junctionPolygon);
 
-        this.laneList.forEach(jLane => {
-            junctionProto.addOverlapId().setId(jLane.id);
+        this.overlapList.forEach(overlap => {
+            junctionProto.addOverlapId().setId(overlap.id);
         });
 
         return junctionProto;
@@ -230,6 +242,8 @@ class JunctionGenerator {
         junction.generateJunctionLanes();
 
         junction.generatePolygon();
+
+        junction.generateLaneOverlap();
 
         return junction;
     }

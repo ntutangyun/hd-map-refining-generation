@@ -18,7 +18,7 @@ const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
 
 // sample new junction configurations including road socket information using the clustering results.
 const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
-const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 10);
+const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 1);
 
 console.log(junction_samples);
 
@@ -27,13 +27,14 @@ const MapGenerator = require("./Generators/MapGenerator");
 const config = {
     hd_map_header: require("../common/hd_map_header.json"),
     junction_samples,
-    curveSampleCount: 100
+    curveSampleCount: 20
 };
 
-fs.writeFileSync("./index.json", JSON.stringify(config));
+fs.writeFileSync("./index.config.json", JSON.stringify(config));
 
 const mapGenerator = new MapGenerator(config);
 
 const map = mapGenerator.generate();
 
-fs.writeFileSync("./index.bin", map.serializeBinary());
+fs.writeFileSync("./base_map.bin", map.serializeBinary());
+fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
