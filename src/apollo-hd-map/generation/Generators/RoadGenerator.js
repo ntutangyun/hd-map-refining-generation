@@ -149,6 +149,24 @@ class RoadGenerator {
             }
         }
 
+        if (forwardLaneList.length > 1) {
+            for (let i = 0; i < forwardLaneList.length - 1; i++) {
+                const leftLane = forwardLaneList[i];
+                const rightLane = forwardLaneList[i + 1];
+                leftLane.rightNeighborForwardList.push(rightLane);
+                rightLane.leftNeighborForwardList.push(leftLane);
+            }
+        }
+
+        if (backwardLaneList.length > 1) {
+            for (let i = 0; i < backwardLaneList.length - 1; i++) {
+                const leftLane = backwardLaneList[i];
+                const rightLane = backwardLaneList[i + 1];
+                leftLane.rightNeighborForwardList.push(rightLane);
+                rightLane.leftNeighborForwardList.push(leftLane);
+            }
+        }
+
         return new Road({
             id: road_id,
             centralCurve: roadCentralCurve,

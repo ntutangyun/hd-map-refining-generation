@@ -44,6 +44,13 @@ class Lane {
         this.startHeading = startHeading;
         this.endPoint = endPoint;
         this.endHeading = endHeading;
+        this.overlapList = [];
+
+        this.outgoingList = [];
+        this.incomingList = [];
+
+        this.leftNeighborForwardList = [];
+        this.rightNeighborForwardList = [];
     }
 
     serializeToProtobuf(curveSampleCount) {
@@ -73,6 +80,22 @@ class Lane {
         rightBoundary.addBoundaryType(rightLaneBoundaryType);
         lane.setRightBoundary(rightBoundary);
 
+        this.overlapList.forEach(overlap => {
+            lane.addOverlapId().setId(overlap.id);
+        });
+
+        this.incomingList.forEach(inLane => {
+            lane.addPredecessorId().setId(inLane.id);
+        });
+
+        this.outgoingList.forEach(outLane => {
+            lane.addSuccessorId().setId(outLane.id);
+        });
+
+        this.leftNeighborForwardList.forEach(leftNeighborLane => {
+            lane.addLeftNeighborForwardLaneId().setId(leftNeighborLane.id);
+        });
+
         return lane;
     }
 }
@@ -95,24 +118,14 @@ class LaneGenerator {
         // build left and right boundaries
         const leftBoundaryStartPoint = startPoint.moveTowards(startHeading + Math.PI / 2, laneWidth / 2);
         const leftBoundaryEndPoint = endPoint.moveTowards(endHeading + Math.PI / 2, laneWidth / 2);
-        const leftBoundaryCurve = BezierCurve.buildBezierCurve(
-            {
-                startPoint: leftBoundaryStartPoint,
-                startHeading,
-                endPoint: leftBoundaryEndPoint,
-                endHeading
-            }
-        );
+        const leftBoundaryCurve = BezierCurve.buildBezierCurve({
+            startPoint: leftBoundaryStartPoint, startHeading, endPoint: leftBoundaryEndPoint, endHeading
+        });
         const rightBoundaryStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth / 2);
         const rightBoundaryEndPoint = endPoint.moveTowards(endHeading - Math.PI / 2, laneWidth / 2);
-        const rightBoundaryCurve = BezierCurve.buildBezierCurve(
-            {
-                startPoint: rightBoundaryStartPoint,
-                startHeading,
-                endPoint: rightBoundaryEndPoint,
-                endHeading
-            }
-        );
+        const rightBoundaryCurve = BezierCurve.buildBezierCurve({
+            startPoint: rightBoundaryStartPoint, startHeading, endPoint: rightBoundaryEndPoint, endHeading
+        });
 
         return new Lane({
             id,

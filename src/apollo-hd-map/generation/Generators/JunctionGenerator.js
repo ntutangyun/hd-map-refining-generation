@@ -132,6 +132,12 @@ class Junction {
             const junctionLane = LaneGenerator.generateLane({
                 startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`, turn
             });
+            junctionLane.incomingList.push(incomingLane);
+            incomingLane.outgoingList.push(junctionLane);
+
+            junctionLane.outgoingList.push(outgoingLane);
+            outgoingLane.incomingList.push(junctionLane);
+
             this.laneList.push(junctionLane);
         });
     }
@@ -180,7 +186,9 @@ class Junction {
 
     generateLaneOverlap() {
         this.getLaneList().forEach(lane => {
-            this.overlapList.push(OverlapGenerator.generateJunctionLaneOverlap(this, lane));
+            const junctionLaneOverlap = OverlapGenerator.generateJunctionLaneOverlap(this, lane);
+            this.overlapList.push(junctionLaneOverlap);
+            lane.overlapList.push(junctionLaneOverlap);
         });
     }
 
