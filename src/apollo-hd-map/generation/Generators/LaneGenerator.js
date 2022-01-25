@@ -60,7 +60,9 @@ class Lane {
         lane.setSpeedLimit(this.speedLimit);
         lane.setType(this.type);
         lane.setTurn(this.turn);
-        lane.setDirection(this.isForward ? LaneProto.Lane.LaneDirection.FORWARD : LaneProto.Lane.LaneDirection.BACKWARD);
+
+        // direction defaults to forward
+        lane.setDirection(LaneProto.Lane.LaneDirection.FORWARD);
 
         lane.setCentralCurve(this.centralCurve.serializeToProtobuf(curveSampleCount));
 
@@ -94,6 +96,10 @@ class Lane {
 
         this.leftNeighborForwardList.forEach(leftNeighborLane => {
             lane.addLeftNeighborForwardLaneId().setId(leftNeighborLane.id);
+        });
+
+        this.rightNeighborForwardList.forEach(rightNeighborLane => {
+            lane.addRightNeighborForwardLaneId().setId(rightNeighborLane.id);
         });
 
         return lane;
