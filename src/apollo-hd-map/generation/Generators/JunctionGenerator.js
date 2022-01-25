@@ -15,6 +15,7 @@ class Junction {
 
         this.connectedRoadList = [];
         this.laneList = [];
+        this.laneRoadList = [];
         this.polygonPointList = [];
         this.overlapList = [];
     }
@@ -137,6 +138,9 @@ class Junction {
 
             junctionLane.outgoingList.push(outgoingLane);
             outgoingLane.incomingList.push(junctionLane);
+
+            // generate individual road per junction lane
+            this.laneRoadList.push(RoadGenerator.generateJunctionLaneRoad(junctionLane));
 
             this.laneList.push(junctionLane);
         });

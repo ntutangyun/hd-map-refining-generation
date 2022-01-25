@@ -178,6 +178,19 @@ class RoadGenerator {
             endHeading,
         });
     }
+
+    static generateJunctionLaneRoad(jLane) {
+        return new Road({
+            id: `R_${jLane.id}`,
+            centralCurve: jLane.leftBoundaryCurve,
+            forwardLaneList: [jLane],
+            backwardLaneList: [],
+            startPoint: jLane.leftBoundaryCurve.controlPoints[0],
+            startHeading: jLane.leftBoundaryCurve.startHeading,
+            endPoint: jLane.leftBoundaryCurve.controlPoints.last(),
+            endHeading: jLane.leftBoundaryCurve.endHeading,
+        });
+    }
 }
 
 module.exports = RoadGenerator;
