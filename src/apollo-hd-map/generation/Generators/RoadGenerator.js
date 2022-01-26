@@ -16,28 +16,106 @@ const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 class Road {
     constructor({
                     id,
-                    centralCurve,
-                    forwardLaneList,
-                    backwardLaneList,
+                    centralCurve = null,
+                    forwardLaneList = [],
+                    backwardLaneList = [],
                     type = RoadProto.Road.Type.CITY_ROAD,
-                    startPoint,
-                    startHeading,
-                    endPoint,
-                    endHeading
+                    startPoint = null,
+                    startHeading = null,
+                    endPoint = null,
+                    endHeading = null
                 }) {
         this.id = id;
         this.type = type;
-        this.centralCurve = centralCurve;
-        this.forwardLaneList = forwardLaneList;
-        this.backwardLaneList = backwardLaneList;
         this.startPoint = startPoint;
         this.startHeading = startHeading;
         this.endPoint = endPoint;
         this.endHeading = endHeading;
+        this.centralCurve = centralCurve;
+        this.forwardLaneList = forwardLaneList;
+        this.backwardLaneList = backwardLaneList;
     }
 
     getLaneList() {
         return [...this.forwardLaneList, ...this.backwardLaneList];
+    }
+
+    buildCentralCurve() {
+        this.centralCurve = BezierCurve.buildBezierCurve({
+            startPoint: this.startPoint,
+            startHeading: this.startHeading,
+            endPoint: this.endPoint,
+            endHeading: this.endHeading
+        });
+    }
+
+    buildLanes({forwardLaneCount, backwardLaneCount, laneWidth, forwardSpeedLimit, backwardSpeedLimit}) {
+        this.forwardLaneList = [];
+        this.backwardLaneList = [];
+
+        // generate forward and backward lanes
+        let lane_count = 0;
+
+        if (forwardLaneCount > 0) {
+            for (let i = 1; i <= forwardLaneCount; i++) {
+                const laneCentralCurveStartPoint = this.startPoint.moveTowards(this.startHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveEndPoint = this.endPoint.moveTowards(this.endHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
+
+                const lane = LaneGenerator.generateLane({
+                    startPoint: laneCentralCurveStartPoint,
+                    startHeading: this.startHeading,
+                    endPoint: laneCentralCurveEndPoint,
+                    endHeading: this.endHeading,
+                    id: `lane_${lane_count++}_${this.id}`,
+                    laneWidth,
+                    speedLimit: forwardSpeedLimit,
+                    isForward: true
+                });
+
+                lane.road = this;
+                lane.sampleWidth(i - 1, forwardLaneCount - i);
+                this.forwardLaneList.push(lane);
+            }
+        }
+
+        if (backwardLaneCount > 0) {
+            for (let i = 1; i <= backwardLaneCount; i++) {
+                const laneCentralCurveStartPoint = this.endPoint.moveTowards(this.endHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveEndPoint = this.startPoint.moveTowards(this.startHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
+
+                const lane = LaneGenerator.generateLane({
+                    startPoint: laneCentralCurveStartPoint,
+                    startHeading: this.endHeading + Math.PI,
+                    endPoint: laneCentralCurveEndPoint,
+                    endHeading: this.startHeading + Math.PI,
+                    id: `lane_${lane_count++}_${this.id}`,
+                    laneWidth,
+                    speedLimit: backwardSpeedLimit,
+                    isForward: false
+                });
+                lane.road = this;
+                lane.sampleWidth(i - 1, backwardLaneCount - i);
+                this.backwardLaneList.push(lane);
+            }
+        }
+
+        if (this.forwardLaneList.length > 1) {
+            for (let i = 0; i < this.forwardLaneList.length - 1; i++) {
+                const leftLane = this.forwardLaneList[i];
+                const rightLane = this.forwardLaneList[i + 1];
+                leftLane.rightNeighborForwardList.push(rightLane);
+                rightLane.leftNeighborForwardList.push(leftLane);
+            }
+        }
+
+        if (this.backwardLaneList.length > 1) {
+            for (let i = 0; i < this.backwardLaneList.length - 1; i++) {
+                const leftLane = this.backwardLaneList[i];
+                const rightLane = this.backwardLaneList[i + 1];
+                leftLane.rightNeighborForwardList.push(rightLane);
+                rightLane.leftNeighborForwardList.push(leftLane);
+            }
+        }
     }
 
     serializeToProtobuf(curveSampleCount) {
@@ -99,83 +177,13 @@ class RoadGenerator {
                             backwardSpeedLimit = 10,
                         }) {
 
-        // generating road central curve
-        const roadCentralCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
-        // const roadCentralCurvePoints = roadCentralCurve.sample(centralCurveSamples);
-
-        // generate forward and backward lanes
-        let lane_count = 0;
-        const forwardLaneList = [];
-        const backwardLaneList = [];
-
-        if (forwardLaneCount > 0) {
-            for (let i = 1; i <= forwardLaneCount; i++) {
-                const laneCentralCurveStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
-                const laneCentralCurveEndPoint = endPoint.moveTowards(endHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
-
-                const lane = LaneGenerator.generateLane({
-                    startPoint: laneCentralCurveStartPoint,
-                    startHeading,
-                    endPoint: laneCentralCurveEndPoint,
-                    endHeading,
-                    id: `lane_${lane_count++}_${road_id}`,
-                    laneWidth,
-                    speedLimit: forwardSpeedLimit,
-                    isForward: true
-                });
-
-                forwardLaneList.push(lane);
-            }
-        }
-
-        if (backwardLaneCount > 0) {
-            for (let i = 1; i <= backwardLaneCount; i++) {
-                const laneCentralCurveStartPoint = endPoint.moveTowards(endHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
-                const laneCentralCurveEndPoint = startPoint.moveTowards(startHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
-
-                const lane = LaneGenerator.generateLane({
-                    startPoint: laneCentralCurveStartPoint,
-                    startHeading: endHeading + Math.PI,
-                    endPoint: laneCentralCurveEndPoint,
-                    endHeading: startHeading + Math.PI,
-                    id: `lane_${lane_count++}_${road_id}`,
-                    laneWidth,
-                    speedLimit: backwardSpeedLimit,
-                    isForward: false
-                });
-
-                backwardLaneList.push(lane);
-            }
-        }
-
-        if (forwardLaneList.length > 1) {
-            for (let i = 0; i < forwardLaneList.length - 1; i++) {
-                const leftLane = forwardLaneList[i];
-                const rightLane = forwardLaneList[i + 1];
-                leftLane.rightNeighborForwardList.push(rightLane);
-                rightLane.leftNeighborForwardList.push(leftLane);
-            }
-        }
-
-        if (backwardLaneList.length > 1) {
-            for (let i = 0; i < backwardLaneList.length - 1; i++) {
-                const leftLane = backwardLaneList[i];
-                const rightLane = backwardLaneList[i + 1];
-                leftLane.rightNeighborForwardList.push(rightLane);
-                rightLane.leftNeighborForwardList.push(leftLane);
-            }
-        }
-
-        return new Road({
-            id: road_id,
-            centralCurve: roadCentralCurve,
-            forwardLaneList,
-            backwardLaneList,
-            startPoint,
-            startHeading,
-            endPoint,
-            endHeading,
+        const road = new Road({
+            id: road_id, startPoint, startHeading, endPoint, endHeading,
         });
+        // generating road central curve
+        road.buildCentralCurve();
+        road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});
+        return road;
     }
 
     static generateJunctionLaneRoad(jLane) {

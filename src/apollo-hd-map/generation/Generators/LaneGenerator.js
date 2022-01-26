@@ -2,6 +2,7 @@ const {BezierCurve} = require("../../common/ApolloHDMap/Geometry");
 const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 
+const WIDTH_SAMPLE_COUNT = 3;
 
 // lane boundary ====
 // for road lanes:
@@ -28,13 +29,13 @@ class Lane {
                     startHeading,
                     endPoint,
                     endHeading,
-                    junction = null,
-                    road = null,
                 }) {
         this.id = id;
         this.laneWidth = laneWidth;
         this.isForward = isForward;
         this.centralCurve = centralCurve;
+        this.length = this.centralCurve.approximateLength();
+
         this.leftBoundaryCurve = leftBoundaryCurve;
         this.rightBoundaryCurve = rightBoundaryCurve;
         this.leftBoundaryType = leftBoundaryType;
@@ -46,6 +47,7 @@ class Lane {
         this.startHeading = startHeading;
         this.endPoint = endPoint;
         this.endHeading = endHeading;
+
         this.overlapList = [];
 
         this.outgoingList = [];
@@ -59,14 +61,39 @@ class Lane {
         this.leftRoadSampleList = [];
         this.rightRoadSampleList = [];
 
-        this.junction = junction;
-        this.road = road;
+        this.junction = null;
+        this.road = null;
+        this.junctionRoad = null;
+    }
+
+    // assume the lane has constant lane width along s axis for now
+    // for road width sampling, forward lanes and backward lanes are the same
+    // as there is one set of road boundary for each forward list and backward list respectively
+    sampleWidth(leftLaneCount, rightLaneCount) {
+        const sWindow = this.length / (WIDTH_SAMPLE_COUNT - 1);
+        const halfWidth = this.laneWidth / 2;
+
+        for (let i = 0; i < WIDTH_SAMPLE_COUNT; i++) {
+            const s = sWindow * i;
+            this.leftSampleList.push({
+                s, width: halfWidth
+            });
+            this.rightSampleList.push({
+                s, width: halfWidth
+            });
+            this.leftRoadSampleList.push({
+                s, width: leftLaneCount * this.laneWidth + halfWidth,
+            });
+            this.rightRoadSampleList.push({
+                s, width: rightLaneCount * this.laneWidth + halfWidth
+            });
+        }
     }
 
     serializeToProtobuf(curveSampleCount) {
         const lane = new LaneProto.Lane();
         lane.setId((new MapIDProto.Id().setId(this.id)));
-        lane.setLength(this.centralCurve.approximateLength());
+        lane.setLength(this.length);
         lane.setSpeedLimit(this.speedLimit);
         lane.setType(this.type);
         lane.setTurn(this.turn);
@@ -110,6 +137,22 @@ class Lane {
 
         this.rightNeighborForwardList.forEach(rightNeighborLane => {
             lane.addRightNeighborForwardLaneId().setId(rightNeighborLane.id);
+        });
+
+        this.leftSampleList.forEach(sample => {
+            lane.addLeftSample().setS(sample.s).setWidth(sample.width);
+        });
+
+        this.rightSampleList.forEach(sample => {
+            lane.addRightSample().setS(sample.s).setWidth(sample.width);
+        });
+
+        this.leftRoadSampleList.forEach(sample => {
+            lane.addLeftRoadSample().setS(sample.s).setWidth(sample.width);
+        });
+
+        this.rightRoadSampleList.forEach(sample => {
+            lane.addRightRoadSample().setS(sample.s).setWidth(sample.width);
         });
 
         return lane;

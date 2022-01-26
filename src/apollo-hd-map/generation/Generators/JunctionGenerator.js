@@ -133,6 +133,7 @@ class Junction {
             const junctionLane = LaneGenerator.generateLane({
                 startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`, turn
             });
+
             junctionLane.incomingList.push(incomingLane);
             incomingLane.outgoingList.push(junctionLane);
 
@@ -140,8 +141,14 @@ class Junction {
             outgoingLane.incomingList.push(junctionLane);
 
             // generate individual road per junction lane
-            this.laneRoadList.push(RoadGenerator.generateJunctionLaneRoad(junctionLane));
+            const junctionLaneRoad = RoadGenerator.generateJunctionLaneRoad(junctionLane);
+            junctionLane.junctionRoad = junctionLaneRoad;
+            this.laneRoadList.push(junctionLaneRoad);
 
+            // perform width sampling at proper context
+            junctionLane.sampleWidth(0, 0);
+
+            junctionLane.junction = this;
             this.laneList.push(junctionLane);
         });
     }

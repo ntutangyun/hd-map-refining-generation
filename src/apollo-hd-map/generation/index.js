@@ -25,9 +25,7 @@ console.log(junction_samples);
 const MapGenerator = require("./Generators/MapGenerator");
 
 const config = {
-    hd_map_header: require("../common/hd_map_header.json"),
-    junction_samples,
-    curveSampleCount: 20
+    hd_map_header: require("../common/hd_map_header.json"), junction_samples, curveSampleCount: 20
 };
 
 fs.writeFileSync("./index.config.json", JSON.stringify(config));
