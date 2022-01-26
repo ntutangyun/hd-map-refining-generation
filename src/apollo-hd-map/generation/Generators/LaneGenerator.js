@@ -27,7 +27,9 @@ class Lane {
                     startPoint,
                     startHeading,
                     endPoint,
-                    endHeading
+                    endHeading,
+                    junction = null,
+                    road = null,
                 }) {
         this.id = id;
         this.laneWidth = laneWidth;
@@ -51,6 +53,14 @@ class Lane {
 
         this.leftNeighborForwardList = [];
         this.rightNeighborForwardList = [];
+
+        this.leftSampleList = [];
+        this.rightSampleList = [];
+        this.leftRoadSampleList = [];
+        this.rightRoadSampleList = [];
+
+        this.junction = junction;
+        this.road = road;
     }
 
     serializeToProtobuf(curveSampleCount) {

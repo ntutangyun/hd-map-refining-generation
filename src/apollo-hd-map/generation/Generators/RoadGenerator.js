@@ -85,7 +85,6 @@ class Road {
     }
 }
 
-
 class RoadGenerator {
     static generateRoad({
                             road_id,
@@ -99,6 +98,7 @@ class RoadGenerator {
                             forwardSpeedLimit = 10,
                             backwardSpeedLimit = 10,
                         }) {
+
         // generating road central curve
         const roadCentralCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
         // const roadCentralCurvePoints = roadCentralCurve.sample(centralCurveSamples);
@@ -112,8 +112,6 @@ class RoadGenerator {
             for (let i = 1; i <= forwardLaneCount; i++) {
                 const laneCentralCurveStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
                 const laneCentralCurveEndPoint = endPoint.moveTowards(endHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
-
-                // const leftBoundaryType =
 
                 const lane = LaneGenerator.generateLane({
                     startPoint: laneCentralCurveStartPoint,
@@ -129,6 +127,7 @@ class RoadGenerator {
                 forwardLaneList.push(lane);
             }
         }
+
         if (backwardLaneCount > 0) {
             for (let i = 1; i <= backwardLaneCount; i++) {
                 const laneCentralCurveStartPoint = endPoint.moveTowards(endHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));

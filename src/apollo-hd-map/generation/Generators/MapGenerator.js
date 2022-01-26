@@ -25,11 +25,7 @@ class MapGenerator {
                     this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
                 });
                 this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
-            })
-
-            // junction.getLaneList().forEach(lane => {
-            //     this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-            // });
+            });
 
             junction.getOverlapList().forEach(overlap => {
                 this.map.addOverlap(overlap.serializeToProtobuf());
@@ -37,13 +33,10 @@ class MapGenerator {
 
             junction.getConnectedRoadList().forEach(road => {
                 road.getLaneList().forEach(lane => {
-                    // console.log(lane);
                     this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
                 });
-
                 this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
             });
-
 
             this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
         });
