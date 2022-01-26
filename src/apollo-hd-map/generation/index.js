@@ -36,3 +36,4 @@ const map = mapGenerator.generate();
 
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
+fs.writeFileSync("./sim_map.bin", map.serializeBinary());

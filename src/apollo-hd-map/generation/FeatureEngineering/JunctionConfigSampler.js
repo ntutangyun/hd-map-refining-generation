@@ -1,5 +1,7 @@
 const {degreeToRad, getRandomIntInclusive} = require("../../common/mathUtils");
 
+const MAP_START_OFFSET_X = 10000;
+const MAP_START_OFFSET_Y = 10000;
 const JUNCTION_GRID_WIDTH = 100;
 const MAX_LANE_COUNT_PER_ROAD = 4;
 const DEFAULT_LANE_WIDTH = 3.5;
@@ -20,8 +22,8 @@ class JunctionConfigSampler {
                     const junction_id = `J_${junctionIndex}`;
 
                     const center_point = {
-                        x: JUNCTION_GRID_WIDTH * junctionIndex,
-                        y: -JUNCTION_GRID_WIDTH * rowI,
+                        x: JUNCTION_GRID_WIDTH * junctionIndex + MAP_START_OFFSET_X,
+                        y: -JUNCTION_GRID_WIDTH * rowI + MAP_START_OFFSET_X,
                         z: 0
                     };
 
