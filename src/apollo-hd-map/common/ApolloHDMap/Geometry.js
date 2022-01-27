@@ -24,12 +24,7 @@ function vector(P0, P1) {
 // angle from v1 to v2, anti-clockwise: positive, clockwise: negative
 function angleBetween(v1, v2) {
     let angle = Math.atan2(v2.y, v2.x) - Math.atan2(v1.y, v1.x);
-    if (angle > Math.PI) {
-        angle -= 2 * Math.PI;
-    } else if (angle <= -Math.PI) {
-        angle += 2 * Math.PI;
-    }
-    return angle;   // in radian
+    return angleNormalize(angle);
 }
 
 function vectorHeading(v) {

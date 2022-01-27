@@ -23,11 +23,11 @@ class JunctionConfigSampler {
 
                     const center_point = {
                         x: JUNCTION_GRID_WIDTH * junctionIndex + MAP_START_OFFSET_X,
-                        y: -JUNCTION_GRID_WIDTH * rowI + MAP_START_OFFSET_X,
+                        y: -JUNCTION_GRID_WIDTH * rowI + MAP_START_OFFSET_Y,
                         z: 0
                     };
 
-                    // Equally divide the roads for now.
+                    // divide the roads equally for now.
                     const junctionRoadCount = roadTopoGroup.roadTopoVec.length;
                     const roadSocketAngleGap = degreeToRad(360) / junctionRoadCount;
 
@@ -97,7 +97,7 @@ class JunctionConfigSampler {
 //         y: 0,
 //         z: 0
 //     },
-//     road_links: [
+//     road_sockets: [
 //         {
 //             roadId: "R_0",
 //             junction_center_angle: degreeToRad(30),

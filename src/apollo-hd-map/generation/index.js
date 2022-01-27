@@ -16,6 +16,10 @@ const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureEx
 // cluster junctions based on their road topology feature vector
 const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
 
+const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
+const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
+
+
 // sample new junction configurations including road socket information using the clustering results.
 const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
 const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 1);
