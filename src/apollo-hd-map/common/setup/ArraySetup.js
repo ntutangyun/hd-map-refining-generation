@@ -3,21 +3,6 @@ Array.prototype.random = function () {
     return this[Math.floor((Math.random() * this.length))];
 };
 
-Array.prototype.shuffle = function () {
-    const arr = [...this];
-    for (let i = arr.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
-
-        // swap elements array[i] and array[j]
-        // we use "destructuring assignment" syntax to achieve that
-        // you'll find more details about that syntax in later chapters
-        // same can be written as:
-        // let t = array[i]; array[i] = array[j]; array[j] = t
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-};
-
 Array.prototype.shuffleInPlace = function () {
     for (let i = this.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1)); // random index from 0 to i
@@ -29,6 +14,12 @@ Array.prototype.shuffleInPlace = function () {
         // let t = array[i]; array[i] = array[j]; array[j] = t
         [this[i], this[j]] = [this[j], this[i]];
     }
+};
+
+Array.prototype.shuffle = function () {
+    const arr = [...this];
+    arr.shuffleInPlace();
+    return arr;
 };
 
 Array.prototype.last = function () {
