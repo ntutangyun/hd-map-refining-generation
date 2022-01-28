@@ -164,6 +164,23 @@ class JunctionGridPoint {
         assignment.score += 5 - this.westRequirement.length;
     }
 
+    computeOppositeRequirement(directionTopo) {
+        switch (directionTopo) {
+            case "IN": {
+                return ["OUT"];
+            }
+            case "OUT": {
+                return ["IN"];
+            }
+            case "IN-OUT": {
+                return ["IN-OUT"];
+            }
+            default: {
+                return [...DEFAULT_DIRECTION_REQUIREMENT];
+            }
+        }
+    }
+
     assignTopoGroup(topoGroup, assignment) {
         this.topoGroup = topoGroup;
 
@@ -172,7 +189,70 @@ class JunctionGridPoint {
         this.west = assignment.WEST;
         this.south = assignment.SOUTH;
 
-        this.grid.extendFromPoint(this);
+        // extend the grid
+        {
+            // east direction
+            const xI = this.xI + 1;
+            const yI = this.yI;
+            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            if (!point) {
+                point = this.grid.addPoint(xI, yI);
+            }
+            if (!point.topoGroup) {
+                // free point, add proper assignment
+                point.westRequirement = this.computeOppositeRequirement(this.east);
+            } else {
+                // do nothing as it's already assigned a topo group.
+            }
+        }
+
+        {
+            // north direction
+            const xI = this.xI;
+            const yI = this.yI + 1;
+            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            if (!point) {
+                point = this.grid.addPoint(xI, yI);
+            }
+            if (!point.topoGroup) {
+                // free point, add proper assignment
+                point.southRequirement = this.computeOppositeRequirement(this.north);
+            } else {
+                // do nothing as it's already assigned a topo group.
+            }
+        }
+
+        {
+            // west direction
+            const xI = this.xI - 1;
+            const yI = this.yI;
+            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            if (!point) {
+                point = this.grid.addPoint(xI, yI);
+            }
+            if (!point.topoGroup) {
+                // free point, add proper assignment
+                point.eastRequirement = this.computeOppositeRequirement(this.west);
+            } else {
+                // do nothing as it's already assigned a topo group.
+            }
+        }
+
+        {
+            // south direction
+            const xI = this.xI;
+            const yI = this.yI - 1;
+            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            if (!point) {
+                point = this.grid.addPoint(xI, yI);
+            }
+            if (!point.topoGroup) {
+                // free point, add proper assignment
+                point.northRequirement = this.computeOppositeRequirement(this.south);
+            } else {
+                // do nothing as it's already assigned a topo group.
+            }
+        }
     }
 }
 
@@ -198,6 +278,7 @@ class JunctionGrid {
         }
         const freePoint = new JunctionGridPoint(this, xI, yI);
         this.pointList.push(freePoint);
+        return freePoint;
     }
 
     getFreePointList() {
@@ -242,14 +323,6 @@ class JunctionGrid {
         });
 
         return pointMatches[0];
-    }
-
-    extendFromPoint(point) {
-        const {xI, yI} = point;
-        this.addPoint(xI + 1, yI); // east
-        this.addPoint(xI, yI + 1); // north
-        this.addPoint(xI - 1, yI); // west
-        this.addPoint(xI, yI - 1); // south
     }
 }
 
