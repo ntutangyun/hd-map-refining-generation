@@ -17,7 +17,9 @@ function buildGridLayout(graph, roadTopoList) {
         const {point, assignment} = junctionGrid.computeBestMatch(topoGroup);
 
         if (assignment.score < 0) {
-            global.logE("BUILD_GRID_LAYOUT", "Cannot find a match for current topoGroup");
+            global.logE("BUILD_GRID_LAYOUT", "Cannot find a match for current topoGroup. Please try run again.");
+            console.log(junctionGrid);
+            console.log(topoGroup);
             process.exit(-1);
         }
 

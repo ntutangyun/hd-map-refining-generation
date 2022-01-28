@@ -20,7 +20,7 @@ const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
 const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
 
 console.log(junctionGrid);
-//
+
 //
 // // sample new junction configurations including road socket information using the clustering results.
 // const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
