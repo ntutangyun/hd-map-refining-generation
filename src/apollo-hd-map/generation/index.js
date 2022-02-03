@@ -19,7 +19,20 @@ const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
 const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
 const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
 
-console.log(junctionGrid);
+const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
+const config = {
+    hd_map_header: require("../common/hd_map_header.json"),
+    curveSampleCount: 20
+};
+const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
+
+const map = mapGenerator.generate();
+
+console.log(map);
+
+fs.writeFileSync("./base_map.bin", map.serializeBinary());
+fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
+fs.writeFileSync("./sim_map.bin", map.serializeBinary());
 
 //
 // // sample new junction configurations including road socket information using the clustering results.
@@ -30,9 +43,7 @@ console.log(junctionGrid);
 //
 // const MapGenerator = require("./Generators/MapGenerator");
 //
-// const config = {
-//     hd_map_header: require("../common/hd_map_header.json"), junction_samples, curveSampleCount: 20
-// };
+
 //
 // fs.writeFileSync("./index.config.json", JSON.stringify(config));
 //
@@ -40,6 +51,3 @@ console.log(junctionGrid);
 //
 // const map = mapGenerator.generate();
 //
-// fs.writeFileSync("./base_map.bin", map.serializeBinary());
-// fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
-// fs.writeFileSync("./sim_map.bin", map.serializeBinary());

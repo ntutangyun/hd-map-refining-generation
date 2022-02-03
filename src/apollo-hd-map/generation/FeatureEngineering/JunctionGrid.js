@@ -19,13 +19,34 @@ const DEFAULT_DIRECTION_ASSIGNMENT = {
     EAST: null, NORTH: null, WEST: null, SOUTH: null,
 };
 
-function formatGridPointId(xI, yI) {
-    return `grid-point-(${xI},${yI})`;
-}
-
 class JunctionGridPoint {
+    static formatGridPointId(xI, yI) {
+        return `grid-point-(${xI},${yI})`;
+    }
+
+    static getOppositeDirection(direction) {
+        switch (direction) {
+            case "east": {
+                return "west";
+            }
+            case "north": {
+                return "south";
+            }
+            case "west": {
+                return "east";
+            }
+            case "south": {
+                return "north";
+            }
+            default: {
+                global.logE("JunctionGridPoint", `Direction is invalid: ${direction}`);
+                process.exit(-1);
+            }
+        }
+    }
+
     constructor(grid, xI, yI, eastRequirement = DEFAULT_DIRECTION_REQUIREMENT, northRequirement = DEFAULT_DIRECTION_REQUIREMENT, westRequirement = DEFAULT_DIRECTION_REQUIREMENT, southRequirement = DEFAULT_DIRECTION_REQUIREMENT) {
-        this.id = formatGridPointId(xI, yI);
+        this.id = JunctionGridPoint.formatGridPointId(xI, yI);
         this.grid = grid;
         this.xI = xI;
         this.yI = yI;
@@ -48,6 +69,35 @@ class JunctionGridPoint {
 
     get name() {
         return this.constructor.name;
+    }
+
+    getOppositeGridPoint(direction) {
+        let xI = this.xI, yI = this.yI;
+        switch (direction) {
+            case "east": {
+                xI++;
+                break;
+            }
+            case "north": {
+                yI++;
+                break;
+            }
+            case "west": {
+                xI--;
+                break;
+            }
+            case "south": {
+                yI--;
+                break;
+            }
+        }
+
+        const pointId = JunctionGridPoint.formatGridPointId(xI, yI);
+        return this.grid.getPointByID(pointId);
+    }
+
+    formatJunctionId() {
+        return `J_(${this.xI},${this.yI})`;
     }
 
     // find best matching score
@@ -194,7 +244,7 @@ class JunctionGridPoint {
             // east direction
             const xI = this.xI + 1;
             const yI = this.yI;
-            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            let point = this.grid.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI));
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
@@ -210,7 +260,7 @@ class JunctionGridPoint {
             // north direction
             const xI = this.xI;
             const yI = this.yI + 1;
-            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            let point = this.grid.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI));
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
@@ -226,7 +276,7 @@ class JunctionGridPoint {
             // west direction
             const xI = this.xI - 1;
             const yI = this.yI;
-            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            let point = this.grid.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI));
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
@@ -242,7 +292,7 @@ class JunctionGridPoint {
             // south direction
             const xI = this.xI;
             const yI = this.yI - 1;
-            let point = this.grid.getPointByID(formatGridPointId(xI, yI));
+            let point = this.grid.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI));
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
@@ -272,7 +322,7 @@ class JunctionGrid {
     }
 
     addPoint(xI, yI) {
-        if (this.getPointByID(formatGridPointId(xI, yI))) {
+        if (this.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI))) {
             global.logI(this.name, `point at ${xI}, ${yI} already exists`);
             return;
         }
@@ -327,5 +377,5 @@ class JunctionGrid {
 }
 
 module.exports = {
-    JunctionGrid, JunctionGridPoint
+    JunctionGrid, JunctionGridPoint, DEFAULT_DIRECTIONS
 };
