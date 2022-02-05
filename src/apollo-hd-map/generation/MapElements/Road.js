@@ -8,6 +8,7 @@
 //      one left boundary (i.e. left most boundary of all reverse lanes)
 //      one right boundary (i.e. right most boundary of all reverse lanes)
 
+const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
 const RoadProto = require("../../protobuf_out/modules/map/proto/map_road_pb");
 const {BezierCurve} = require("../../common/ApolloHDMap/Geometry");
 const LaneGenerator = require("../Generators/LaneGenerator");
@@ -49,6 +50,7 @@ class Road {
         });
     }
 
+    // this is only called by general road, not junction lane road.
     buildLanes({forwardLaneCount, backwardLaneCount, laneWidth, forwardSpeedLimit, backwardSpeedLimit}) {
         this.forwardLaneList = [];
         this.backwardLaneList = [];
@@ -72,10 +74,17 @@ class Road {
                     isForward: true
                 });
 
+                lane.leftBoundaryType = LaneProto.LaneBoundaryType.Type.DOTTED_WHITE;
+                lane.rightBoundaryType = LaneProto.LaneBoundaryType.Type.DOTTED_WHITE;
+
                 lane.road = this;
                 lane.sampleWidth(i - 1, forwardLaneCount - i);
                 this.forwardLaneList.push(lane);
             }
+
+            // update lane boundaries
+            this.forwardLaneList.first().leftBoundaryType = LaneProto.LaneBoundaryType.Type.CURB;
+            this.forwardLaneList.last().rightBoundaryType = LaneProto.LaneBoundaryType.Type.CURB;
         }
 
         if (backwardLaneCount > 0) {
@@ -93,10 +102,18 @@ class Road {
                     speedLimit: backwardSpeedLimit,
                     isForward: false
                 });
+
+                lane.leftBoundaryType = LaneProto.LaneBoundaryType.Type.DOTTED_WHITE;
+                lane.rightBoundaryType = LaneProto.LaneBoundaryType.Type.DOTTED_WHITE;
+
                 lane.road = this;
                 lane.sampleWidth(i - 1, backwardLaneCount - i);
                 this.backwardLaneList.push(lane);
             }
+
+            // update lane boundaries
+            this.backwardLaneList.first().leftBoundaryType = LaneProto.LaneBoundaryType.Type.CURB;
+            this.backwardLaneList.last().rightBoundaryType = LaneProto.LaneBoundaryType.Type.CURB;
         }
 
         if (this.forwardLaneList.length > 1) {
