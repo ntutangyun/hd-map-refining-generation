@@ -3,8 +3,13 @@ const JunctionGenerator = require("./JunctionGenerator");
 const Junction = require("../MapElements/Junction");
 const {Point} = require("../../common/ApolloHDMap/Geometry");
 const {JunctionGridPoint, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/JunctionGrid");
-const {getRandomIntInclusive} = require("../../common/mathUtils");
-const {DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH} = require("../../common/constants");
+const {getRandomIntInclusive, getHypotenuse} = require("../../common/mathUtils");
+const {
+    DEFAULT_ROAD_SOCKET_X_OFFSET,
+    DEFAULT_LANE_WIDTH,
+    MAX_LANE_COUNT_PER_ROAD,
+    DEFAULT_ROAD_LENGTH
+} = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
 
 class MapGeneratorGrid {
@@ -27,6 +32,8 @@ class MapGeneratorGrid {
         this.instantiateJunctions();
         this.instantiateRoads();
 
+        this.updateJunctions();
+
         return this.map;
     }
 
@@ -45,7 +52,8 @@ class MapGeneratorGrid {
     }
 
     instantiateRoads() {
-        const roadConfigs = [];
+        console.log(this.junctionGrid);
+        console.log(this.junctionGrid.pointList.filter(p => p.junction !== null));
         this.junctionGrid.pointList
             .filter(point => point.junction !== null)
             .forEach(junctionPoint => {
@@ -55,6 +63,11 @@ class MapGeneratorGrid {
 
                     // self direction is null. no road is instantiated.
                     if (junctionPoint[direction] === null) {
+                        return;
+                    }
+
+                    // check if a road has already been instantiated or not
+                    if (junctionPoint.roadAssignment[direction] !== null) {
                         return;
                     }
 
@@ -92,6 +105,7 @@ class MapGeneratorGrid {
                             process.exit(-1);
                         }
 
+                        // starts from junction = true
                         //                                        y_offset
                         //  junction_center                       |
                         //    * ----------------------------------|
@@ -100,95 +114,202 @@ class MapGeneratorGrid {
                         // imagine the x_offset of the road socket is at the distance of DEFAULT_ROAD_SOCKET_X_OFFSET,
                         // then for every forward lane / outgoing lane, the y_offset increases by 0.5,
                         // for every backward lane / incoming lane, the y_offset decreases by 0.5
-                        let xOffset, yOffset;
-                        xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+
+                        // starts from junction = false
+                        //
+                        //  junction_center             |  0.75 * JUNCTION GRID GAP   |
+                        //    * ------------------------|-----------------------------|
+                        //                            x_offset                        y_offset
+                        //
+                        // imagine the x_offset of the road socket is at the distance of DEFAULT_ROAD_SOCKET_X_OFFSET,
+                        // then for every forward lane / outgoing lane, the y_offset increases by 0.5,
+                        // for every backward lane / incoming lane, the y_offset decreases by 0.5
+                        let startPoint, startHeading, endPoint, endHeading;
+
+                        const directionAngle = JunctionGridPoint.getDirectionAngle(direction);
+                        const directionOppositeAngle = JunctionGridPoint.getDirectionOppositeAngle(direction);
+
                         if (startsFromJunction) {
-                            yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
+
+                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                            const yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
+
+                            const localCenterAngle = Math.atan2(yOffset, xOffset);
+                            const junctionCenterAngle = directionAngle + localCenterAngle;
+                            const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
+
+                            startPoint = junctionPoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
+                            startHeading = directionAngle;
+
+                            endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
+                            endHeading = startHeading;
+
                         } else {
-                            yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
+                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                            const yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
+
+                            const localCenterAngle = Math.atan2(yOffset, xOffset);
+                            const junctionCenterAngle = directionAngle + localCenterAngle;
+                            const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
+
+                            endPoint = junctionPoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
+                            endHeading = directionOppositeAngle;
+
+                            startPoint = endPoint.moveTowards(directionAngle, DEFAULT_ROAD_LENGTH);
+                            startHeading = endHeading;
                         }
 
-                        const localCenterAngle = Math.atan2(yOffset, xOffset);
-                        const junction_center_angle = roadSocketAngleGap * roadLocalIndex + localCenterAngle;
-                        const junction_center_distance = localCenterAngle === 0 ? DEFAULT_ROAD_SOCKET_X_OFFSET : yOffset / Math.sin(localCenterAngle);
-                        const self_rotation = -localCenterAngle;
-
-                        const startPoint = junction.centerPoint.moveTowards(junction_center_angle, junction_center_distance);
-                        const startHeading = junction_center_angle + self_rotation;
-
-                        const endPoint = startPoint.moveTowards(startHeading, 20);
-                        const endHeading = startHeading;
-
                         const road = RoadGenerator.generateRoad({
-                            road_id,
+                            roadId,
                             startPoint,
                             startHeading,
                             endPoint,
                             endHeading,
-                            forwardLaneCount: outgoing_lane_count,
-                            backwardLaneCount: incoming_lane_count
+                            forwardLaneCount,
+                            backwardLaneCount,
                         });
 
-                        // road_id,
-                        //     junction_center_angle,
-                        //     junction_center_distance,
-                        //     self_rotation,
-                        //     outgoing_lane_count,
-                        //     incoming_lane_count
+                        junctionPoint.assignRoad(direction, road);
+
+                        junctionPoint.junction.connectRoad(road);
 
                     } else {
+                        // check if a road has already been created
+                        if (oppositePoint.roadAssignment[oppositeDirection] !== null) {
+                            global.logE(this.name, "Road created in opposite direction. Something went wrong. This should not happen.");
+                            process.exit(-1);
+                        }
+
+                        // if the road topo is IN, road will be named after and starts from the opposite junction.
+                        // road will be created at the opposite point, not here.
+                        if (roadTopo === "IN") {
+                            return;
+                        }
+
                         // create road connecting to junctions on both side
-                    }
+                        // road starts from and is named after the current junction.
+                        const roadId = `R_${junctionPoint.junction.id}_${direction}`;
 
-                    switch (junctionPoint.east) {
-                        case "IN-OUT": {
-                            // check opposite direction has junction or not
+                        let forwardLaneCount, backwardLaneCount;
+                        if (roadTopo === "IN-OUT") {
+                            // randomly select number of total lanes in the road
+                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
+                            backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
+                        } else if (roadTopo === "OUT") {
+                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            backwardLaneCount = 0;
+                        } else {
+                            global.logE(this.name, `Unknown roadTopo: ${roadTopo}`);
+                            process.exit(-1);
+                        }
 
-                            break;
-                        }
-                        case "IN": {
+                        // starts from junction = true
+                        //                                        y_offset
+                        //  junction_center                       |
+                        //    * ----------------------------------|
+                        //                 x_offset               |
+                        //
+                        // imagine the x_offset of the road socket is at the distance of DEFAULT_ROAD_SOCKET_X_OFFSET,
+                        // then for every forward lane / outgoing lane, the y_offset increases by 0.5,
+                        // for every backward lane / incoming lane, the y_offset decreases by 0.5
 
-                            break;
-                        }
-                        case "OUT": {
+                        let startPoint, startHeading, endPoint, endHeading;
 
-                            break;
-                        }
-                        default: {
-                            global.logE(this.name, `Invalid grid direction assignment on east ${junctionPoint.east}`);
-                            break;
-                        }
+                        const directionAngle = JunctionGridPoint.getDirectionAngle(direction);
+
+                        const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                        const yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
+
+                        const localCenterAngle = Math.atan2(yOffset, xOffset);
+                        const junctionCenterAngle = directionAngle + localCenterAngle;
+                        const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
+
+                        startPoint = junctionPoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
+                        startHeading = directionAngle;
+
+                        endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
+                        endHeading = startHeading;
+
+                        const road = RoadGenerator.generateRoad({
+                            roadId,
+                            startPoint,
+                            startHeading,
+                            endPoint,
+                            endHeading,
+                            forwardLaneCount,
+                            backwardLaneCount,
+                        });
+
+                        junctionPoint.assignRoad(direction, road);
+                        oppositePoint.assignRoad(oppositeDirection, road);
+
+                        junctionPoint.junction.connectRoad(road);
+                        oppositePoint.junction.connectRoad(road);
                     }
                 });
             });
     }
 
-    generateJunctions() {
-        this.config.junction_samples.forEach(junctionSample => {
-            const junction = JunctionGenerator.generateJunction(junctionSample);
+    updateJunctions() {
+        const roadList = {};
 
-            junction.laneRoadList.forEach(jLaneRoad => {
+        this.junctionGrid.pointList.filter(p => p.junction !== null).forEach(junctionPoint => {
+            junctionPoint.junction.generateJunctionLanes();
+            junctionPoint.junction.generatePolygon();
+            junctionPoint.junction.generateLaneOverlap();
+
+            junctionPoint.junction.laneRoadList.forEach(jLaneRoad => {
                 jLaneRoad.getLaneList().forEach(lane => {
                     this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
                 });
                 this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
             });
 
-            junction.getOverlapList().forEach(overlap => {
+            junctionPoint.junction.getOverlapList().forEach(overlap => {
                 this.map.addOverlap(overlap.serializeToProtobuf());
             });
 
-            junction.getConnectedRoadList().forEach(road => {
-                road.getLaneList().forEach(lane => {
-                    this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-                });
-                this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+            junctionPoint.junction.getConnectedRoadList().forEach(road => {
+                roadList[road.id] = road;
             });
-            this.junctionGrid = junctionGrid;
 
-            this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
+            this.map.addJunction(junctionPoint.junction.serializeToProtobuf(this.config.curveSampleCount));
+        });
+
+        Object.values(roadList).forEach(road => {
+            road.getLaneList().forEach(lane => {
+                this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+            });
+            this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
         });
     }
+
+    // generateJunctions() {
+    //     this.config.junction_samples.forEach(junctionSample => {
+    //         const junction = JunctionGenerator.generateJunction(junctionSample);
+    //
+    //         junction.laneRoadList.forEach(jLaneRoad => {
+    //             jLaneRoad.getLaneList().forEach(lane => {
+    //                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+    //             });
+    //             this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
+    //         });
+    //
+    //         junction.getOverlapList().forEach(overlap => {
+    //             this.map.addOverlap(overlap.serializeToProtobuf());
+    //         });
+    //
+    //         junction.getConnectedRoadList().forEach(road => {
+    //             road.getLaneList().forEach(lane => {
+    //                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+    //             });
+    //             this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+    //         });
+    //         this.junctionGrid = junctionGrid;
+    //
+    //         this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
+    //     });
+    // }
 }
 
 module.exports = MapGeneratorGrid;

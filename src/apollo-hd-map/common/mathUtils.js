@@ -63,6 +63,10 @@ function radToDegree(rad) {
     return rad / Math.PI * 180;
 }
 
+function getHypotenuse(a, b) {
+    return Math.sqrt(a * a + b * b);
+}
+
 module.exports = {
     bound,
     getRandomIntInclusive,
@@ -73,6 +77,7 @@ module.exports = {
     square,
     cube,
     degreeToRad,
-    radToDegree
+    radToDegree,
+    getHypotenuse
 };
 

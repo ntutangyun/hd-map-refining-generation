@@ -19,6 +19,10 @@ class Junction {
         this.overlapList = [];
     }
 
+    get name() {
+        return this.constructor.name;
+    }
+
     getLaneList() {
         return [...this.laneList];
     }
@@ -28,7 +32,11 @@ class Junction {
     }
 
     connectRoad(road) {
-        this.connectedRoadList.push(road);
+        if (!this.connectedRoadList.find(r => r.id === road.id)) {
+            this.connectedRoadList.push(road);
+        } else {
+            global.logI(this.name, `road ${road.id} is already connected to junction ${this.id}`);
+        }
     }
 
     getConnectedRoadList() {

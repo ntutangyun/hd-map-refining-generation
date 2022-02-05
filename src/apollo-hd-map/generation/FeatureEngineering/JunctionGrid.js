@@ -1,3 +1,4 @@
+const {degreeToRad} = require("../../common/mathUtils");
 const GRID_START_OFFSET_X = 10000;
 const GRID_START_OFFSET_Y = 10000;
 const GRID_POINT_MARGIN = 100;
@@ -24,19 +25,61 @@ class JunctionGridPoint {
         return `grid-point-(${xI},${yI})`;
     }
 
+    static getDirectionAngle(direction) {
+        switch (direction) {
+            case "EAST": {
+                return 0;
+            }
+            case "NORTH": {
+                return degreeToRad(90);
+            }
+            case "WEST": {
+                return degreeToRad(180);
+            }
+            case "SOUTH": {
+                return degreeToRad(-90);
+            }
+            default: {
+                global.logE("JunctionGridPoint", `Direction is invalid: ${direction}`);
+                process.exit(-1);
+            }
+        }
+    }
+
+    static getDirectionOppositeAngle(direction) {
+        switch (direction) {
+            case "EAST": {
+                return degreeToRad(180);
+            }
+            case "NORTH": {
+                return degreeToRad(-90);
+            }
+            case "WEST": {
+                return degreeToRad(0);
+            }
+            case "SOUTH": {
+                return degreeToRad(90);
+            }
+            default: {
+                global.logE("JunctionGridPoint", `Direction is invalid: ${direction}`);
+                process.exit(-1);
+            }
+        }
+    }
+
     static getOppositeDirection(direction) {
         switch (direction) {
-            case "east": {
-                return "west";
+            case "EAST": {
+                return "WEST";
             }
-            case "north": {
-                return "south";
+            case "NORTH": {
+                return "SOUTH";
             }
-            case "west": {
-                return "east";
+            case "WEST": {
+                return "EAST";
             }
-            case "south": {
-                return "north";
+            case "SOUTH": {
+                return "NORTH";
             }
             default: {
                 global.logE("JunctionGridPoint", `Direction is invalid: ${direction}`);
@@ -56,37 +99,48 @@ class JunctionGridPoint {
 
         this.topoGroup = null;
 
-        this.east = null;
-        this.north = null;
-        this.west = null;
-        this.south = null;
+        this.EAST = null;
+        this.NORTH = null;
+        this.WEST = null;
+        this.SOUTH = null;
 
         this.eastRequirement = eastRequirement;
         this.northRequirement = northRequirement;
         this.westRequirement = westRequirement;
         this.southRequirement = southRequirement;
+
+        this.roadAssignment = {
+            EAST: null,
+            NORTH: null,
+            WEST: null,
+            SOUTH: null,
+        };
     }
 
     get name() {
         return this.constructor.name;
     }
 
+    assignRoad(direction, road) {
+        this.roadAssignment[direction] = road;
+    }
+
     getOppositeGridPoint(direction) {
         let xI = this.xI, yI = this.yI;
         switch (direction) {
-            case "east": {
+            case "EAST": {
                 xI++;
                 break;
             }
-            case "north": {
+            case "NORTH": {
                 yI++;
                 break;
             }
-            case "west": {
+            case "WEST": {
                 xI--;
                 break;
             }
-            case "south": {
+            case "SOUTH": {
                 yI--;
                 break;
             }
@@ -234,10 +288,10 @@ class JunctionGridPoint {
     assignTopoGroup(topoGroup, assignment) {
         this.topoGroup = topoGroup;
 
-        this.east = assignment.EAST;
-        this.north = assignment.NORTH;
-        this.west = assignment.WEST;
-        this.south = assignment.SOUTH;
+        this.EAST = assignment.EAST;
+        this.NORTH = assignment.NORTH;
+        this.WEST = assignment.WEST;
+        this.SOUTH = assignment.SOUTH;
 
         // extend the grid
         {
@@ -250,7 +304,7 @@ class JunctionGridPoint {
             }
             if (!point.topoGroup) {
                 // free point, add proper assignment
-                point.westRequirement = this.computeOppositeRequirement(this.east);
+                point.westRequirement = this.computeOppositeRequirement(this.EAST);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -266,7 +320,7 @@ class JunctionGridPoint {
             }
             if (!point.topoGroup) {
                 // free point, add proper assignment
-                point.southRequirement = this.computeOppositeRequirement(this.north);
+                point.southRequirement = this.computeOppositeRequirement(this.NORTH);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -282,7 +336,7 @@ class JunctionGridPoint {
             }
             if (!point.topoGroup) {
                 // free point, add proper assignment
-                point.eastRequirement = this.computeOppositeRequirement(this.west);
+                point.eastRequirement = this.computeOppositeRequirement(this.WEST);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -298,7 +352,7 @@ class JunctionGridPoint {
             }
             if (!point.topoGroup) {
                 // free point, add proper assignment
-                point.northRequirement = this.computeOppositeRequirement(this.south);
+                point.northRequirement = this.computeOppositeRequirement(this.SOUTH);
             } else {
                 // do nothing as it's already assigned a topo group.
             }

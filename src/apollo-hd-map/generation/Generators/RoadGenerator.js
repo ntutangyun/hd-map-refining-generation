@@ -2,7 +2,7 @@ const Road = require("../MapElements/Road");
 
 class RoadGenerator {
     static generateRoad({
-                            road_id,
+                            roadId,
                             startPoint,
                             startHeading,
                             endPoint,
@@ -15,9 +15,8 @@ class RoadGenerator {
                         }) {
 
         const road = new Road({
-            id: road_id, startPoint, startHeading, endPoint, endHeading,
+            id: roadId, startPoint, startHeading, endPoint, endHeading,
         });
-        // generating road central curve
         road.buildCentralCurve();
         road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});
         return road;
