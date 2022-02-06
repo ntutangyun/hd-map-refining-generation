@@ -1,5 +1,4 @@
 const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
-const JunctionGenerator = require("./JunctionGenerator");
 const Junction = require("../MapElements/Junction");
 const {Point} = require("../../common/ApolloHDMap/Geometry");
 const {JunctionGridPoint, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/JunctionGrid");
