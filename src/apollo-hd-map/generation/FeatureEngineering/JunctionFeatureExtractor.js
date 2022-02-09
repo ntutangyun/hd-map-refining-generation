@@ -1,5 +1,6 @@
 const {vectorHeading, vector} = require("../../common/ApolloHDMap/Geometry");
 const {matchVectorRotation} = require("../../common/arrayUtils");
+const TwoWayRoad = require("../../common/ApolloHDMap/TwoWayRoad");
 
 // junction topology is now represented by the sequence of in-out road types.
 // e.g. [in, in, inout, out] for a four road junction
@@ -26,22 +27,33 @@ class JunctionRoadTopoGroup {
     }
 
     static extractRoadTopoVector(junction) {
-        const roadList = junction.getRoadList().sort((roadA, roadB) => {
+        const neighborList = junction.getConnectedJunctionAndRoad().sort((neighborA, neighborB) => {
             const junctionCenter = junction.getPolygonCenter();
 
-            const roadAOutgoing = junction.isRoadOutgoing(roadA);
-            const roadBOutgoing = junction.isRoadOutgoing(roadB);
+            let neighborARotation, neighborBRotation;
 
-            const roadACurvePoint = roadAOutgoing ? roadA.startPoint : roadA.endPoint;
-            const roadBCurvePoint = roadBOutgoing ? roadB.startPoint : roadB.endPoint;
+            if (neighborA instanceof TwoWayRoad) {
+                const neighborAOutgoing = junction.isRoadOutgoing(neighborA);
+                const neighborACurvePoint = neighborAOutgoing ? neighborA.startPoint : neighborA.endPoint;
+                neighborARotation = vectorHeading(vector(junctionCenter, neighborACurvePoint));
+            } else {
+                const neighborACenter = neighborA.getPolygonCenter();
+                neighborARotation = vectorHeading(vector(junctionCenter, neighborACenter));
+            }
 
-            const roadARotation = vectorHeading(vector(junctionCenter, roadACurvePoint));
-            const roadBRotation = vectorHeading(vector(junctionCenter, roadBCurvePoint));
+            if (neighborB instanceof TwoWayRoad) {
+                const neighborBOutgoing = junction.isRoadOutgoing(neighborB);
+                const neighborBCurvePoint = neighborBOutgoing ? neighborB.startPoint : neighborB.endPoint;
+                neighborBRotation = vectorHeading(vector(junctionCenter, neighborBCurvePoint));
+            } else {
+                const neighborBCenter = neighborB.getPolygonCenter();
+                neighborBRotation = vectorHeading(vector(junctionCenter, neighborBCenter));
+            }
 
-            return roadARotation - roadBRotation;
+            return neighborARotation - neighborBRotation;
         });
 
-        return roadList.map(road => {
+        return neighborList.map(road => {
             if (road.incoming.hasOwnProperty(junction.id) && road.outgoing.hasOwnProperty(junction.id)) {
                 return "IN-OUT";
             }
@@ -58,7 +70,10 @@ class JunctionRoadTopoGroup {
 class JunctionFeatureExtractor {
     static computeRoadTopoGroups(graph) {
         const roadTopoGroupList = [];
-        const junctionList = graph.getJunctionList();
+        // currently, only support junctions with four connected roads.
+        // for the shalun map, the mega-junction with 8 connected roads can be modified to 4-road junctions.
+        const junctionList = graph.getJunctionList().filter(junction => junction.getConnectedJunctionAndRoad().length <= 4);
+
         junctionList.forEach(junction => {
             let junctionAdded = false;
             for (const roadTopoGroup of roadTopoGroupList) {
@@ -74,7 +89,6 @@ class JunctionFeatureExtractor {
 
         return roadTopoGroupList;
     }
-
 }
 
 module.exports = JunctionFeatureExtractor;

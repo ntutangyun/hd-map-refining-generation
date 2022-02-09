@@ -110,10 +110,7 @@ class JunctionGridPoint {
         this.southRequirement = southRequirement;
 
         this.roadAssignment = {
-            EAST: null,
-            NORTH: null,
-            WEST: null,
-            SOUTH: null,
+            EAST: null, NORTH: null, WEST: null, SOUTH: null,
         };
     }
 
@@ -157,8 +154,8 @@ class JunctionGridPoint {
     // find best matching score
     computeBestAssignment(topoGroup) {
         const topoVector = topoGroup.roadTopoVec;
+        global.logI(this.name, topoVector.toString());
         const topoDirectionAssignment = this.getPossibleDirectionAssignments(topoVector);
-
         // iterate through all the possible direction assignments. and find the best match
         topoDirectionAssignment.sort((a1, a2) => {
             return a2.score - a1.score;
@@ -278,6 +275,9 @@ class JunctionGridPoint {
             }
             case "IN-OUT": {
                 return ["IN-OUT"];
+            }
+            case null: {
+                return [null];
             }
             default: {
                 return [...DEFAULT_DIRECTION_REQUIREMENT];

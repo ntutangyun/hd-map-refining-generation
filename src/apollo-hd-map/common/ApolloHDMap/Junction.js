@@ -173,6 +173,21 @@ class Junction {
         return Object.values(roadList);
     }
 
+    getConnectedJunctionAndRoad() {
+        const neighborList = {};
+        this.getIncomingList()
+            .filter(neighbor => (neighbor instanceof TwoWayRoad) || (neighbor instanceof Junction))
+            .forEach(neighbor => {
+                neighborList[neighbor.id] = neighbor;
+            });
+        this.getOutgoingList()
+            .filter(neighbor => (neighbor instanceof TwoWayRoad) || (neighbor instanceof Junction))
+            .forEach(neighbor => {
+                neighborList[neighbor.id] = neighbor;
+            });
+        return Object.values(neighborList);
+    }
+
     // get all the overlapping crosswalks of junction's lanes
     getCrosswalkList() {
         let junctionLaneList = this.getLaneList();

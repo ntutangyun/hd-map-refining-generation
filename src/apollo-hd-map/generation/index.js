@@ -1,13 +1,15 @@
 require("../common/setup");
 const fs = require("fs");
 
+const mapName = "san_francisco";
+
 // read existing hd map data
-const graphData = require("../../../data/apollo/san_francisco_routing_map.json");
-const mapData = require("../../../data/apollo/san_francisco_base_map.json");
+const graphData = require(`../../../data/apollo/${mapName}_routing_map.json`);
+const mapData = require(`../../../data/apollo/${mapName}_base_map.json`);
 
 // parse hd map data
 const Graph = require("../common/ApolloHDMap/Graph");
-const graph = new Graph("san_francisco_roadonly");
+const graph = new Graph(mapName);
 graph.init(graphData, mapData);
 
 // extract junction feature vectors
@@ -28,7 +30,7 @@ const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
 
 const map = mapGenerator.generate();
 
-console.log(map);
+// console.log(map);
 
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
