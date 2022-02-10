@@ -1,7 +1,7 @@
 import carla
 
 # Read the .osm data
-f = open("../data/openStreetMap/blk842.osm", 'r')
+f = open("../data/openStreetMap/san_francisco_neighbor_junction.osm", 'r')
 osm_data = f.read()
 f.close()
 
@@ -13,6 +13,6 @@ settings.set_osm_way_types(["motorway", "motorway_link", "trunk", "trunk_link", 
 xodr_data = carla.Osm2Odr.convert(osm_data, settings)
 
 # save opendrive file
-f = open("../data/openDrive/blk842.xodr", 'w')
+f = open("../data/openDrive/san_francisco_neighbor_junction.xodr", 'w')
 f.write(xodr_data)
 f.close()
