@@ -15,26 +15,29 @@ graph.init(graphData, mapData);
 // extract junction feature vectors
 const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureExtractor");
 
-// cluster junctions based on their road topology feature vector
-const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
-
-const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
-const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
-
-const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
-const config = {
-    hd_map_header: require("../common/hd_map_header.json"),
-    curveSampleCount: 20
-};
-const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
-
-const map = mapGenerator.generate();
-
-// console.log(map);
-
-fs.writeFileSync("./base_map.bin", map.serializeBinary());
-fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
-fs.writeFileSync("./sim_map.bin", map.serializeBinary());
+// cluster junction based on their topology and geometry feature
+const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
+//
+// // cluster junctions based on their road topology feature vector
+// const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
+//
+// const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
+// const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
+//
+// const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
+// const config = {
+//     hd_map_header: require("../common/hd_map_header.json"),
+//     curveSampleCount: 20
+// };
+// const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
+//
+// const map = mapGenerator.generate();
+//
+// // console.log(map);
+//
+// fs.writeFileSync("./base_map.bin", map.serializeBinary());
+// fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
+// fs.writeFileSync("./sim_map.bin", map.serializeBinary());
 
 //
 // // sample new junction configurations including road socket information using the clustering results.

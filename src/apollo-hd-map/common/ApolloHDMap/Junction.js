@@ -1,4 +1,4 @@
-const {checkLineSegmentIntersect, pointDist} = require("./Geometry");
+const {checkLineSegmentIntersect, pointDist, vectorHeading, vector} = require("./Geometry");
 const TwoWayRoad = require("./TwoWayRoad");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
@@ -186,6 +186,18 @@ class Junction {
                 neighborList[neighbor.id] = neighbor;
             });
         return Object.values(neighborList);
+    }
+
+    // a neighbor of a junction can be a junction or road
+    getNeighborCenterRotation(neighbor) {
+        if (neighbor instanceof TwoWayRoad) {
+            const neighborOutgoing = this.isRoadOutgoing(neighbor);
+            const neighborCurvePoint = neighborOutgoing ? neighbor.startPoint : neighbor.endPoint;
+            return vectorHeading(vector(this.getPolygonCenter(), neighborCurvePoint));
+        } else {
+            const neighborCenter = neighbor.getPolygonCenter();
+            return vectorHeading(vector(this.getPolygonCenter(), neighborCenter));
+        }
     }
 
     // get all the overlapping crosswalks of junction's lanes

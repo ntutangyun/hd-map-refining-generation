@@ -1,4 +1,5 @@
 const JunctionRoadTopoGroup = require("./JunctionRoadTopoGroup");
+const JunctionTopoGeoCluster = require("./JunctionTopoGeoCluster");
 
 class JunctionFeatureExtractor {
     static computeRoadTopoGroups(graph) {
@@ -21,6 +22,19 @@ class JunctionFeatureExtractor {
         });
 
         return roadTopoGroupList;
+    }
+
+    static junctionTopoGeoClustering(graph) {
+        const junctionList = graph.getJunctionList();
+
+        const junctionListWithTopoGeoInfo = graph.getJunctionList().map(junction => {
+            const feature = JunctionTopoGeoCluster.extractJunctionTopoGeoInfo(junction);
+            return {
+                junction, feature
+            };
+        });
+
+        return junctionList;
     }
 }
 

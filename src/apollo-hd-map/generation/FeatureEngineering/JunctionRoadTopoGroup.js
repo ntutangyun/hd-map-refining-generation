@@ -2,8 +2,6 @@
 // e.g. [in, in, inout, out] for a four road junction
 // note that all the roads are now two-way roads.
 const {matchVectorRotation} = require("../../common/arrayUtils");
-const TwoWayRoad = require("../../common/ApolloHDMap/TwoWayRoad");
-const {vectorHeading, vector} = require("../../common/ApolloHDMap/Geometry");
 
 class JunctionRoadTopoGroup {
     constructor(firstJunction) {
@@ -28,37 +26,15 @@ class JunctionRoadTopoGroup {
 
     static extractRoadTopoVector(junction) {
         const neighborList = junction.getConnectedJunctionAndRoad().sort((neighborA, neighborB) => {
-            const junctionCenter = junction.getPolygonCenter();
-
-            let neighborARotation, neighborBRotation;
-
-            if (neighborA instanceof TwoWayRoad) {
-                const neighborAOutgoing = junction.isRoadOutgoing(neighborA);
-                const neighborACurvePoint = neighborAOutgoing ? neighborA.startPoint : neighborA.endPoint;
-                neighborARotation = vectorHeading(vector(junctionCenter, neighborACurvePoint));
-            } else {
-                const neighborACenter = neighborA.getPolygonCenter();
-                neighborARotation = vectorHeading(vector(junctionCenter, neighborACenter));
-            }
-
-            if (neighborB instanceof TwoWayRoad) {
-                const neighborBOutgoing = junction.isRoadOutgoing(neighborB);
-                const neighborBCurvePoint = neighborBOutgoing ? neighborB.startPoint : neighborB.endPoint;
-                neighborBRotation = vectorHeading(vector(junctionCenter, neighborBCurvePoint));
-            } else {
-                const neighborBCenter = neighborB.getPolygonCenter();
-                neighborBRotation = vectorHeading(vector(junctionCenter, neighborBCenter));
-            }
-
-            return neighborARotation - neighborBRotation;
+            return junction.getNeighborCenterRotation(neighborA) - junction.getNeighborCenterRotation(neighborB);
         });
 
-        return neighborList.map(road => {
-            if (road.incoming.hasOwnProperty(junction.id) && road.outgoing.hasOwnProperty(junction.id)) {
+        return neighborList.map(neighbor => {
+            if (neighbor.incoming.hasOwnProperty(junction.id) && neighbor.outgoing.hasOwnProperty(junction.id)) {
                 return "IN-OUT";
             }
 
-            if (road.incoming.hasOwnProperty(junction.id)) {
+            if (neighbor.incoming.hasOwnProperty(junction.id)) {
                 return "OUT";
             }
 
