@@ -17,7 +17,9 @@ const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureEx
 
 // cluster junction based on their topology and geometry feature
 const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
-//
+
+console.log(junctionClusters);
+
 // // cluster junctions based on their road topology feature vector
 // const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
 //

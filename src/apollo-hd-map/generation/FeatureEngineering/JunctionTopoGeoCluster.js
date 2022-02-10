@@ -1,5 +1,25 @@
+const {matchVectorRotation} = require("../../common/arrayUtils");
+const JunctionRoadTopoGroup = require("./JunctionRoadTopoGroup");
+
 class JunctionTopoGeoCluster {
-    constructor(graph) {
+    constructor(firstJunction) {
+        this.junctionList = {[firstJunction.id]: firstJunction};
+        this.roadTopoVec = JunctionRoadTopoGroup.extractRoadTopoVector(firstJunction);
+    }
+
+    tryAdd(junction) {
+        if (this.junctionList.hasOwnProperty(junction.id)) {
+            return true;
+        }
+
+        const roadTopoVector = JunctionRoadTopoGroup.extractRoadTopoVector(junction);
+
+        if (matchVectorRotation(this.roadTopoVec, roadTopoVector)) {
+            this.junctionList[junction.id] = junction;
+            return true;
+        }
+
+        return false;
     }
 
     static extractJunctionTopoGeoInfo(junction) {

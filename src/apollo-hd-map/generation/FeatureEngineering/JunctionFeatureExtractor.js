@@ -25,16 +25,24 @@ class JunctionFeatureExtractor {
     }
 
     static junctionTopoGeoClustering(graph) {
+        const junctionTopoGeoClusters = [];
+
         const junctionList = graph.getJunctionList();
 
-        const junctionListWithTopoGeoInfo = graph.getJunctionList().map(junction => {
-            const feature = JunctionTopoGeoCluster.extractJunctionTopoGeoInfo(junction);
-            return {
-                junction, feature
-            };
+        junctionList.forEach(junction => {
+            let junctionAdded = false;
+            for (const cluster of junctionTopoGeoClusters) {
+                if (cluster.tryAdd(junction)) {
+                    junctionAdded = true;
+                    break;
+                }
+            }
+            if (!junctionAdded) {
+                junctionTopoGeoClusters.push(new JunctionTopoGeoCluster(junction));
+            }
         });
 
-        return junctionList;
+        return junctionTopoGeoClusters;
     }
 }
 

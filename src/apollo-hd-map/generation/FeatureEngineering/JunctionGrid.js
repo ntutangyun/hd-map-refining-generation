@@ -389,27 +389,6 @@ class JunctionGrid {
         return this.pointList.filter(p => p.topoGroup === null);
     }
 
-    // tryAddTopoGroup(topoGroup) {
-    //     const freePoints = this.getFreePointList();
-    //
-    //     if (freePoints.length === 0) {
-    //         global.logE(this.name, "There is no free points in the junction grid...");
-    //         process.exit(-1);
-    //         return false;
-    //     }
-    //
-    //     const pointMatches = freePoints.map(point => ({
-    //         point, assignment: point.computeBestAssignment(topoGroup)
-    //     })).sort((m1, m2) => {
-    //         return m2.assignment.score - m1.assignment.score;
-    //     });
-    //
-    //     if (pointMatches[0].score < 0) {
-    //         // Cannot find a free point to match the current topo-group.
-    //         return false;
-    //     }
-    // }
-
     // find best match between free points and the topoGroup.
     computeBestMatch(topoGroup) {
         const freePoints = this.getFreePointList();
