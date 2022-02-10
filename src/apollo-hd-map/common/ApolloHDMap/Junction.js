@@ -192,7 +192,7 @@ class Junction {
     getNeighborCenterRotation(neighbor) {
         if (neighbor instanceof TwoWayRoad) {
             const neighborOutgoing = this.isRoadOutgoing(neighbor);
-            const neighborCurvePoint = neighborOutgoing ? neighbor.startPoint : neighbor.endPoint;
+            const neighborCurvePoint = neighborOutgoing ? neighbor.getStartCenter() : neighbor.getEndCenter();
             return vectorHeading(vector(this.getPolygonCenter(), neighborCurvePoint));
         } else {
             const neighborCenter = neighbor.getPolygonCenter();

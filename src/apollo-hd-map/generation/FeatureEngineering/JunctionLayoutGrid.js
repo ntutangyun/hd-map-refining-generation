@@ -10,7 +10,7 @@ function buildGridLayout(graph, roadTopoList) {
 
     while (localTopoList.length > 0) {
         localTopoList.sort((t1, t2) => {
-            return junctionGrid.computeBestMatch(t2).assignment.score - junctionGrid.computeBestMatch(t2).assignment.score;
+            return junctionGrid.computeBestMatch(t2).assignment.score - junctionGrid.computeBestMatch(t1).assignment.score;
         });
 
         const topoGroup = localTopoList.shift();

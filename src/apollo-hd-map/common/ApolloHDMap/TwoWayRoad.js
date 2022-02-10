@@ -1,4 +1,4 @@
-const {vector, vectorHeading} = require("./Geometry");
+const {vector, vectorHeading, Point} = require("./Geometry");
 
 class TwoWayRoad {
     constructor(graph) {
@@ -93,6 +93,46 @@ class TwoWayRoad {
 
     getOutgoingList() {
         return Object.values(this.outgoing);
+    }
+
+    getStartCenter() {
+        const center = new Point(0, 0, 0);
+        this.forwardLaneList.forEach(forwardLane => {
+            const point = forwardLane.getFirstPoint();
+            center.x += point.x;
+            center.y += point.y;
+            center.z += point.z;
+        });
+        this.backwardLaneList.forEach(backwardLane => {
+            const point = backwardLane.getLastPoint();
+            center.x += point.x;
+            center.y += point.y;
+            center.z += point.z;
+        });
+        center.x /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        center.y /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        center.z /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        return center;
+    }
+
+    getEndCenter() {
+        const center = new Point(0, 0, 0);
+        this.forwardLaneList.forEach(forwardLane => {
+            const point = forwardLane.getLastPoint();
+            center.x += point.x;
+            center.y += point.y;
+            center.z += point.z;
+        });
+        this.backwardLaneList.forEach(backwardLane => {
+            const point = backwardLane.getFirstPoint();
+            center.x += point.x;
+            center.y += point.y;
+            center.z += point.z;
+        });
+        center.x /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        center.y /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        center.z /= (this.forwardLaneList.length + this.backwardLaneList.length);
+        return center;
     }
 }
 
