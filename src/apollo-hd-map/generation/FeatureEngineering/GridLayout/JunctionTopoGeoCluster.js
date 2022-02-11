@@ -1,5 +1,4 @@
 const {matchVectorRotation} = require("../../../common/arrayUtils");
-const JunctionRoadTopoGroup = require("./JunctionRoadTopoGroup");
 
 class JunctionTopoGeoCluster {
     constructor(firstJunction) {
@@ -12,7 +11,7 @@ class JunctionTopoGeoCluster {
             return true;
         }
         const topoGeoVectorCopy = JSON.parse(JSON.stringify(junction.topoGeoVector));
-        if (matchVectorRotation(this.topoGeoVector.map(e => e.topo), topoGeoVectorCopy.map(e => e.topo))) {
+        if (matchVectorRotation(this.topoGeoVector.map(e => e ? e.topo : null), topoGeoVectorCopy.map(e => e ? e.topo : null))) {
             this.junctionList[junction.id] = junction;
             return true;
         }

@@ -1,5 +1,6 @@
 const {checkLineSegmentIntersect, pointDist, vectorHeading, vector} = require("./Geometry");
 const TwoWayRoad = require("./TwoWayRoad");
+const {radToDegree, angleNormalize} = require("../mathUtils");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
 const JUNCTION_LANE_SAME_END_DIST_THRESHOLD = 1;
@@ -238,8 +239,15 @@ class Junction {
             process.exit(-1);
         }
 
-        // neighbors: 2, 3, 4, fill in null values if necessary
+        // normalize angles.
+        // for four legged junctions, normalization is needed to prevent
+        // cases where the angles of two consecutive roads are less than 90 degrees and gets classified into one direction.
+        const delta = 0 - topoGeoList[0].rotation;
+        topoGeoList.forEach(entry => {
+            entry.rotation = angleNormalize(entry.rotation + delta);
+        });
 
+        // neighbors: 2, 3, 4. Fill in null values if necessary
         const eastList = [];
         const northList = [];
         const westList = [];
@@ -249,9 +257,9 @@ class Junction {
             const r = entry.rotation;
             if ((r >= -Math.PI / 4) && (r < Math.PI / 4)) {
                 eastList.push(entry);
-            } else if (r >= Math.PI / 4 && r < Math.PI / 4 * 3) {
+            } else if ((r >= Math.PI / 4) && (r < Math.PI / 4 * 3)) {
                 northList.push(entry);
-            } else if (r >= Math.PI / 4 * 3 || r < -Math.PI / 4 * 3) {
+            } else if ((r >= Math.PI / 4 * 3) || (r < -Math.PI / 4 * 3)) {
                 westList.push(entry);
             } else {
                 southList.push(entry);
@@ -259,7 +267,10 @@ class Junction {
         });
 
         if (eastList.length > 1 || northList.length > 1 || westList.length > 1 || southList.length > 1) {
-            global.logE(this.id, `found multiple neighbors in one direction ${JSON.stringify(topoGeoList)}`);
+            global.logE(this.id, `found multiple neighbors in one direction ${JSON.stringify(topoGeoList.map(entry => ({
+                ...entry,
+                rotation: radToDegree(entry.rotation)
+            })))}`);
             process.exit(-1);
         }
 
