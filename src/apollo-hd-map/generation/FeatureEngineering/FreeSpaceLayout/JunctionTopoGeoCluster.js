@@ -1,9 +1,7 @@
-// junction topology is now represented by the sequence of in-out road types.
-// e.g. [in, in, inout, out] for a four road junction
-// note that all the roads are now two-way roads.
-const {matchVectorRotation} = require("../../common/arrayUtils");
+const {matchVectorRotation} = require("../../../common/arrayUtils");
+const JunctionRoadTopoGroup = require("../GridLayout/JunctionRoadTopoGroup");
 
-class JunctionRoadTopoGroup {
+class JunctionTopoGeoCluster {
     constructor(firstJunction) {
         this.junctionList = {[firstJunction.id]: firstJunction};
         this.roadTopoVec = JunctionRoadTopoGroup.extractRoadTopoVector(firstJunction);
@@ -24,23 +22,24 @@ class JunctionRoadTopoGroup {
         return false;
     }
 
-    static extractRoadTopoVector(junction) {
+    static extractJunctionTopoGeoInfo(junction) {
         const neighborList = junction.getConnectedJunctionAndRoad().sort((neighborA, neighborB) => {
             return junction.getNeighborCenterRotation(neighborA) - junction.getNeighborCenterRotation(neighborB);
         });
 
         return neighborList.map(neighbor => {
+            const rotation = junction.getNeighborCenterRotation(neighbor);
+            let topo;
             if (neighbor.incoming.hasOwnProperty(junction.id) && neighbor.outgoing.hasOwnProperty(junction.id)) {
-                return "IN-OUT";
+                topo = "IN-OUT";
+            } else if (neighbor.incoming.hasOwnProperty(junction.id)) {
+                topo = "OUT";
+            } else {
+                topo = "IN";
             }
-
-            if (neighbor.incoming.hasOwnProperty(junction.id)) {
-                return "OUT";
-            }
-
-            return "IN";
+            return {topo, rotation};
         });
     }
 }
 
-module.exports = JunctionRoadTopoGroup;
+module.exports = JunctionTopoGeoCluster;

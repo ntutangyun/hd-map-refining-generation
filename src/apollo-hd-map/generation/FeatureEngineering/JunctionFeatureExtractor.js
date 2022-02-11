@@ -1,5 +1,5 @@
-const JunctionRoadTopoGroup = require("./JunctionRoadTopoGroup");
-const JunctionTopoGeoCluster = require("./JunctionTopoGeoCluster");
+const JunctionRoadTopoGroup = require("./GridLayout/JunctionRoadTopoGroup");
+const JunctionTopoGeoCluster = require("./FreeSpaceLayout/JunctionTopoGeoCluster");
 
 class JunctionFeatureExtractor {
     static computeRoadTopoGroups(graph) {

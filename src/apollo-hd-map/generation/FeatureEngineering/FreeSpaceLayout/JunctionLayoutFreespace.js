@@ -1,5 +1,5 @@
 const JunctionTopoGeoCluster = require("./JunctionTopoGeoCluster");
-const {Point, angleNormalize} = require("../../common/ApolloHDMap/Geometry");
+const {Point, angleNormalize} = require("../../../common/ApolloHDMap/Geometry");
 const FREE_SPACE_START_OFFSET_X = 10000;
 const FREE_SPACE_START_OFFSET_Y = 10000;
 const FREE_SPACE_POINT_MARGIN = 100;
@@ -56,7 +56,6 @@ class JunctionFreeSpacePoint extends Point {
             this.layout.addPoint(newFreePoint);
             topoAssignment.oppositePoint = newFreePoint;
         });
-        console.log("test");
     }
 
     findBestMatchToCluster(junctionCluster) {
@@ -64,7 +63,11 @@ class JunctionFreeSpacePoint extends Point {
             .map(junction => this.tryAssign(junction))
             .filter(assignment => assignment !== null)
             .sort((a, b) => b.score - a.score);
-        return assignmentList[0];
+
+        if (assignmentList.length > 0) {
+            return assignmentList[0];
+        }
+        return null;
     }
 
     // default score is zero, mismatch will minus points.
@@ -85,6 +88,7 @@ class JunctionFreeSpacePoint extends Point {
 
             const matchTopoRotationCount = topoGeoInfo.findIndex(topoGeo => topoGeo.topo === requiredTopo);
             if (matchTopoRotationCount < 0) {
+                global.logI(this.name, `cannot find any match on the topo ${requiredTopo} in cluster junction: ${JSON.stringify(topoGeoInfo)}`);
                 return null;
             }
             topoGeoInfo.rotate(matchTopoRotationCount);
@@ -95,14 +99,12 @@ class JunctionFreeSpacePoint extends Point {
             return {
                 point: this, junction, score: 0, assignment: [...topoGeoInfo]
             };
-        } else {
-            // requirements length > 1
-            return null;
         }
 
-        return {
-            point: this, junction, score: 1, assignment: null,
-        };
+        // requirements length > 1
+        console.log("this should not happen");
+        global.logE(this.name, "this should not happen.");
+        process.exit(-1);
     }
 }
 
@@ -128,11 +130,17 @@ class JunctionFreeSpaceLayout {
     }
 
     computeBestMatch(junctionCluster) {
-        const freePoints = this.getFreePoints().sort((p1, p2) => {
-            return p2.findBestMatchToCluster(junctionCluster).score - p1.findBestMatchToCluster(junctionCluster).score;
-        });
-
+        const freePoints = this.getFreePoints().filter(p => p.findBestMatchToCluster(junctionCluster))
+            .sort((p1, p2) => {
+                console.log(p1.findBestMatchToCluster(junctionCluster));
+                console.log(p2.findBestMatchToCluster(junctionCluster));
+                return p2.findBestMatchToCluster(junctionCluster).score - p1.findBestMatchToCluster(junctionCluster).score;
+            });
+        if (freePoints.length === 0) {
+            console.log("test");
+        }
         const freePointWithBestMatch = freePoints.shift();
+
         const bestMatch = freePointWithBestMatch.findBestMatchToCluster(junctionCluster);
 
         if (bestMatch.score < 0) {

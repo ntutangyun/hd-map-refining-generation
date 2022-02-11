@@ -1,4 +1,4 @@
-const {degreeToRad} = require("../../common/mathUtils");
+const {degreeToRad} = require("../../../common/mathUtils");
 const GRID_START_OFFSET_X = 10000;
 const GRID_START_OFFSET_Y = 10000;
 const GRID_POINT_MARGIN = 100;

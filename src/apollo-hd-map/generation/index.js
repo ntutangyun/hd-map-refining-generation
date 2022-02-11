@@ -14,11 +14,11 @@ graph.init(graphData, mapData);
 
 // extract junction feature vectors
 const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureExtractor");
-const {buildFreeSpaceLayout} = require("./FeatureEngineering/JunctionLayoutFreespace");
+const {buildFreeSpaceLayout} = require("./FeatureEngineering/FreeSpaceLayout/JunctionLayoutFreespace");
 
 // // cluster junction based on their topology and geometry feature
 const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
-console.log(junctionClusters);
+// console.log(junctionClusters);
 
 const freeSpaceLayout = buildFreeSpaceLayout(junctionClusters);
 
