@@ -1,5 +1,16 @@
 // reference:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+
+function angleNormalize(angle) {
+    let res = angle % (2 * Math.PI);
+    if (res > Math.PI) {
+        res -= 2 * Math.PI;
+    } else if (res <= -Math.PI) {
+        res += 2 * Math.PI;
+    }
+    return res;
+}
+
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -56,11 +67,11 @@ function cube(v) {
 }
 
 function degreeToRad(degree) {
-    return degree / 180 * Math.PI;
+    return angleNormalize(degree / 180 * Math.PI);
 }
 
 function radToDegree(rad) {
-    return rad / Math.PI * 180;
+    return angleNormalize(rad) / Math.PI * 180;
 }
 
 function getHypotenuse(a, b) {
@@ -78,6 +89,7 @@ module.exports = {
     cube,
     degreeToRad,
     radToDegree,
-    getHypotenuse
+    getHypotenuse,
+    angleNormalize
 };
 

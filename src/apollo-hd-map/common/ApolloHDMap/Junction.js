@@ -22,7 +22,7 @@ class Junction {
         // junction will be marked as invalid and won't be tested for now.
         this.valid = true;
 
-        this.topoRoadList = null;
+        this.topoGeoVector = null;
     }
 
     init(junctionData) {
@@ -212,6 +212,63 @@ class Junction {
         console.log(`====== crosswalk list: ${Object.values(crosswalkList).length}`);
 
         return Object.values(crosswalkList);
+    }
+
+    computeTopoGeoVector() {
+        const topoGeoList = this.getConnectedJunctionAndRoad()
+            .map(neighbor => {
+                let topo;
+                if (neighbor.incoming.hasOwnProperty(this.id) && neighbor.outgoing.hasOwnProperty(this.id)) {
+                    topo = "IN-OUT";
+                } else if (neighbor.incoming.hasOwnProperty(this.id)) {
+                    topo = "OUT";
+                } else {
+                    topo = "IN";
+                }
+                return {
+                    topo,
+                    rotation: this.getNeighborCenterRotation(neighbor)
+                };
+            }).sort((nA, nB) => {
+                return nA.rotation - nB.rotation;
+            });
+
+        if (topoGeoList.length > 4 || topoGeoList.length < 2) {
+            global.logE(this.id, `Incorrect number of neighbors (${topoGeoList.length}).`);
+            process.exit(-1);
+        }
+
+        // neighbors: 2, 3, 4, fill in null values if necessary
+
+        const eastList = [];
+        const northList = [];
+        const westList = [];
+        const southList = [];
+
+        topoGeoList.forEach(entry => {
+            const r = entry.rotation;
+            if ((r >= -Math.PI / 4) && (r < Math.PI / 4)) {
+                eastList.push(entry);
+            } else if (r >= Math.PI / 4 && r < Math.PI / 4 * 3) {
+                northList.push(entry);
+            } else if (r >= Math.PI / 4 * 3 || r < -Math.PI / 4 * 3) {
+                westList.push(entry);
+            } else {
+                southList.push(entry);
+            }
+        });
+
+        if (eastList.length > 1 || northList.length > 1 || westList.length > 1 || southList.length > 1) {
+            global.logE(this.id, `found multiple neighbors in one direction ${JSON.stringify(topoGeoList)}`);
+            process.exit(-1);
+        }
+
+        this.topoGeoVector = [
+            eastList.length === 1 ? eastList[0] : null,
+            northList.length === 1 ? northList[0] : null,
+            westList.length === 1 ? westList[0] : null,
+            southList.length === 1 ? southList[0] : null,
+        ];
     }
 }
 

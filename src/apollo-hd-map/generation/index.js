@@ -14,20 +14,13 @@ graph.init(graphData, mapData);
 
 // extract junction feature vectors
 const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureExtractor");
-const {buildFreeSpaceLayout} = require("./FeatureEngineering/FreeSpaceLayout/JunctionLayoutFreespace");
 
-// // cluster junction based on their topology and geometry feature
+// cluster junction based on their topology and geometry feature
 const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
-// console.log(junctionClusters);
 
-const freeSpaceLayout = buildFreeSpaceLayout(junctionClusters);
+const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionLayoutGrid");
+const junctionGrid = buildGridLayout(graph, junctionClusters);
 
-//
-// // cluster junctions based on their road topology feature vector
-// const roadTopoGroupList = JunctionFeatureExtractor.computeRoadTopoGroups(graph);
-//
-// const {buildGridLayout} = require("./FeatureEngineering/JunctionLayoutGrid");
-// const junctionGrid = buildGridLayout(graph, roadTopoGroupList);
 //
 // const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
 // const config = {

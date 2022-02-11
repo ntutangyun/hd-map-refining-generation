@@ -1,5 +1,5 @@
 const JunctionRoadTopoGroup = require("./GridLayout/JunctionRoadTopoGroup");
-const JunctionTopoGeoCluster = require("./FreeSpaceLayout/JunctionTopoGeoCluster");
+const JunctionTopoGeoCluster = require("./GridLayout/JunctionTopoGeoCluster");
 
 class JunctionFeatureExtractor {
     static computeRoadTopoGroups(graph) {
@@ -27,7 +27,8 @@ class JunctionFeatureExtractor {
     static junctionTopoGeoClustering(graph) {
         const junctionTopoGeoClusters = [];
 
-        const junctionList = graph.getJunctionList();
+        const junctionList = graph.getJunctionList().filter(junction => junction.getConnectedJunctionAndRoad().length <= 4);
+        junctionList.forEach(j => j.computeTopoGeoVector());
 
         junctionList.forEach(junction => {
             let junctionAdded = false;

@@ -1,17 +1,14 @@
 const {degreeToRad} = require("../../../common/mathUtils");
-const GRID_START_OFFSET_X = 10000;
-const GRID_START_OFFSET_Y = 10000;
-const GRID_POINT_MARGIN = 100;
-const MAX_LANE_COUNT_PER_ROAD = 4;
-const DEFAULT_LANE_WIDTH = 3.5;
-const DEFAULT_ROAD_SOCKET_X_OFFSET = 10;
+const {MAP_START_OFFSET_X, JUNCTION_GRID_WIDTH, MAP_START_OFFSET_Y} = require("../../../common/constants");
+const JunctionTopoGeoCluster = require("./JunctionTopoGeoCluster");
+const {angleNormalize} = require("../../../common/ApolloHDMap/Geometry");
 
 function xIToX(xI) {
-    return GRID_START_OFFSET_X + GRID_POINT_MARGIN * xI;
+    return MAP_START_OFFSET_X + JUNCTION_GRID_WIDTH * xI;
 }
 
 function yIToY(yI) {
-    return GRID_START_OFFSET_Y + GRID_POINT_MARGIN * yI;
+    return MAP_START_OFFSET_Y + JUNCTION_GRID_WIDTH * yI;
 }
 
 const DEFAULT_DIRECTIONS = ["EAST", "NORTH", "WEST", "SOUTH"];
@@ -88,7 +85,16 @@ class JunctionGridPoint {
         }
     }
 
-    constructor(grid, xI, yI, eastRequirement = DEFAULT_DIRECTION_REQUIREMENT, northRequirement = DEFAULT_DIRECTION_REQUIREMENT, westRequirement = DEFAULT_DIRECTION_REQUIREMENT, southRequirement = DEFAULT_DIRECTION_REQUIREMENT) {
+    constructor(grid, xI, yI,
+                eastTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
+                northTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
+                westTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
+                southTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
+                eastAngleOptimal = 0,
+                northAngleOptimal = degreeToRad(90),
+                westAngleOptimal = degreeToRad(-180),
+                southAngleOptimal = degreeToRad(-90)
+    ) {
         this.id = JunctionGridPoint.formatGridPointId(xI, yI);
         this.grid = grid;
         this.xI = xI;
@@ -97,17 +103,22 @@ class JunctionGridPoint {
         this.x = xIToX(this.xI);
         this.y = yIToY(this.yI);
 
-        this.topoGroup = null;
+        this.junctionCluster = null;
 
         this.EAST = null;
         this.NORTH = null;
         this.WEST = null;
         this.SOUTH = null;
 
-        this.eastRequirement = eastRequirement;
-        this.northRequirement = northRequirement;
-        this.westRequirement = westRequirement;
-        this.southRequirement = southRequirement;
+        this.eastTopoRequirement = eastTopoRequirement;
+        this.northTopoRequirement = northTopoRequirement;
+        this.westTopoRequirement = westTopoRequirement;
+        this.southTopoRequirement = southTopoRequirement;
+
+        this.eastAngleOptimal = eastAngleOptimal;
+        this.northAngleOptimal = northAngleOptimal;
+        this.westAngleOptimal = westAngleOptimal;
+        this.southAngleOptimal = southAngleOptimal;
 
         this.roadAssignment = {
             EAST: null, NORTH: null, WEST: null, SOUTH: null,
@@ -151,96 +162,123 @@ class JunctionGridPoint {
         return `J_(${this.xI},${this.yI})`;
     }
 
+    computeBestJunctionAssignment(junction) {
+        const assignmentList = [];
+        // const [topo1, topo2, topo3, topo4] = topoVector;
+
+        const topoGeoInfo = JunctionTopoGeoCluster.extractJunctionTopoGeoInfo(junction);
+
+        // max rotation = direction - 1;
+        for (let rotation = 0; rotation < 4; rotation++) {
+            const rotatedDirections = [...DEFAULT_DIRECTIONS];
+            rotatedDirections.rotate(rotation);
+
+            const assignment = {
+                [rotatedDirections[0]]: {
+                    topo: topoGeoInfo[0].topo,
+                    rotation: angleNormalize(topoGeoInfo[0].rotation + rotation * Math.PI / 4)
+                },
+                [rotatedDirections[1]]: {
+                    topo: topoGeoInfo[1].topo,
+                    rotation: angleNormalize(topoGeoInfo[1].rotation + rotation * Math.PI / 4)
+                },
+                [rotatedDirections[2]]: {
+                    topo: topoGeoInfo[2].topo,
+                    rotation: angleNormalize(topoGeoInfo[2].rotation + rotation * Math.PI / 4)
+                },
+                [rotatedDirections[3]]: {
+                    topo: topoGeoInfo[3].topo,
+                    rotation: angleNormalize(topoGeoInfo[3].rotation + rotation * Math.PI / 4)
+                },
+            };
+            this.computeAssignmentScore(assignment);
+            assignmentList.push(assignment);
+        }
+        return assignmentList;
+    }
+
     // find best matching score
-    computeBestAssignment(topoGroup) {
-        const topoVector = topoGroup.roadTopoVec;
-        global.logI(this.name, topoVector.toString());
-        const topoDirectionAssignment = this.getPossibleDirectionAssignments(topoVector);
-        // iterate through all the possible direction assignments. and find the best match
-        topoDirectionAssignment.sort((a1, a2) => {
-            return a2.score - a1.score;
-        });
+    computeBestClusterAssignment(junctionCluster) {
+        // const topoVector = junctionCluster.roadTopoVec;
+        // global.logI(this.name, topoVector.toString());
 
-        return topoDirectionAssignment[0];
+        const junctionAssignmentList = Object.values(junctionCluster.junctionList)
+            .map(junction => this.computeBestJunctionAssignment(junction)).sort((a, b) => {
+                return b.score - a.score;
+            });
+
+        return null;
+        //
+        // // const junctionList = junctionCluster.
+        // const topoDirectionAssignment = this.getPossibleDirectionAssignments(topoVector);
+        // // iterate through all the possible direction assignments. and find the best match
+        // topoDirectionAssignment.sort((a1, a2) => {
+        //     return a2.score - a1.score;
+        // });
+
+        // return topoDirectionAssignment[0];
     }
 
-    getPossibleDirectionAssignments(topoVector) {
-        // east, north, west, south
-        if (topoVector.length < 2 || topoVector > 4) {
-            global.logE(this.name, "Invalid topoVector length");
-            process.exit(-1);
-        }
-
-        if (topoVector.length === 2) {
-            const assignmentList = [];
-            const [topo1, topo2] = topoVector;
-
-            // max rotation = direction - 1;
-            for (let rotation = 0; rotation < 4; rotation++) {
-                const rotatedDirections = [...DEFAULT_DIRECTIONS];
-                rotatedDirections.rotate(rotation);
-                const topo1Index = 0;
-                const topo1Direction = rotatedDirections[topo1Index];
-                for (let topo2Index = 1; topo2Index < 4; topo2Index++) {
-                    const topo2Direction = rotatedDirections[topo2Index];
-                    const assignment = {
-                        ...DEFAULT_DIRECTION_ASSIGNMENT, [topo1Direction]: topo1, [topo2Direction]: topo2
-                    };
-                    this.computeAssignmentScore(assignment);
-                    assignmentList.push(assignment);
-                }
-            }
-            return assignmentList;
-        }
-
-        if (topoVector.length === 3) {
-            const assignmentList = [];
-            const [topo1, topo2, topo3] = topoVector;
-            // max rotation = direction - 1;
-            for (let rotation = 0; rotation < 4; rotation++) {
-                const rotatedDirections = [...DEFAULT_DIRECTIONS];
-                rotatedDirections.rotate(rotation);
-                const topo1Index = 0;
-                const topo1Direction = rotatedDirections[topo1Index];
-                for (let topo2Index = 1; topo2Index < 3; topo2Index++) {
-                    const topo2Direction = rotatedDirections[topo2Index];
-                    for (let topo3Index = topo2Index + 1; topo3Index < 4; topo3Index++) {
-                        const topo3Direction = rotatedDirections[topo3Index];
-                        const assignment = {
-                            ...DEFAULT_DIRECTION_ASSIGNMENT,
-                            [topo1Direction]: topo1,
-                            [topo2Direction]: topo2,
-                            [topo3Direction]: topo3,
-                        };
-                        this.computeAssignmentScore(assignment);
-                        assignmentList.push(assignment);
-                    }
-                }
-            }
-            return assignmentList;
-        }
-
-        if (topoVector.length === 4) {
-            const assignmentList = [];
-            const [topo1, topo2, topo3, topo4] = topoVector;
-
-            // max rotation = direction - 1;
-            for (let rotation = 0; rotation < 4; rotation++) {
-                const rotatedDirections = [...DEFAULT_DIRECTIONS];
-                rotatedDirections.rotate(rotation);
-
-                const assignment = {
-                    [rotatedDirections[0]]: topo1,
-                    [rotatedDirections[1]]: topo2,
-                    [rotatedDirections[2]]: topo3,
-                    [rotatedDirections[3]]: topo4,
-                };
-                this.computeAssignmentScore(assignment);
-                assignmentList.push(assignment);
-            }
-            return assignmentList;
-        }
-    }
+    // getPossibleDirectionAssignments(topoVector) {
+    //     // east, north, west, south
+    //     if (topoVector.length < 2 || topoVector > 4) {
+    //         global.logE(this.name, "Invalid topoVector length");
+    //         process.exit(-1);
+    //     }
+    //
+    //     if (topoVector.length === 2) {
+    //         const assignmentList = [];
+    //         const [topo1, topo2] = topoVector;
+    //
+    //         // max rotation = direction - 1;
+    //         for (let rotation = 0; rotation < 4; rotation++) {
+    //             const rotatedDirections = [...DEFAULT_DIRECTIONS];
+    //             rotatedDirections.rotate(rotation);
+    //             const topo1Index = 0;
+    //             const topo1Direction = rotatedDirections[topo1Index];
+    //             for (let topo2Index = 1; topo2Index < 4; topo2Index++) {
+    //                 const topo2Direction = rotatedDirections[topo2Index];
+    //                 const assignment = {
+    //                     ...DEFAULT_DIRECTION_ASSIGNMENT, [topo1Direction]: topo1, [topo2Direction]: topo2
+    //                 };
+    //                 this.computeAssignmentScore(assignment);
+    //                 assignmentList.push(assignment);
+    //             }
+    //         }
+    //         return assignmentList;
+    //     }
+    //
+    //     if (topoVector.length === 3) {
+    //         const assignmentList = [];
+    //         const [topo1, topo2, topo3] = topoVector;
+    //         // max rotation = direction - 1;
+    //         for (let rotation = 0; rotation < 4; rotation++) {
+    //             const rotatedDirections = [...DEFAULT_DIRECTIONS];
+    //             rotatedDirections.rotate(rotation);
+    //             const topo1Index = 0;
+    //             const topo1Direction = rotatedDirections[topo1Index];
+    //             for (let topo2Index = 1; topo2Index < 3; topo2Index++) {
+    //                 const topo2Direction = rotatedDirections[topo2Index];
+    //                 for (let topo3Index = topo2Index + 1; topo3Index < 4; topo3Index++) {
+    //                     const topo3Direction = rotatedDirections[topo3Index];
+    //                     const assignment = {
+    //                         ...DEFAULT_DIRECTION_ASSIGNMENT,
+    //                         [topo1Direction]: topo1,
+    //                         [topo2Direction]: topo2,
+    //                         [topo3Direction]: topo3,
+    //                     };
+    //                     this.computeAssignmentScore(assignment);
+    //                     assignmentList.push(assignment);
+    //                 }
+    //             }
+    //         }
+    //         return assignmentList;
+    //     }
+    //
+    //     if (topoVector.length === 4) {
+    //
+    //     }
+    // }
 
     // assignment matching score
     // assume IN-OUT can only match IN-OUT for now
@@ -248,21 +286,28 @@ class JunctionGridPoint {
     computeAssignmentScore(assignment) {
         assignment.score = 0;
 
-        if (!this.eastRequirement.includes(assignment.EAST) || !this.northRequirement.includes(assignment.NORTH) || !this.westRequirement.includes(assignment.WEST) || !this.southRequirement.includes(assignment.SOUTH)) {
-            assignment.score = -1;
+        // match topo first
+        if (!this.eastTopoRequirement.includes(assignment.EAST.topo) ||
+            !this.northTopoRequirement.includes(assignment.NORTH.topo) ||
+            !this.westTopoRequirement.includes(assignment.WEST.topo) ||
+            !this.southTopoRequirement.includes(assignment.SOUTH.topo)) {
+            assignment.score = -10;
             return;
         }
 
         // assume assignment east is "IN"
-        // eastRequirement = ["IN", 'OUT', 'IN-OUT', null] = 1 point
-        // eastRequirement = ["IN", 'IN-OUT', null] = 2 point
-        // eastRequirement = ["IN", null] = 3 point
-        // eastRequirement = ["IN"] = 4 point
+        // eastTopoRequirement = ["IN", 'OUT', 'IN-OUT', null] = 1 point
+        // eastTopoRequirement = ["IN", 'IN-OUT', null] = 2 point
+        // eastTopoRequirement = ["IN", null] = 3 point
+        // eastTopoRequirement = ["IN"] = 4 point
         // when matched, the more specific requirement is, the higher score it gets.
-        assignment.score += 5 - this.eastRequirement.length;
-        assignment.score += 5 - this.northRequirement.length;
-        assignment.score += 5 - this.southRequirement.length;
-        assignment.score += 5 - this.westRequirement.length;
+        assignment.score += 5 - this.eastTopoRequirement.length;
+        assignment.score += 5 - this.northTopoRequirement.length;
+        assignment.score += 5 - this.southTopoRequirement.length;
+        assignment.score += 5 - this.westTopoRequirement.length;
+
+        // if necessary, calculate the angle match
+
     }
 
     computeOppositeRequirement(directionTopo) {
@@ -285,8 +330,8 @@ class JunctionGridPoint {
         }
     }
 
-    assignTopoGroup(topoGroup, assignment) {
-        this.topoGroup = topoGroup;
+    assignJunctionCluster(junctionCluster, assignment) {
+        this.junctionCluster = junctionCluster;
 
         this.EAST = assignment.EAST;
         this.NORTH = assignment.NORTH;
@@ -302,9 +347,9 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.topoGroup) {
+            if (!point.junctionCluster) {
                 // free point, add proper assignment
-                point.westRequirement = this.computeOppositeRequirement(this.EAST);
+                point.westTopoRequirement = this.computeOppositeRequirement(this.EAST);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -318,9 +363,9 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.topoGroup) {
+            if (!point.junctionCluster) {
                 // free point, add proper assignment
-                point.southRequirement = this.computeOppositeRequirement(this.NORTH);
+                point.southTopoRequirement = this.computeOppositeRequirement(this.NORTH);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -334,9 +379,9 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.topoGroup) {
+            if (!point.junctionCluster) {
                 // free point, add proper assignment
-                point.eastRequirement = this.computeOppositeRequirement(this.WEST);
+                point.eastTopoRequirement = this.computeOppositeRequirement(this.WEST);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -350,9 +395,9 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.topoGroup) {
+            if (!point.junctionCluster) {
                 // free point, add proper assignment
-                point.northRequirement = this.computeOppositeRequirement(this.SOUTH);
+                point.northTopoRequirement = this.computeOppositeRequirement(this.SOUTH);
             } else {
                 // do nothing as it's already assigned a topo group.
             }
@@ -386,11 +431,11 @@ class JunctionGrid {
     }
 
     getFreePointList() {
-        return this.pointList.filter(p => p.topoGroup === null);
+        return this.pointList.filter(p => p.junctionCluster === null);
     }
 
-    // find best match between free points and the topoGroup.
-    computeBestMatch(topoGroup) {
+    // find best match between free points and the junctionCluster.
+    computeBestMatch(junctionCluster) {
         const freePoints = this.getFreePointList();
 
         if (freePoints.length === 0) {
@@ -400,7 +445,7 @@ class JunctionGrid {
         }
 
         const pointMatches = freePoints.map(point => ({
-            point, assignment: point.computeBestAssignment(topoGroup)
+            point, assignment: point.computeBestClusterAssignment(junctionCluster)
         })).sort((m1, m2) => {
             return m2.assignment.score - m1.assignment.score;
         });

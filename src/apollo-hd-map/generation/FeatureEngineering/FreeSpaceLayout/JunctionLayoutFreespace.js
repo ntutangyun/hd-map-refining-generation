@@ -1,4 +1,4 @@
-const JunctionTopoGeoCluster = require("./JunctionTopoGeoCluster");
+const JunctionTopoGeoCluster = require("../GridLayout/JunctionTopoGeoCluster");
 const {Point, angleNormalize} = require("../../../common/ApolloHDMap/Geometry");
 const FREE_SPACE_START_OFFSET_X = 10000;
 const FREE_SPACE_START_OFFSET_Y = 10000;

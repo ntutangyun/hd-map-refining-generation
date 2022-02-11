@@ -1,4 +1,4 @@
-const {square, cube} = require("../mathUtils");
+const {square, cube, angleNormalize} = require("../mathUtils");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
 const CommonGeoProto = require("../../protobuf_out/modules/common/proto/geometry_pb");
 
@@ -467,16 +467,6 @@ function pointRotation(point, rotation, offset = null) {
         x: newPoint.x + offset.x,
         y: newPoint.y + offset.y
     };
-}
-
-function angleNormalize(angle) {
-    let res = angle % (2 * Math.PI);
-    if (res > Math.PI) {
-        res -= 2 * Math.PI;
-    } else if (res <= -Math.PI) {
-        res += 2 * Math.PI;
-    }
-    return res;
 }
 
 module.exports = {
