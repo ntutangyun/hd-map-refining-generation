@@ -1,8 +1,8 @@
 const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
 const Junction = require("../MapElements/Junction");
 const {Point} = require("../../common/ApolloHDMap/Geometry");
-const {JunctionGridPoint, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/JunctionGrid");
-const {getRandomIntInclusive, getHypotenuse} = require("../../common/mathUtils");
+const {JunctionGridPoint} = require("../FeatureEngineering/GridLayout/JunctionGrid");
+const {getRandomIntInclusive, getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
 const {
     DEFAULT_ROAD_SOCKET_X_OFFSET,
     DEFAULT_LANE_WIDTH,
@@ -10,6 +10,7 @@ const {
     DEFAULT_ROAD_LENGTH
 } = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
+const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 
 class MapGeneratorGrid {
     constructor(config, junctionGrid) {
@@ -26,8 +27,6 @@ class MapGeneratorGrid {
         this.map = new MapProto.Map();
         this.map.setHeader(MapProto.Header.fromObject(this.config.hd_map_header));
 
-        console.log(this.junctionGrid);
-
         this.instantiateJunctions();
         this.instantiateRoads();
 
@@ -39,7 +38,7 @@ class MapGeneratorGrid {
     instantiateJunctions() {
         this.junctionGrid.pointList.forEach(point => {
             // empty point
-            if (point.topoGroup === null) {
+            if (point.junctionCluster === null) {
                 point.junction = null;
                 return;
             }
@@ -51,19 +50,16 @@ class MapGeneratorGrid {
     }
 
     instantiateRoads() {
-        console.log(this.junctionGrid);
-        console.log(this.junctionGrid.pointList.filter(p => p.junction !== null));
         this.junctionGrid.pointList
             .filter(point => point.junction !== null)
             .forEach(junctionPoint => {
                 DEFAULT_DIRECTIONS.forEach(direction => {
-
-                    const roadTopo = junctionPoint[direction];
-
                     // self direction is null. no road is instantiated.
-                    if (junctionPoint[direction] === null) {
+                    if (junctionPoint[direction].topo === null) {
                         return;
                     }
+
+                    const {topo, rotation} = junctionPoint[direction];
 
                     // check if a road has already been instantiated or not
                     if (junctionPoint.roadAssignment[direction] !== null) {
@@ -78,9 +74,10 @@ class MapGeneratorGrid {
                     }
 
                     // check opposite point is empty point or not
-                    const oppositeDirection = JunctionGridPoint.getOppositeDirection(direction);
-                    if (oppositePoint[oppositeDirection] === null) {
-                        // create road connecting to the current junction
+                    const oppositeDirection = getOppositeDirection(direction);
+
+                    if (oppositePoint.junction === null || oppositePoint[oppositeDirection].topo === null) {
+                        // create a straight road connecting to the current junction
                         // the road will be named after current junction
                         const roadId = `R_${junctionPoint.junction.id}_${direction}`;
 
@@ -88,19 +85,19 @@ class MapGeneratorGrid {
                         let startsFromJunction = true;
 
                         let forwardLaneCount, backwardLaneCount;
-                        if (roadTopo === "IN-OUT") {
+                        if (topo === "IN-OUT") {
                             // randomly select number of total lanes in the road
                             forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
                             backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
-                        } else if (roadTopo === "OUT") {
+                        } else if (topo === "OUT") {
                             forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
                             backwardLaneCount = 0;
-                        } else if (roadTopo === "IN") {
+                        } else if (topo === "IN") {
                             startsFromJunction = false;
                             forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
                             backwardLaneCount = 0;
                         } else {
-                            global.logE(this.name, `Unknown roadTopo: ${roadTopo}`);
+                            global.logE(this.name, `Unknown topo: ${topo}`);
                             process.exit(-1);
                         }
 
@@ -125,12 +122,11 @@ class MapGeneratorGrid {
                         // for every backward lane / incoming lane, the y_offset decreases by 0.5
                         let startPoint, startHeading, endPoint, endHeading;
 
-                        const directionAngle = JunctionGridPoint.getDirectionAngle(direction);
-                        const directionOppositeAngle = JunctionGridPoint.getDirectionOppositeAngle(direction);
+                        const directionAngle = degreeToRad(rotation);
+                        const directionOppositeAngle = degreeToRad(degreeNormalize(180 + rotation));
 
+                        const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
                         if (startsFromJunction) {
-
-                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
                             const yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
 
                             const localCenterAngle = Math.atan2(yOffset, xOffset);
@@ -142,9 +138,7 @@ class MapGeneratorGrid {
 
                             endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
                             endHeading = startHeading;
-
                         } else {
-                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
                             const yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
 
                             const localCenterAngle = Math.atan2(yOffset, xOffset);
@@ -181,7 +175,7 @@ class MapGeneratorGrid {
 
                         // if the road topo is IN, road will be named after and starts from the opposite junction.
                         // road will be created at the opposite point, not here.
-                        if (roadTopo === "IN") {
+                        if (topo === "IN") {
                             return;
                         }
 
@@ -190,15 +184,15 @@ class MapGeneratorGrid {
                         const roadId = `R_${junctionPoint.junction.id}_${direction}`;
 
                         let forwardLaneCount, backwardLaneCount;
-                        if (roadTopo === "IN-OUT") {
+                        if (topo === "IN-OUT") {
                             // randomly select number of total lanes in the road
                             forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
                             backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
-                        } else if (roadTopo === "OUT") {
+                        } else if (topo === "OUT") {
                             forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
                             backwardLaneCount = 0;
                         } else {
-                            global.logE(this.name, `Unknown roadTopo: ${roadTopo}`);
+                            global.logE(this.name, `Unknown topo: ${topo}`);
                             process.exit(-1);
                         }
 
@@ -214,20 +208,35 @@ class MapGeneratorGrid {
 
                         let startPoint, startHeading, endPoint, endHeading;
 
-                        const directionAngle = JunctionGridPoint.getDirectionAngle(direction);
+                        // calculate start point and start heading on the current point
+                        {
+                            const directionAngle = degreeToRad(rotation);
 
-                        const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
-                        const yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
+                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                            const yOffset = (0.5 * forwardLaneCount - 0.5 * backwardLaneCount) * DEFAULT_LANE_WIDTH;
 
-                        const localCenterAngle = Math.atan2(yOffset, xOffset);
-                        const junctionCenterAngle = directionAngle + localCenterAngle;
-                        const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
+                            const localCenterAngle = Math.atan2(yOffset, xOffset);
+                            const junctionCenterAngle = directionAngle + localCenterAngle;
+                            const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
 
-                        startPoint = junctionPoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
-                        startHeading = directionAngle;
+                            startPoint = junctionPoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
+                            startHeading = directionAngle;
+                        }
 
-                        endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
-                        endHeading = startHeading;
+                        // calculate the end point and end heading based on the opposite point
+                        {
+                            const directionAngle = degreeToRad(oppositePoint[oppositeDirection].rotation);
+
+                            const xOffset = DEFAULT_ROAD_SOCKET_X_OFFSET;
+                            const yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
+
+                            const localCenterAngle = Math.atan2(yOffset, xOffset);
+                            const junctionCenterAngle = directionAngle + localCenterAngle;
+                            const junctionCenterDistance = getHypotenuse(xOffset, yOffset);
+
+                            endPoint = oppositePoint.junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
+                            endHeading = degreeToRad(degreeNormalize(180 + oppositePoint[oppositeDirection].rotation));
+                        }
 
                         const road = RoadGenerator.generateRoad({
                             roadId,

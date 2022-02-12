@@ -1,4 +1,5 @@
 require("../common/setup");
+const fs = require("fs");
 
 const mapName = "san_francisco";
 
@@ -22,22 +23,22 @@ const junctionGrid = buildGridLayout(graph, junctionClusters);
 
 console.log(junctionGrid);
 
-//
-// const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
-// const config = {
-//     hd_map_header: require("../common/hd_map_header.json"),
-//     curveSampleCount: 20
-// };
-// const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
-//
-// const map = mapGenerator.generate();
-//
-// // console.log(map);
-//
-// fs.writeFileSync("./base_map.bin", map.serializeBinary());
-// fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
-// fs.writeFileSync("./sim_map.bin", map.serializeBinary());
 
+const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
+const config = {
+    hd_map_header: require("../common/hd_map_header.json"),
+    curveSampleCount: 20
+};
+const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
+
+const map = mapGenerator.generate();
+
+console.log(map);
+
+fs.writeFileSync("./base_map.bin", map.serializeBinary());
+fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
+fs.writeFileSync("./sim_map.bin", map.serializeBinary());
+//
 //
 // // sample new junction configurations including road socket information using the clustering results.
 // const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
