@@ -11,6 +11,16 @@ function angleNormalize(angle) {
     return res;
 }
 
+function degreeNormalize(degree) {
+    let res = degree % 360;
+    if (res > 180) {
+        res -= 360;
+    } else if (res <= -180) {
+        res += 360;
+    }
+    return res;
+}
+
 function getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -90,6 +100,7 @@ module.exports = {
     degreeToRad,
     radToDegree,
     getHypotenuse,
-    angleNormalize
+    angleNormalize,
+    degreeNormalize
 };
 

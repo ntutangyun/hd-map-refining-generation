@@ -111,6 +111,10 @@ Array.prototype.std = function () {
     return Math.sqrt(this.map(v => Math.pow(v - avg, 2)).average());
 };
 
+Array.prototype.sum = function () {
+    return this.reduce((a, b) => a + b, 0);
+};
+
 Array.prototype.movingAvg = function (windowSize) {
     if (this.length <= windowSize) {
         return [this.average()];

@@ -2,6 +2,7 @@ const {matchVectorRotation} = require("../../../common/arrayUtils");
 
 class JunctionTopoGeoCluster {
     constructor(firstJunction) {
+        this.id = `cluster_${firstJunction.id}`;
         this.junctionList = {[firstJunction.id]: firstJunction};
         this.topoGeoVector = JSON.parse(JSON.stringify(firstJunction.topoGeoVector));
     }

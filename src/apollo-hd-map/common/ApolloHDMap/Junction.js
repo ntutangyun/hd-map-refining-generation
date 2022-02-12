@@ -1,6 +1,6 @@
 const {checkLineSegmentIntersect, pointDist, vectorHeading, vector} = require("./Geometry");
 const TwoWayRoad = require("./TwoWayRoad");
-const {radToDegree, angleNormalize} = require("../mathUtils");
+const {radToDegree, angleNormalize, degreeNormalize} = require("../mathUtils");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
 const JUNCTION_LANE_SAME_END_DIST_THRESHOLD = 1;
@@ -228,7 +228,7 @@ class Junction {
                 }
                 return {
                     topo,
-                    rotation: this.getNeighborCenterRotation(neighbor)
+                    rotation: degreeNormalize(radToDegree(this.getNeighborCenterRotation(neighbor)))
                 };
             }).sort((nA, nB) => {
                 return nA.rotation - nB.rotation;
@@ -244,7 +244,7 @@ class Junction {
         // cases where the angles of two consecutive roads are less than 90 degrees and gets classified into one direction.
         const delta = 0 - topoGeoList[0].rotation;
         topoGeoList.forEach(entry => {
-            entry.rotation = angleNormalize(entry.rotation + delta);
+            entry.rotation = degreeNormalize(entry.rotation + delta);
         });
 
         // neighbors: 2, 3, 4. Fill in null values if necessary
@@ -255,11 +255,11 @@ class Junction {
 
         topoGeoList.forEach(entry => {
             const r = entry.rotation;
-            if ((r >= -Math.PI / 4) && (r < Math.PI / 4)) {
+            if ((r >= -45) && (r < 45)) {
                 eastList.push(entry);
-            } else if ((r >= Math.PI / 4) && (r < Math.PI / 4 * 3)) {
+            } else if ((r >= 45) && (r < 135)) {
                 northList.push(entry);
-            } else if ((r >= Math.PI / 4 * 3) || (r < -Math.PI / 4 * 3)) {
+            } else if ((r >= 135) || (r < -135)) {
                 westList.push(entry);
             } else {
                 southList.push(entry);
@@ -267,10 +267,7 @@ class Junction {
         });
 
         if (eastList.length > 1 || northList.length > 1 || westList.length > 1 || southList.length > 1) {
-            global.logE(this.id, `found multiple neighbors in one direction ${JSON.stringify(topoGeoList.map(entry => ({
-                ...entry,
-                rotation: radToDegree(entry.rotation)
-            })))}`);
+            global.logE(this.id, `found multiple neighbors in one direction ${JSON.stringify(topoGeoList)}`);
             process.exit(-1);
         }
 

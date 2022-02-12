@@ -1,4 +1,6 @@
 const {JunctionGrid} = require("./JunctionGrid");
+const {TOPO_MISMATCH_PENALTY} = require("./JunctionGridUtils");
+
 
 // Try to add all junctions into one junction grid for now.
 // later can support multiple junction grid in a single map;
@@ -6,24 +8,29 @@ function buildGridLayout(graph, junctionClusters) {
     const junctionGrid = new JunctionGrid();
 
     // greedy match add in the highest match per iteration
-    const jClusters = junctionClusters.shuffle();
+    // const jClusters = junctionClusters.shuffle();
 
-    while (jClusters.length > 0) {
-        jClusters.sort((t1, t2) => {
-            return junctionGrid.computeBestMatch(t2).assignment.score - junctionGrid.computeBestMatch(t1).assignment.score;
-        });
+    while (junctionClusters.length > 0) {
+        const matchList = junctionClusters.map(junctionCluster => ({
+            junctionCluster,
+            bestMatch: junctionGrid.computeBestMatch(junctionCluster),
+        })).sort((a, b) => b.bestMatch.assignment.score - a.bestMatch.assignment.score);
 
-        const jCluster = jClusters.shift();
-        const {point, assignment} = junctionGrid.computeBestMatch(jCluster);
+        const {junctionCluster, bestMatch} = matchList[0];
 
-        if (assignment.score < 0) {
+        if (bestMatch.assignment.score === TOPO_MISMATCH_PENALTY) {
             global.logE("BUILD_GRID_LAYOUT", "Cannot find a match for current topoGroup. Please try run again.");
             console.log(junctionGrid);
-            console.log(jCluster);
+            console.log(junctionCluster);
             process.exit(-1);
         }
 
-        point.assignJunctionCluster(jCluster, assignment);
+        bestMatch.point.assignJunctionCluster(junctionCluster, bestMatch.assignment);
+
+        // remove the cluster from the clusterList
+        const clusterIdx = junctionClusters.findIndex(c => c.id === junctionCluster.id);
+        junctionClusters.splice(clusterIdx, 1);
+        global.logI("BUILD_GRID_LAYOUT", `junction clusters remaining: ${junctionClusters.length}`);
     }
 
     return junctionGrid;

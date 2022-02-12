@@ -1,5 +1,4 @@
 require("../common/setup");
-const fs = require("fs");
 
 const mapName = "san_francisco";
 
@@ -20,6 +19,8 @@ const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(grap
 
 const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionLayoutGrid");
 const junctionGrid = buildGridLayout(graph, junctionClusters);
+
+console.log(junctionGrid);
 
 //
 // const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
