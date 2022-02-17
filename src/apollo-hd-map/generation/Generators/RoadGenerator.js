@@ -24,7 +24,7 @@ class RoadGenerator {
 
     static generateJunctionLaneRoad(jLane) {
         return new Road({
-            id: `R_${jLane.id}`,
+            id: global.getNewRoadId(),
             centralCurve: jLane.leftBoundaryCurve,
             forwardLaneList: [jLane],
             backwardLaneList: [],

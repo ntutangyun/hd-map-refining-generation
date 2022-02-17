@@ -68,7 +68,7 @@ class Road {
                     startHeading: this.startHeading,
                     endPoint: laneCentralCurveEndPoint,
                     endHeading: this.endHeading,
-                    id: `lane_${lane_count++}_${this.id}`,
+                    id: global.getNewLaneId(),
                     laneWidth,
                     speedLimit: forwardSpeedLimit,
                     isForward: true
@@ -97,7 +97,7 @@ class Road {
                     startHeading: this.endHeading + Math.PI,
                     endPoint: laneCentralCurveEndPoint,
                     endHeading: this.startHeading + Math.PI,
-                    id: `lane_${lane_count++}_${this.id}`,
+                    id: global.getNewLaneId(),
                     laneWidth,
                     speedLimit: backwardSpeedLimit,
                     isForward: false

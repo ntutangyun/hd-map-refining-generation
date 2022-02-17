@@ -138,7 +138,7 @@ class Junction {
 
         laneConfigs.forEach(({startPoint, startHeading, incomingLane, endPoint, endHeading, outgoingLane, turn}) => {
             const junctionLane = LaneGenerator.generateLane({
-                startPoint, startHeading, endPoint, endHeading, id: `${incomingLane.id}__${outgoingLane.id}`, turn
+                startPoint, startHeading, endPoint, endHeading, id: global.getNewLaneId(), turn
             });
 
             junctionLane.incomingList.push(incomingLane);

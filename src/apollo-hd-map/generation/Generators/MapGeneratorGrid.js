@@ -17,6 +17,22 @@ class MapGeneratorGrid {
         this.config = config;
         this.map = null;
         this.junctionGrid = junctionGrid;
+
+        this.junctionCount = 0;
+        this.roadCount = 0;
+        this.laneCount = 0;
+
+        global.getNewJunctionId = () => {
+            return `J_${this.junctionCount++}`;
+        };
+
+        global.getNewRoadId = () => {
+            return `road_${this.roadCount++}`;
+        };
+
+        global.getNewLaneId = () => {
+            return `lane_${this.laneCount++}`;
+        };
     }
 
     get name() {
@@ -44,7 +60,8 @@ class MapGeneratorGrid {
             }
 
             point.junction = new Junction({
-                junction_id: point.formatJunctionId(), center_point: new Point(point.x, point.y, 0)
+                junction_id: global.getNewJunctionId(),
+                center_point: new Point(point.x, point.y, 0)
             });
         });
     }
@@ -79,7 +96,7 @@ class MapGeneratorGrid {
                     if (oppositePoint.junction === null || oppositePoint[oppositeDirection].topo === null) {
                         // create a straight road connecting to the current junction
                         // the road will be named after current junction
-                        const roadId = `R_${junctionPoint.junction.id}_${direction}`;
+                        const roadId = global.getNewRoadId();
 
                         // for in-out and out, startsFromJunction is true. for in roads, startsFromJunction is false
                         let startsFromJunction = true;
@@ -185,7 +202,7 @@ class MapGeneratorGrid {
 
                         // create road connecting to junctions on both side
                         // road starts from and is named after the current junction.
-                        const roadId = `R_${junctionPoint.junction.id}_${direction}`;
+                        const roadId = global.getNewRoadId();
 
                         let forwardLaneCount, backwardLaneCount;
                         if (topo === "IN-OUT") {
