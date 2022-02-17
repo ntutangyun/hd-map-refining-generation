@@ -1,3 +1,4 @@
+const {Curve} = require("./Curve");
 const SIGNAL_TYPE = {
     UNKNOWN: 1,
     MIX_2_HORIZONTAL: 2,
@@ -44,6 +45,7 @@ class Signal {
         this.subSignalList = {};
         this.junction = null;
         this.signInfoList = [];
+        this.stopLineList = [];
         this.renderColor = null;
     }
 
@@ -62,11 +64,20 @@ class Signal {
                 this.addLane(lane);
                 lane.addSignal(this);
             }
-            // TODO overlap between junction and signal
+
+            if (ol.id.includes("overlap_junction_I")) {
+                this.junction = this.graph.getJunctionById(this.extractJunctionId(ol.id));
+            }
         });
 
-        // TODO stopLineList, signInfoList
+        this.stopLineList = s.stopLineList.map(stopLine => new Curve(this).init(stopLine));
+        this.signInfoList = s.signInfoList;
         return this;
+    }
+
+    extractJunctionId(olId) {
+        const split = olId.split("_J0_")[0];
+        return split.replace(`overlap_junction_I`, "J_");
     }
 
     extractLaneId(olId) {

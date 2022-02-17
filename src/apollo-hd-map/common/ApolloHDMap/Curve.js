@@ -25,8 +25,10 @@ class LineSegment {
 }
 
 class Curve {
-    constructor(lane) {
-        this.lane = lane;
+    // parent could be lane or signal
+    constructor(parent) {
+        this.parent = parent;
+        this.lane = parent;
         this.segmentList = null;
     }
 
