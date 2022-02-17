@@ -21,9 +21,6 @@ const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(grap
 const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionLayoutGrid");
 const junctionGrid = buildGridLayout(graph, junctionClusters);
 
-console.log(junctionGrid);
-
-
 const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
 const config = {
     hd_map_header: require("../common/hd_map_header.json"),
@@ -32,8 +29,6 @@ const config = {
 const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
 
 const map = mapGenerator.generate();
-
-console.log(map);
 
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));

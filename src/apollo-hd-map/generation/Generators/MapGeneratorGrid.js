@@ -4,13 +4,11 @@ const {Point} = require("../../common/ApolloHDMap/Geometry");
 const {JunctionGridPoint} = require("../FeatureEngineering/GridLayout/JunctionGrid");
 const {getRandomIntInclusive, getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
 const {
-    DEFAULT_ROAD_SOCKET_X_OFFSET,
-    DEFAULT_LANE_WIDTH,
-    MAX_LANE_COUNT_PER_ROAD,
-    DEFAULT_ROAD_LENGTH
+    DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH, MAX_LANE_COUNT_PER_ROAD, DEFAULT_ROAD_LENGTH
 } = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
 const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
+const Signal = require("../MapElements/Signal");
 
 class MapGeneratorGrid {
     constructor(config, junctionGrid) {
@@ -21,6 +19,7 @@ class MapGeneratorGrid {
         this.junctionCount = 0;
         this.roadCount = 0;
         this.laneCount = 0;
+        this.signalCount = 0;
 
         global.getNewJunctionId = () => {
             return `J_${this.junctionCount++}`;
@@ -32,6 +31,10 @@ class MapGeneratorGrid {
 
         global.getNewLaneId = () => {
             return `lane_${this.laneCount++}`;
+        };
+
+        global.getNewSignalId = () => {
+            return `signal_${this.signalCount++}`;
         };
     }
 
@@ -45,7 +48,7 @@ class MapGeneratorGrid {
 
         this.instantiateJunctions();
         this.instantiateRoads();
-
+        this.instantiateSignals();
         this.updateJunctions();
 
         return this.map;
@@ -60,15 +63,13 @@ class MapGeneratorGrid {
             }
 
             point.junction = new Junction({
-                junction_id: global.getNewJunctionId(),
-                center_point: new Point(point.x, point.y, 0)
+                junction_id: global.getNewJunctionId(), center_point: new Point(point.x, point.y, 0)
             });
         });
     }
 
     instantiateRoads() {
-        this.junctionGrid.pointList
-            .filter(point => point.junction !== null)
+        this.junctionGrid.getJunctionPointList()
             .forEach(junctionPoint => {
                 DEFAULT_DIRECTIONS.forEach(direction => {
                     // self direction is null. no road is instantiated.
@@ -174,13 +175,7 @@ class MapGeneratorGrid {
                         }
 
                         const road = RoadGenerator.generateRoad({
-                            roadId,
-                            startPoint,
-                            startHeading,
-                            endPoint,
-                            endHeading,
-                            forwardLaneCount,
-                            backwardLaneCount,
+                            roadId, startPoint, startHeading, endPoint, endHeading, forwardLaneCount, backwardLaneCount,
                         });
 
                         junctionPoint.assignRoad(direction, road);
@@ -263,13 +258,7 @@ class MapGeneratorGrid {
                         }
 
                         const road = RoadGenerator.generateRoad({
-                            roadId,
-                            startPoint,
-                            startHeading,
-                            endPoint,
-                            endHeading,
-                            forwardLaneCount,
-                            backwardLaneCount,
+                            roadId, startPoint, startHeading, endPoint, endHeading, forwardLaneCount, backwardLaneCount,
                         });
 
                         junctionPoint.assignRoad(direction, road);
@@ -282,10 +271,19 @@ class MapGeneratorGrid {
             });
     }
 
+    instantiateSignals() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            console.log(junctionPoint);
+
+            const signal = new Signal({});
+
+        });
+    }
+
     updateJunctions() {
         const roadList = {};
 
-        this.junctionGrid.pointList.filter(p => p.junction !== null).forEach(junctionPoint => {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
             junctionPoint.junction.generateJunctionLanes();
             junctionPoint.junction.generatePolygon();
             junctionPoint.junction.generateLaneOverlap();

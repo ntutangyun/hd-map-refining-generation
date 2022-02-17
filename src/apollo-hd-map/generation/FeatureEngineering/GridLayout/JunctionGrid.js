@@ -4,7 +4,9 @@ const {
     xIToX,
     yIToY,
     DEFAULT_DIRECTIONS,
-    TOPO_MISMATCH_PENALTY, computeOppositeTopoRequirement, computeOppositeDegreeOptimal
+    TOPO_MISMATCH_PENALTY,
+    computeOppositeTopoRequirement,
+    computeOppositeDegreeOptimal
 } = require("./JunctionGridUtils");
 
 class JunctionGridPoint {
@@ -12,16 +14,7 @@ class JunctionGridPoint {
         return `grid-point-(${xI},${yI})`;
     }
 
-    constructor(grid, xI, yI,
-                eastTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
-                northTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
-                westTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
-                southTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT,
-                eastDegreeOptimal = 0,
-                northDegreeOptimal = 90,
-                westDegreeOptimal = -180,
-                southDegreeOptimal = -90
-    ) {
+    constructor(grid, xI, yI, eastTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT, northTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT, westTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT, southTopoRequirement = DEFAULT_DIRECTION_REQUIREMENT, eastDegreeOptimal = 0, northDegreeOptimal = 90, westDegreeOptimal = -180, southDegreeOptimal = -90) {
         this.id = JunctionGridPoint.formatGridPointId(xI, yI);
         this.grid = grid;
         this.xI = xI;
@@ -36,6 +29,18 @@ class JunctionGridPoint {
         this.NORTH = null;
         this.WEST = null;
         this.SOUTH = null;
+
+        // note that signals are placed at the opposite direction within the junction.
+        // e.g. the east signal is placed close to the west road contact point.
+        this.eastSignal = true;
+        this.northSignal = true;
+        this.westSignal = true;
+        this.southSignal = true;
+
+        this.eastCrosswalk = true;
+        this.northCrosswalk = true;
+        this.westCrosswalk = true;
+        this.southCrosswalk = true;
 
         this.eastTopoRequirement = eastTopoRequirement;
         this.northTopoRequirement = northTopoRequirement;
@@ -139,22 +144,17 @@ class JunctionGridPoint {
             rotatedDirections.rotate(rotation);
             const assignment = {
                 [rotatedDirections[0]]: {
-                    topo: topoGeoInfo[0].topo,
-                    rotation: degreeNormalize(topoGeoInfo[0].rotation + rotation * 90)
-                },
-                [rotatedDirections[1]]: {
+                    topo: topoGeoInfo[0].topo, rotation: degreeNormalize(topoGeoInfo[0].rotation + rotation * 90)
+                }, [rotatedDirections[1]]: {
                     topo: topoGeoInfo[1] ? topoGeoInfo[1].topo : null,
                     rotation: topoGeoInfo[1] ? degreeNormalize(topoGeoInfo[1].rotation + rotation * 90) : null,
-                },
-                [rotatedDirections[2]]: {
+                }, [rotatedDirections[2]]: {
                     topo: topoGeoInfo[2] ? topoGeoInfo[2].topo : null,
                     rotation: topoGeoInfo[2] ? degreeNormalize(topoGeoInfo[2].rotation + rotation * 90) : null,
-                },
-                [rotatedDirections[3]]: {
+                }, [rotatedDirections[3]]: {
                     topo: topoGeoInfo[3] ? topoGeoInfo[3].topo : null,
                     rotation: topoGeoInfo[3] ? degreeNormalize(topoGeoInfo[3].rotation + rotation * 90) : null
-                },
-                junction,
+                }, junction,
             };
             this.validateAssignment(assignment);
 
@@ -188,10 +188,7 @@ class JunctionGridPoint {
         assignment.score = 0;
 
         // match topo first
-        if (!this.eastTopoRequirement.includes(assignment.EAST.topo) ||
-            !this.northTopoRequirement.includes(assignment.NORTH.topo) ||
-            !this.westTopoRequirement.includes(assignment.WEST.topo) ||
-            !this.southTopoRequirement.includes(assignment.SOUTH.topo)) {
+        if (!this.eastTopoRequirement.includes(assignment.EAST.topo) || !this.northTopoRequirement.includes(assignment.NORTH.topo) || !this.westTopoRequirement.includes(assignment.WEST.topo) || !this.southTopoRequirement.includes(assignment.SOUTH.topo)) {
             assignment.score = TOPO_MISMATCH_PENALTY;
             return;
         }
@@ -294,6 +291,9 @@ class JunctionGridPoint {
             } else {
                 // do nothing as it's already assigned a topo group.
             }
+
+            // process signal
+            this.eastSignal = this.eastSignal && (this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT");
         }
 
         if (this.NORTH) {
@@ -311,6 +311,9 @@ class JunctionGridPoint {
             } else {
                 // do nothing as it's already assigned a topo group.
             }
+
+            // process signal
+            this.northSignal = this.northSignal && (this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT");
         }
 
         if (this.WEST) {
@@ -328,6 +331,9 @@ class JunctionGridPoint {
             } else {
                 // do nothing as it's already assigned a topo group.
             }
+
+            // process signal
+            this.westSignal = this.westSignal && (this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT");
         }
 
         if (this.SOUTH) {
@@ -345,6 +351,9 @@ class JunctionGridPoint {
             } else {
                 // do nothing as it's already assigned a topo group.
             }
+
+            // process signal
+            this.southSignal = this.southSignal && (this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT");
         }
         console.log(this.grid);
     }
@@ -398,9 +407,12 @@ class JunctionGrid {
 
         return pointMatches[0];
     }
+
+    getJunctionPointList() {
+        return this.pointList.filter(point => point.junction !== null);
+    }
 }
 
 module.exports = {
-    JunctionGrid,
-    JunctionGridPoint,
+    JunctionGrid, JunctionGridPoint,
 };

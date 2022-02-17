@@ -12,8 +12,7 @@ function buildGridLayout(graph, junctionClusters) {
 
     while (junctionClusters.length > 0) {
         const matchList = junctionClusters.map(junctionCluster => ({
-            junctionCluster,
-            bestMatch: junctionGrid.computeBestMatch(junctionCluster),
+            junctionCluster, bestMatch: junctionGrid.computeBestMatch(junctionCluster),
         })).sort((a, b) => b.bestMatch.assignment.score - a.bestMatch.assignment.score);
 
         const {junctionCluster, bestMatch} = matchList[0];
