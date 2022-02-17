@@ -87,14 +87,18 @@ class MapGeneratorGrid {
                         let forwardLaneCount, backwardLaneCount;
                         if (topo === "IN-OUT") {
                             // randomly select number of total lanes in the road
-                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
-                            backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
+                            // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
+                            // backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
+                            forwardLaneCount = 1;
+                            backwardLaneCount = 1;
                         } else if (topo === "OUT") {
-                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            forwardLaneCount = 1;
                             backwardLaneCount = 0;
                         } else if (topo === "IN") {
                             startsFromJunction = false;
-                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            forwardLaneCount = 1;
+                            // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
                             backwardLaneCount = 0;
                         } else {
                             global.logE(this.name, `Unknown topo: ${topo}`);
@@ -186,10 +190,13 @@ class MapGeneratorGrid {
                         let forwardLaneCount, backwardLaneCount;
                         if (topo === "IN-OUT") {
                             // randomly select number of total lanes in the road
-                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
-                            backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
+                            // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
+                            // backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
+                            forwardLaneCount = 1;
+                            backwardLaneCount = 1;
                         } else if (topo === "OUT") {
-                            forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
+                            forwardLaneCount = 1;
                             backwardLaneCount = 0;
                         } else {
                             global.logE(this.name, `Unknown topo: ${topo}`);

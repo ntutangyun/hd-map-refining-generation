@@ -126,7 +126,7 @@ class JunctionGridPoint {
     }
 
     formatJunctionId() {
-        return `J_(${this.xI},${this.yI})`;
+        return `J_${this.xI}_${this.yI}`;
     }
 
     computeBestJunctionAssignment(junction) {
