@@ -48,9 +48,13 @@ class MapGeneratorGrid {
 
         this.instantiateJunctions();
         this.instantiateRoads();
-        this.instantiateSignals();
         this.updateJunctions();
-        this.updateOverlaps();
+        this.instantiateSignals();
+
+        this.addJunctions();
+        this.addLaneNRoads();
+        this.addSignals();
+        this.addOverlaps();
 
         return this.map;
     }
@@ -349,36 +353,15 @@ class MapGeneratorGrid {
     }
 
     updateJunctions() {
-        const roadList = {};
-
         this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
-            junctionPoint.junction.generateJunctionLanes();
-            junctionPoint.junction.generatePolygon();
-            junctionPoint.junction.generateLaneOverlap();
-
-            junctionPoint.junction.laneRoadList.forEach(jLaneRoad => {
-                jLaneRoad.getLaneList().forEach(lane => {
-                    this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-                });
-                this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
-            });
-
-            junctionPoint.junction.getConnectedRoadList().forEach(road => {
-                roadList[road.id] = road;
-            });
-
-            this.map.addJunction(junctionPoint.junction.serializeToProtobuf(this.config.curveSampleCount));
-        });
-
-        Object.values(roadList).forEach(road => {
-            road.getLaneList().forEach(lane => {
-                this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-            });
-            this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+            const junction = junctionPoint.junction;
+            junction.generateJunctionLanes();
+            junction.generatePolygon();
+            junction.generateLaneOverlap();
         });
     }
 
-    updateOverlaps() {
+    addOverlaps() {
         const overlapList = {};
         this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
             junctionPoint.junction.getOverlapList().forEach(overlap => {
@@ -393,6 +376,47 @@ class MapGeneratorGrid {
 
         Object.values(overlapList).forEach(overlap => {
             this.map.addOverlap(overlap.serializeToProtobuf());
+        });
+    }
+
+    addLaneNRoads() {
+        const roadList = {};
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            const junction = junctionPoint.junction;
+
+            junction.laneRoadList.forEach(jLaneRoad => {
+                jLaneRoad.getLaneList().forEach(lane => {
+                    this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+                });
+                this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
+            });
+
+            junction.getConnectedRoadList().forEach(road => {
+                roadList[road.id] = road;
+            });
+        });
+
+        Object.values(roadList).forEach(road => {
+            road.getLaneList().forEach(lane => {
+                this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+            });
+            this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+        });
+    }
+
+    addJunctions() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            const junction = junctionPoint.junction;
+            this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
+        });
+    }
+
+    addSignals() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            const junction = junctionPoint.junction;
+            junction.signalList.forEach(signal => {
+                this.map.addSignal(signal.serializeToProtobuf());
+            });
         });
     }
 

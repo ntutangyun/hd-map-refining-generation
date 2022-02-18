@@ -114,7 +114,7 @@ class Signal {
         this.overlapList.push(jOverlap);
     }
 
-    serializeToProtobuf() {
+    serializeToProtobuf(curveSampleCount = 3) {
         const signal = new SignalProto.Signal();
         signal.setId((new MapIDProto.Id()).setId(this.id));
         signal.setType(this.type);
@@ -133,8 +133,12 @@ class Signal {
                 .setLocation(new commonProto.PointENU().setX(subSignal.location.x).setY(subSignal.location.y).setZ(subSignal.location.z));
         });
 
-        const stopLine = this.stopLine.serializeToProtobuf();
+        const stopLine = this.stopLine.serializeToProtobuf(3);
         signal.addStopLine(stopLine);
+
+        this.overlapList.forEach(overlap => {
+            signal.addOverlapId().setId(overlap.id);
+        });
 
         return signal;
     }
