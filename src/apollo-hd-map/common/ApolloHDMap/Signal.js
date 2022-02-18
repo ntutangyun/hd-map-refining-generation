@@ -56,16 +56,16 @@ class Signal {
         this.type = s.type;
 
         s.overlapIdList.forEach(o => {
-            const overlap = this.graph.graphData.overlapList.find(overlap => overlap.id.id === o.id);
+            const overlap = this.graph.mapData.overlapList.find(overlap => overlap.id.id === o.id);
             if (!overlap) {
-                global.logE("StopSign", "Cannot find the overlap");
+                global.logE("signal", "Cannot find the overlap");
                 process.exit(-1);
             }
 
             if (o.id.includes("lane")) {
                 const laneObject = overlap.objectList.find(object => object.id.id.startsWith("lane"));
                 if (!laneObject) {
-                    global.logE("StopSign", "Cannot find the lane object");
+                    global.logE("signal", "Cannot find the lane object");
                     process.exit(-1);
                 }
 
@@ -80,7 +80,7 @@ class Signal {
             if (o.id.includes("junction")) {
                 const junctionObject = overlap.objectList.find(object => object.id.id.startsWith("J_"));
                 if (!junctionObject) {
-                    global.logE("StopSign", "Cannot find the junction object");
+                    global.logE("signal", "Cannot find the junction object");
                     process.exit(-1);
                 }
                 this.junction = this.graph.getJunctionById(junctionObject.id.id);

@@ -19,7 +19,11 @@ class StopSign {
         this.id = stopSignData.id.id;
         this.type = stopSignData.type;
         stopSignData.overlapIdList.forEach(o => {
-            const overlap = this.graph.graphData.overlapList.find(overlap => overlap.id.id === o.id);
+            if (!o.id.includes("lane")) {
+                // ignore other types of overlap for now
+                return;
+            }
+            const overlap = this.graph.mapData.overlapList.find(overlap => overlap.id.id === o.id);
             if (!overlap) {
                 global.logE("StopSign", "Cannot find the overlap");
                 process.exit(-1);
