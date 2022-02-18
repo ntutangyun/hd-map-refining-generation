@@ -65,6 +65,14 @@ class Lane {
         this.junctionRoad = null;
     }
 
+    getIncomingList() {
+        return [...this.incomingList];
+    }
+
+    getOutgoingList() {
+        return [...this.outgoingList];
+    }
+
     getOutgoingLaneList() {
         return [...this.outgoingList];
     }

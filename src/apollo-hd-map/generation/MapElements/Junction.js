@@ -20,6 +20,7 @@ class Junction {
 
         this.signalList = [];
         this.stopSignList = [];
+        this.crosswalkList = [];
     }
 
     get name() {
@@ -149,7 +150,7 @@ class Junction {
 
         laneConfigs.forEach(({startPoint, startHeading, incomingLane, endPoint, endHeading, outgoingLane, turn}) => {
             const junctionLane = LaneGenerator.generateLane({
-                startPoint, startHeading, endPoint, endHeading, id: global.getNewLaneId(), turn
+                startPoint, startHeading, endPoint, endHeading, id: global.getNewLaneId(), turn, isJunctionLane: true
             });
 
             junctionLane.incomingList.push(incomingLane);

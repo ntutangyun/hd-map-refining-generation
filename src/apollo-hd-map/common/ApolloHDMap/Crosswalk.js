@@ -16,7 +16,10 @@ class Crosswalk {
         }
         this.pointList = crossWalkData.polygon.pointList;
         crossWalkData.overlapIdList.forEach(o => {
-
+            if (!o.id.includes("lane")) {
+                // ignore other types of overlaps
+                return;
+            }
             const overlap = this.graph.mapData.overlapList.find(overlap => overlap.id.id === o.id);
             if (!overlap) {
                 global.logE("crosswalk", "Cannot find the overlap");
@@ -33,7 +36,6 @@ class Crosswalk {
             }
 
             this.laneList[lane.id] = lane;
-            // need additional processing for junction lanes.
             lane.addCrosswalk(this);
         });
         return this;

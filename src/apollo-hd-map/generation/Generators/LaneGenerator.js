@@ -12,21 +12,36 @@ class LaneGenerator {
                             laneWidth = 3.5,
                             isForward = undefined,
                             speedLimit = 10,
-                            turn = undefined
+                            turn = undefined,
+                            isJunctionLane = false,
                         }) {
 
-        const centralCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+        const centralCurve = BezierCurve.buildBezierCurve({
+            startPoint,
+            startHeading,
+            endPoint,
+            endHeading,
+            isJunctionLane
+        });
 
         // build left and right boundaries
         const leftBoundaryStartPoint = startPoint.moveTowards(startHeading + Math.PI / 2, laneWidth / 2);
         const leftBoundaryEndPoint = endPoint.moveTowards(endHeading + Math.PI / 2, laneWidth / 2);
         const leftBoundaryCurve = BezierCurve.buildBezierCurve({
-            startPoint: leftBoundaryStartPoint, startHeading, endPoint: leftBoundaryEndPoint, endHeading
+            startPoint: leftBoundaryStartPoint,
+            startHeading,
+            endPoint: leftBoundaryEndPoint,
+            endHeading,
+            isJunctionLane
         });
         const rightBoundaryStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth / 2);
         const rightBoundaryEndPoint = endPoint.moveTowards(endHeading - Math.PI / 2, laneWidth / 2);
         const rightBoundaryCurve = BezierCurve.buildBezierCurve({
-            startPoint: rightBoundaryStartPoint, startHeading, endPoint: rightBoundaryEndPoint, endHeading
+            startPoint: rightBoundaryStartPoint,
+            startHeading,
+            endPoint: rightBoundaryEndPoint,
+            endHeading,
+            isJunctionLane
         });
 
         return new Lane({

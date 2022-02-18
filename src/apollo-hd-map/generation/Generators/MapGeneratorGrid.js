@@ -10,6 +10,7 @@ const RoadGenerator = require("./RoadGenerator");
 const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 const Signal = require("../MapElements/Signal");
 const StopSign = require("../MapElements/StopSign");
+const Crosswalk = require("../MapElements/Crosswalk");
 
 class MapGeneratorGrid {
     constructor(config, junctionGrid) {
@@ -22,6 +23,7 @@ class MapGeneratorGrid {
         this.laneCount = 0;
         this.signalCount = 0;
         this.stopSignCount = 0;
+        this.crosswalkCount = 0;
 
         global.getNewJunctionId = () => {
             return `J_${this.junctionCount++}`;
@@ -42,6 +44,10 @@ class MapGeneratorGrid {
         global.getNewStopSignId = () => {
             return `stop_sign_${this.stopSignCount++}`;
         };
+
+        global.getNewCrosswalkId = () => {
+            return `CW_${this.crosswalkCount++}`;
+        };
     }
 
     get name() {
@@ -57,11 +63,13 @@ class MapGeneratorGrid {
         this.updateJunctions();
         this.instantiateSignals();
         this.instantiateStopSigns();
+        this.instantiateCrosswalks();
 
         this.addJunctions();
         this.addLaneNRoads();
         this.addSignals();
         this.addStopSigns();
+        this.addCrosswalks();
         this.addOverlaps();
 
         return this.map;
@@ -427,6 +435,74 @@ class MapGeneratorGrid {
         });
     }
 
+    instantiateCrosswalks() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            console.log(junctionPoint);
+
+            const junction = junctionPoint.junction;
+
+            const roadList = [];
+            if (junctionPoint.eastCrosswalk) {
+                roadList.push(junctionPoint.roadAssignment.EAST);
+            }
+            if (junctionPoint.northCrosswalk) {
+                roadList.push(junctionPoint.roadAssignment.NORTH);
+            }
+            if (junctionPoint.westCrosswalk) {
+                roadList.push(junctionPoint.roadAssignment.WEST);
+            }
+            if (junctionPoint.southCrosswalk) {
+                roadList.push(junctionPoint.roadAssignment.SOUTH);
+            }
+            roadList.forEach(road => {
+                let isRoadOutgoing;
+                try {
+                    isRoadOutgoing = junction.isRoadOutgoing(road);
+                } catch (e) {
+                    console.log(e);
+                }
+
+                let laneList = {};
+
+                road.getForwardLaneList().forEach(forwardLane => {
+                    laneList[forwardLane.id] = forwardLane;
+
+                    if (isRoadOutgoing) {
+                        forwardLane.getIncomingList().forEach(inLane => {
+                            laneList[inLane.id] = inLane;
+                        });
+                    } else {
+                        forwardLane.getOutgoingList().forEach(outLane => {
+                            laneList[outLane.id] = outLane;
+                        });
+                    }
+                });
+
+                road.getBackwardLaneList().forEach(backwardLane => {
+                    laneList[backwardLane.id] = backwardLane;
+
+                    if (isRoadOutgoing) {
+                        backwardLane.getOutgoingList().forEach(outLane => {
+                            laneList[outLane.id] = outLane;
+                        });
+                    } else {
+                        backwardLane.getIncomingList().forEach(inLane => {
+                            laneList[inLane.id] = inLane;
+                        });
+                    }
+                });
+
+                laneList = Object.values(laneList);
+
+                const crosswalk = new Crosswalk({
+                    id: global.getNewCrosswalkId(), junction, laneList, road
+                });
+
+                junction.crosswalkList.push(crosswalk);
+            });
+        });
+    }
+
     updateJunctions() {
         this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
             const junction = junctionPoint.junction;
@@ -505,6 +581,15 @@ class MapGeneratorGrid {
             const junction = junctionPoint.junction;
             junction.stopSignList.forEach(stopSign => {
                 this.map.addStopSign(stopSign.serializeToProtobuf());
+            });
+        });
+    }
+
+    addCrosswalks() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            const junction = junctionPoint.junction;
+            junction.crosswalkList.forEach(crosswalk => {
+                this.map.addCrosswalk(crosswalk.serializeToProtobuf());
             });
         });
     }

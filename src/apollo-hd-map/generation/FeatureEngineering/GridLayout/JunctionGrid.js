@@ -32,20 +32,20 @@ class JunctionGridPoint {
 
         // note that signals are placed at the opposite direction within the junction.
         // e.g. the east signal is placed close to the west road contact point.
-        this.eastSignal = true;
-        this.northSignal = true;
-        this.westSignal = true;
-        this.southSignal = true;
+        this.eastSignal = false;
+        this.northSignal = false;
+        this.westSignal = false;
+        this.southSignal = false;
 
         this.eastStopSign = false;
         this.northStopSign = false;
         this.westStopSign = false;
         this.southStopSign = false;
 
-        this.eastCrosswalk = true;
-        this.northCrosswalk = true;
-        this.westCrosswalk = true;
-        this.southCrosswalk = true;
+        this.eastCrosswalk = false;
+        this.northCrosswalk = false;
+        this.westCrosswalk = false;
+        this.southCrosswalk = false;
 
         this.eastTopoRequirement = eastTopoRequirement;
         this.northTopoRequirement = northTopoRequirement;
@@ -279,7 +279,7 @@ class JunctionGridPoint {
         let isSignalJunction = Math.random() <= 0.5;
 
         // extend the grid
-        if (this.EAST) {
+        if (this.EAST.topo) {
             // east direction
             const xI = this.xI + 1;
             const yI = this.yI;
@@ -297,16 +297,18 @@ class JunctionGridPoint {
 
             // process signal
             if (isSignalJunction) {
-                this.eastSignal = this.eastSignal && (this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT");
+                this.eastSignal = this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT";
                 this.eastStopSign = false;
             } else {
                 // stop sign junction
                 this.eastSignal = false;
                 this.eastStopSign = this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT";
             }
+
+            this.eastCrosswalk = Math.random() <= 0.5;
         }
 
-        if (this.NORTH) {
+        if (this.NORTH.topo) {
             // north direction
             const xI = this.xI;
             const yI = this.yI + 1;
@@ -324,16 +326,18 @@ class JunctionGridPoint {
 
             // process signal
             if (isSignalJunction) {
-                this.northSignal = this.northSignal && (this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT");
+                this.northSignal = this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT";
                 this.northStopSign = false;
             } else {
                 // stop sign junction
                 this.northSignal = false;
                 this.northStopSign = this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT";
             }
+
+            this.northCrosswalk = Math.random() <= 0.5;
         }
 
-        if (this.WEST) {
+        if (this.WEST.topo) {
             // west direction
             const xI = this.xI - 1;
             const yI = this.yI;
@@ -351,16 +355,18 @@ class JunctionGridPoint {
 
             // process signal
             if (isSignalJunction) {
-                this.westSignal = this.westSignal && (this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT");
+                this.westSignal = this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT";
                 this.westStopSign = false;
             } else {
                 // stop sign junction
                 this.westSignal = false;
                 this.westStopSign = this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT";
             }
+
+            this.westCrosswalk = Math.random() <= 0.5;
         }
 
-        if (this.SOUTH) {
+        if (this.SOUTH.topo) {
             // south direction
             const xI = this.xI;
             const yI = this.yI - 1;
@@ -378,13 +384,15 @@ class JunctionGridPoint {
 
             // process signal
             if (isSignalJunction) {
-                this.southSignal = this.southSignal && (this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT");
+                this.southSignal = this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT";
                 this.southStopSign = false;
             } else {
                 // stop sign junction
                 this.southSignal = false;
                 this.southStopSign = this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT";
             }
+
+            this.southCrosswalk = Math.random() <= 0.5;
         }
         console.log(this.grid);
     }

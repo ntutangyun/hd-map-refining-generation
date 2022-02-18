@@ -318,6 +318,7 @@ class BezierCurve {
                                 startHeading,
                                 endPoint,
                                 endHeading,
+                                isJunctionLane = false
                             }) {
         console.assert(startPoint && endPoint, "start point and end point cannot be undefined or null");
         console.assert(!isNaN(startHeading) && !isNaN(endHeading), "start heading and end heading should be defined");
@@ -326,20 +327,20 @@ class BezierCurve {
         const segmentDist = pointDist(startPoint, endPoint);
         const startOffsetCtrlPoint = startPoint.moveTowards(startHeading, segmentDist / 2);
         const endOffsetCtrlPoint = endPoint.moveTowards(endHeading + Math.PI, segmentDist / 2);
-        return new BezierCurve([startPoint, startOffsetCtrlPoint, endOffsetCtrlPoint, endPoint], startHeading, endHeading);
-        //
-        // const startLine = new StraightLine(startPoint, null, startHeading);
-        // const endLine = new StraightLine(endPoint, null, endHeading);
-        //
-        // const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
 
-        // if (intersectPoint === null) {
-        //     road to create is a straight line with only two control points
-        // return new BezierCurve([startPoint, endPoint], startHeading);
-        // } else {
-        //     road to create is a curve controlled by three control points
-        // return new BezierCurve([startPoint, intersectPoint, endPoint], startHeading);
-        // }
+        if (isJunctionLane) {
+            const startLine = new StraightLine(startPoint, null, startHeading);
+            const endLine = new StraightLine(endPoint, null, endHeading);
+            const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
+
+            if (intersectPoint === null) {
+                return new BezierCurve([startPoint, startOffsetCtrlPoint, endOffsetCtrlPoint, endPoint], startHeading, endHeading);
+            } else {
+                return new BezierCurve([startPoint, intersectPoint, intersectPoint, endPoint], startHeading, endHeading);
+            }
+        }
+
+        return new BezierCurve([startPoint, startOffsetCtrlPoint, endOffsetCtrlPoint, endPoint], startHeading, endHeading);
     }
 
     get name() {
