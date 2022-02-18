@@ -456,11 +456,7 @@ class MapGeneratorGrid {
             }
             roadList.forEach(road => {
                 let isRoadOutgoing;
-                try {
-                    isRoadOutgoing = junction.isRoadOutgoing(road);
-                } catch (e) {
-                    console.log(e);
-                }
+                isRoadOutgoing = junction.isRoadOutgoing(road);
 
                 let laneList = {};
 
@@ -526,6 +522,25 @@ class MapGeneratorGrid {
             junctionPoint.junction.getStopSignList().forEach(stopSign => {
                 stopSign.getOverlapList().forEach(overlap => {
                     overlapList[overlap.id] = overlap;
+                });
+            });
+            junctionPoint.junction.getCrosswalkList().forEach(crosswalk => {
+                crosswalk.getOverlapList().forEach(overlap => {
+                    overlapList[overlap.id] = overlap;
+                });
+            });
+
+            junctionPoint.junction.getLaneList().forEach(lane => {
+                lane.getOverlapList().forEach(overlap => {
+                    overlapList[overlap.id] = overlap;
+                });
+            });
+
+            junctionPoint.junction.getConnectedRoadList().forEach(road => {
+                road.getLaneList().forEach(lane => {
+                    lane.getOverlapList().forEach(overlap => {
+                        overlapList[overlap.id] = overlap;
+                    });
                 });
             });
         });

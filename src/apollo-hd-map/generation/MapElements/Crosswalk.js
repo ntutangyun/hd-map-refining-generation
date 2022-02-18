@@ -31,58 +31,67 @@ class Crosswalk {
 
         let p0, p1, p2, p3;
         if (isOutgoingRoad) {
-            // IN-OUT
-            if (forwardLaneList.length > 0 && backwardLaneList.length > 0) {
-                const forwardIncomingLane = forwardLaneList.last().getIncomingList().last();
-                p0 = forwardIncomingLane.rightBoundaryCurve.pointAt((forwardIncomingLane.length - DEFAULT_CROSSWALK_WIDTH) / forwardIncomingLane.length);
-                p1 = forwardIncomingLane.rightBoundaryCurve.pointAt(1);
+            if (forwardLaneList.length > 0 && backwardLaneList.length > 0) {             // IN-OUT
+                const forwardLaneRight = forwardLaneList.last();
+                p1 = forwardLaneRight.rightBoundaryCurve.startPoint.copy();
+                p0 = forwardLaneRight.rightBoundaryCurve.startPoint.moveTowards(forwardLaneRight.rightBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
 
-                const backwardOutgoingLane = backwardLaneList.last().getOutgoingList().last();
-                p2 = backwardOutgoingLane.rightBoundaryCurve.pointAt(0);
-                p3 = backwardOutgoingLane.rightBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / backwardOutgoingLane.length);
-            } else if (forwardLaneList.length > 0) {
-                const forwardIncomingLaneRight = forwardLaneList.last().getIncomingList().last();
-                p0 = forwardIncomingLaneRight.rightBoundaryCurve.pointAt((forwardIncomingLaneRight.length - DEFAULT_CROSSWALK_WIDTH) / forwardIncomingLaneRight.length);
-                p1 = forwardIncomingLaneRight.rightBoundaryCurve.pointAt(1);
+                const backwardLaneRight = backwardLaneList.last();
+                p2 = backwardLaneRight.rightBoundaryCurve.endPoint.copy();
+                p3 = backwardLaneRight.rightBoundaryCurve.endPoint.moveTowards(backwardLaneRight.rightBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
 
-                const forwardIncomingLaneLeft = forwardLaneList.first().getIncomingList().first();
-                p2 = forwardIncomingLaneLeft.leftBoundaryCurve.pointAt(1);
-                p3 = forwardIncomingLaneLeft.leftBoundaryCurve.pointAt((forwardIncomingLaneLeft.length - DEFAULT_CROSSWALK_WIDTH) / forwardIncomingLaneLeft.length);
-            } else if (backwardLaneList.length > 0) {
-                const backwardOutgoingLaneLeft = backwardLaneList.first().getOutgoingList().first();
-                p0 = backwardOutgoingLaneLeft.leftBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / backwardOutgoingLaneLeft.length);
-                p1 = backwardOutgoingLaneLeft.leftBoundaryCurve.pointAt(0);
+            } else if (forwardLaneList.length > 0) {                    // OUT
 
-                const backwardOutgoingLaneRight = backwardLaneList.last().getOutgoingList().last();
-                p2 = backwardOutgoingLaneRight.leftBoundaryCurve.pointAt(0);
-                p3 = backwardOutgoingLaneRight.leftBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / backwardOutgoingLaneRight.length);
+                const forwardLaneRight = forwardLaneList.last();
+                p1 = forwardLaneRight.rightBoundaryCurve.startPoint.copy();
+                p0 = forwardLaneRight.rightBoundaryCurve.startPoint.moveTowards(forwardLaneRight.rightBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
+
+                const forwardLaneLeft = forwardLaneList.first();
+                p2 = forwardLaneLeft.leftBoundaryCurve.startPoint.copy();
+                p3 = forwardLaneLeft.leftBoundaryCurve.startPoint.moveTowards(forwardLaneLeft.leftBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
+
+            } else if (backwardLaneList.length > 0) {                   // IN
+
+                const backwardLaneLeft = backwardLaneList.first();
+                p1 = backwardLaneLeft.leftBoundaryCurve.endPoint.copy();
+                p0 = backwardLaneLeft.leftBoundaryCurve.endPoint.moveTowards(backwardLaneLeft.leftBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
+
+                const backwardLaneRight = backwardLaneList.last();
+                p2 = backwardLaneRight.rightBoundaryCurve.endPoint.copy();
+                p3 = backwardLaneRight.rightBoundaryCurve.endPoint.moveTowards(backwardLaneRight.rightBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
             }
+
         } else {
-            // IN-OUT
-            if (forwardLaneList.length > 0 && backwardLaneList.length > 0) {
-                const forwardOutgoingLane = forwardLaneList.last().getOutgoingList().last();
-                p0 = forwardOutgoingLane.rightBoundaryCurve.pointAt(0);
-                p1 = forwardOutgoingLane.rightBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / forwardOutgoingLane.length);
 
-                const backwardIncomingLane = backwardLaneList.last().getIncomingList().last();
-                p2 = backwardIncomingLane.rightBoundaryCurve.pointAt((backwardIncomingLane.length - DEFAULT_CROSSWALK_WIDTH) / backwardIncomingLane.length);
-                p3 = backwardIncomingLane.rightBoundaryCurve.pointAt(1);
-            } else if (forwardLaneList.length > 0) {
-                const forwardOutgoingLaneRight = forwardLaneList.last().getOutgoingList().last();
-                p0 = forwardOutgoingLaneRight.rightBoundaryCurve.pointAt(0);
-                p1 = forwardOutgoingLaneRight.rightBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / forwardOutgoingLaneRight.length);
+            if (forwardLaneList.length > 0 && backwardLaneList.length > 0) {        // IN-OUT
 
-                const forwardOutgoingLaneLeft = forwardLaneList.first().getOutgoingList().first();
-                p2 = forwardOutgoingLaneLeft.leftBoundaryCurve.pointAt(DEFAULT_CROSSWALK_WIDTH / forwardOutgoingLaneRight.length);
-                p3 = forwardOutgoingLaneLeft.leftBoundaryCurve.pointAt(0);
-            } else if (backwardLaneList.length > 0) {
-                const backwardIncomingLaneLeft = backwardLaneList.first().getIncomingList().first();
-                p0 = backwardIncomingLaneLeft.leftBoundaryCurve.pointAt(1);
-                p1 = backwardIncomingLaneLeft.leftBoundaryCurve.pointAt((backwardIncomingLaneLeft.length - DEFAULT_CROSSWALK_WIDTH) / backwardIncomingLaneLeft.length);
+                const forwardLaneRight = forwardLaneList.last();
+                p0 = forwardLaneRight.rightBoundaryCurve.endPoint.copy();
+                p1 = forwardLaneRight.rightBoundaryCurve.endPoint.moveTowards(forwardLaneRight.rightBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
 
-                const backwardIncomingLaneRight = backwardLaneList.last().getIncomingList().last();
-                p2 = backwardIncomingLaneRight.leftBoundaryCurve.pointAt((backwardIncomingLaneRight.length - DEFAULT_CROSSWALK_WIDTH) / backwardIncomingLaneRight.length);
-                p3 = backwardIncomingLaneRight.leftBoundaryCurve.pointAt(1);
+                const backwardLaneRight = backwardLaneList.last();
+                p2 = backwardLaneRight.rightBoundaryCurve.startPoint.moveTowards(backwardLaneRight.rightBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
+                p3 = backwardLaneRight.rightBoundaryCurve.startPoint.copy();
+
+            } else if (forwardLaneList.length > 0) {                // IN
+
+                const forwardLaneRight = forwardLaneList.last();
+                p0 = forwardLaneRight.rightBoundaryCurve.endPoint.copy();
+                p1 = forwardLaneRight.rightBoundaryCurve.endPoint.moveTowards(forwardLaneRight.rightBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
+
+                const forwardLaneLeft = forwardLaneList.first();
+                p2 = forwardLaneLeft.leftBoundaryCurve.endPoint.moveTowards(forwardLaneLeft.leftBoundaryCurve.endHeading, DEFAULT_CROSSWALK_WIDTH);
+                p3 = forwardLaneLeft.leftBoundaryCurve.endPoint.copy();
+
+            } else if (backwardLaneList.length > 0) {           // OUT
+
+                const backwardLaneLeft = backwardLaneList.first();
+                p0 = backwardLaneLeft.leftBoundaryCurve.startPoint.copy();
+                p1 = backwardLaneLeft.leftBoundaryCurve.startPoint.moveTowards(backwardLaneLeft.leftBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
+
+                const backwardLaneRight = backwardLaneList.last();
+                p2 = backwardLaneRight.rightBoundaryCurve.startPoint.moveTowards(backwardLaneRight.rightBoundaryCurve.startHeading + Math.PI, DEFAULT_CROSSWALK_WIDTH);
+                p3 = backwardLaneRight.rightBoundaryCurve.startPoint.copy();
             }
         }
 

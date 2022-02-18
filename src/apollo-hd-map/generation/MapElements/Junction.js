@@ -43,6 +43,10 @@ class Junction {
         return [...this.stopSignList];
     }
 
+    getCrosswalkList() {
+        return [...this.crosswalkList];
+    }
+
     connectRoad(road) {
         if (!this.connectedRoadList.find(r => r.id === road.id)) {
             this.connectedRoadList.push(road);

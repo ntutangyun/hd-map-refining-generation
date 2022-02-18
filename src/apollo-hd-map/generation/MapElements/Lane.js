@@ -65,6 +65,10 @@ class Lane {
         this.junctionRoad = null;
     }
 
+    getOverlapList() {
+        return [...this.overlapList];
+    }
+
     getIncomingList() {
         return [...this.incomingList];
     }

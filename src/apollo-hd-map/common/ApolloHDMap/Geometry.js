@@ -276,6 +276,10 @@ class Point {
     equalTo(point) {
         return this.x === point.x && this.y === point.y && this.z === point.z;
     }
+
+    copy() {
+        return new Point(this.x, this.y, this.z);
+    }
 }
 
 class BezierCurve {
