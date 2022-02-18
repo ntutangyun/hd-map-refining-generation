@@ -17,6 +17,8 @@ class Junction {
         this.laneRoadList = [];
         this.polygonPointList = [];
         this.overlapList = [];
+
+        this.signalList = [];
     }
 
     get name() {
@@ -29,6 +31,10 @@ class Junction {
 
     getOverlapList() {
         return [...this.overlapList];
+    }
+
+    getSignalList() {
+        return [...this.signalList];
     }
 
     connectRoad(road) {

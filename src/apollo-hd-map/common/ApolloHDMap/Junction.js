@@ -30,22 +30,28 @@ class Junction {
         this.id = junctionData.id.id;
         this.pointList = junctionData.polygon.pointList;
 
-        junctionData.overlapIdList.forEach(overlap => {
-            const laneId = this.extractLaneId(overlap.id);
-            if (laneId !== null) {
-                const lane = this.graph.getLaneById(laneId);
+        junctionData.overlapIdList.forEach(o => {
+            const overlap = this.graph.graphData.overlapList.find(overlap => overlap.id.id === o.id);
+            if (!overlap) {
+                global.logE("StopSign", "Cannot find the overlap");
+                process.exit(-1);
+            }
+            const laneObject = overlap.objectList.find(object => object.id.id.startsWith("lane"));
+            if (!laneObject) {
+                global.logE("StopSign", "Cannot find the lane object");
+                process.exit(-1);
+            }
+            const lane = this.graph.getLaneById(laneObject.id.id);
+            if (lane === null) {
+                return;
+            }
 
-                if (lane === null) {
-                    return;
-                }
+            this.laneList[lane.id] = lane;
+            lane.junction = this;
 
-                this.laneList[lane.id] = lane;
-                lane.junction = this;
-
-                // check validity
-                if (lane.getIncomingLaneList().length === 0 || lane.getOutgoingLaneList().length === 0) {
-                    this.valid = false;
-                }
+            // check validity
+            if (lane.getIncomingLaneList().length === 0 || lane.getOutgoingLaneList().length === 0) {
+                this.valid = false;
             }
         });
 
@@ -119,13 +125,6 @@ class Junction {
 
     getLaneList() {
         return Object.values(this.laneList);
-    }
-
-    extractLaneId(id) {
-        if (id.includes("lane")) {
-            return id.replace(`overlap_junction_I${this.id.replace("J_", "")}_J0_`, "");
-        }
-        return null;
     }
 
     getSignalList() {
@@ -227,8 +226,7 @@ class Junction {
                     topo = "IN";
                 }
                 return {
-                    topo,
-                    rotation: degreeNormalize(radToDegree(this.getNeighborCenterRotation(neighbor)))
+                    topo, rotation: degreeNormalize(radToDegree(this.getNeighborCenterRotation(neighbor)))
                 };
             }).sort((nA, nB) => {
                 return nA.rotation - nB.rotation;
@@ -272,10 +270,7 @@ class Junction {
         }
 
         this.topoGeoVector = [
-            eastList.length === 1 ? eastList[0] : null,
-            northList.length === 1 ? northList[0] : null,
-            westList.length === 1 ? westList[0] : null,
-            southList.length === 1 ? southList[0] : null,
+            eastList.length === 1 ? eastList[0] : null, northList.length === 1 ? northList[0] : null, westList.length === 1 ? westList[0] : null, southList.length === 1 ? southList[0] : null,
         ];
     }
 }

@@ -65,6 +65,10 @@ class Lane {
         this.junctionRoad = null;
     }
 
+    getOutgoingLaneList() {
+        return [...this.outgoingList];
+    }
+
     // assume the lane has constant lane width along s axis for now
     // for road width sampling, forward lanes and backward lanes are the same
     // as there is one set of road boundary for each forward list and backward list respectively

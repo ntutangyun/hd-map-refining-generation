@@ -20,9 +20,15 @@ class Graph {
         this.signalList = {};
         this.crosswalkList = {};
         this.stopSignList = {};
+
+        this.graphData = null;
+        this.mapData = null;
     }
 
     init(graphData, mapData = null, manualData = null) {
+        this.graphData = graphData;
+        this.mapData = mapData;
+
         this.hdmapVersion = graphData.hdmapVersion;
         this.hdmapDistrict = graphData.hdmapDistrict;
 
@@ -302,6 +308,10 @@ class Graph {
 
     getJunctionById(id) {
         return this.junctionList.hasOwnProperty(id) ? this.junctionList[id] : null;
+    }
+
+    getSignalById(id) {
+        return this.signalList.hasOwnProperty(id) ? this.signalList[id] : null;
     }
 
     getLaneList() {

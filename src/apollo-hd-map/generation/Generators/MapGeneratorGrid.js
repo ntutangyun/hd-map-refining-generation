@@ -1,6 +1,6 @@
 const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
 const Junction = require("../MapElements/Junction");
-const {Point} = require("../../common/ApolloHDMap/Geometry");
+const {Point, vectorHeading, vector, BezierCurve} = require("../../common/ApolloHDMap/Geometry");
 const {JunctionGridPoint} = require("../FeatureEngineering/GridLayout/JunctionGrid");
 const {getRandomIntInclusive, getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
 const {
@@ -50,6 +50,7 @@ class MapGeneratorGrid {
         this.instantiateRoads();
         this.instantiateSignals();
         this.updateJunctions();
+        this.updateOverlaps();
 
         return this.map;
     }
@@ -275,8 +276,75 @@ class MapGeneratorGrid {
         this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
             console.log(junctionPoint);
 
-            const signal = new Signal({});
+            const junction = junctionPoint.junction;
 
+            const roadList = [];
+            if (junctionPoint.eastSignal) {
+                roadList.push(junctionPoint.roadAssignment.EAST);
+            }
+            if (junctionPoint.northSignal) {
+                roadList.push(junctionPoint.roadAssignment.NORTH);
+            }
+            if (junctionPoint.westSignal) {
+                roadList.push(junctionPoint.roadAssignment.WEST);
+            }
+            if (junctionPoint.southSignal) {
+                roadList.push(junctionPoint.roadAssignment.SOUTH);
+            }
+            roadList.forEach(road => {
+                const isRoadOutgoing = junction.isRoadOutgoing(road);
+
+                // signal for east direction is located at west
+                // since opposite not necessarily has road assignment, use the current road to calculate the signal position
+                let roadConnectionPoint;
+                if (isRoadOutgoing) {
+                    roadConnectionPoint = road.startPoint;
+                } else {
+                    roadConnectionPoint = road.endPoint;
+                }
+                const heading = vectorHeading(vector(junction.centerPoint, roadConnectionPoint));
+                const position = junction.centerPoint.moveTowards(heading + Math.PI, DEFAULT_ROAD_SOCKET_X_OFFSET / 3 * 2);
+
+                const laneList = [];
+                if (isRoadOutgoing) {
+                    road.getBackwardLaneList().forEach(rLane => {
+                        laneList.push(rLane);
+                        rLane.getOutgoingLaneList()
+                            .filter(jLane => jLane.junction.id === junction.id)
+                            .forEach(jLane => {
+                                laneList.push(jLane);
+                            });
+                    });
+                } else {
+                    road.getForwardLaneList().forEach(rLane => {
+                        laneList.push(rLane);
+                        rLane.getOutgoingLaneList()
+                            .filter(jLane => jLane.junction.id === junction.id)
+                            .forEach(jLane => {
+                                laneList.push(jLane);
+                            });
+                    });
+                }
+
+                let stopLine, incomingLaneList;
+                if (isRoadOutgoing) {
+                    incomingLaneList = road.getBackwardLaneList();
+                } else {
+                    incomingLaneList = road.getForwardLaneList();
+                }
+
+                const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
+                const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
+                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const endHeading = startHeading;
+                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+
+                const signal = new Signal({
+                    id: global.getNewSignalId(), position, heading, junction, laneList, stopLine
+                });
+
+                junction.signalList.push(signal);
+            });
         });
     }
 
@@ -295,10 +363,6 @@ class MapGeneratorGrid {
                 this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
             });
 
-            junctionPoint.junction.getOverlapList().forEach(overlap => {
-                this.map.addOverlap(overlap.serializeToProtobuf());
-            });
-
             junctionPoint.junction.getConnectedRoadList().forEach(road => {
                 roadList[road.id] = road;
             });
@@ -314,32 +378,50 @@ class MapGeneratorGrid {
         });
     }
 
-    // generateJunctions() {
-    //     this.config.junction_samples.forEach(junctionSample => {
-    //         const junction = JunctionGenerator.generateJunction(junctionSample);
-    //
-    //         junction.laneRoadList.forEach(jLaneRoad => {
-    //             jLaneRoad.getLaneList().forEach(lane => {
-    //                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-    //             });
-    //             this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
-    //         });
-    //
-    //         junction.getOverlapList().forEach(overlap => {
-    //             this.map.addOverlap(overlap.serializeToProtobuf());
-    //         });
-    //
-    //         junction.getConnectedRoadList().forEach(road => {
-    //             road.getLaneList().forEach(lane => {
-    //                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
-    //             });
-    //             this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
-    //         });
-    //         this.junctionGrid = junctionGrid;
-    //
-    //         this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
-    //     });
-    // }
+    updateOverlaps() {
+        const overlapList = {};
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            junctionPoint.junction.getOverlapList().forEach(overlap => {
+                overlapList[overlap.id] = overlap;
+            });
+            junctionPoint.junction.getSignalList().forEach(signal => {
+                signal.getOverlapList().forEach(overlap => {
+                    overlapList[overlap.id] = overlap;
+                });
+            });
+        });
+
+        Object.values(overlapList).forEach(overlap => {
+            this.map.addOverlap(overlap.serializeToProtobuf());
+        });
+    }
+
+// generateJunctions() {
+//     this.config.junction_samples.forEach(junctionSample => {
+//         const junction = JunctionGenerator.generateJunction(junctionSample);
+//
+//         junction.laneRoadList.forEach(jLaneRoad => {
+//             jLaneRoad.getLaneList().forEach(lane => {
+//                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+//             });
+//             this.map.addRoad(jLaneRoad.serializeToProtobuf(this.config.curveSampleCount));
+//         });
+//
+//         junction.getOverlapList().forEach(overlap => {
+//             this.map.addOverlap(overlap.serializeToProtobuf());
+//         });
+//
+//         junction.getConnectedRoadList().forEach(road => {
+//             road.getLaneList().forEach(lane => {
+//                 this.map.addLane(lane.serializeToProtobuf(this.config.curveSampleCount));
+//             });
+//             this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+//         });
+//         this.junctionGrid = junctionGrid;
+//
+//         this.map.addJunction(junction.serializeToProtobuf(this.config.curveSampleCount));
+//     });
+// }
 }
 
 module.exports = MapGeneratorGrid;

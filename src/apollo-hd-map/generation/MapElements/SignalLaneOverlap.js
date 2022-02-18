@@ -14,15 +14,28 @@ class SignalLaneOverlap extends Overlap {
 
         const laneObject = overlap.addObject();
         laneObject.setId((new MapIDProto.Id()).setId(this.lane.id));
-        const laneOverlapInfo = (new OverlapProto.LaneOverlapInfo())
-            .setStartS(0)
-            .setEndS(this.lane.centralCurve.approximateLength())
-            .setIsMerge(false);
+        let laneOverlapInfo;
+
+        // signal and junction lane overlap range: 0 - 1
+        // signal and road lane tail overlap -2.5 - -1
+        if (this.lane.junction !== null) {
+            // signal and junction lane overlap
+            laneOverlapInfo = (new OverlapProto.LaneOverlapInfo())
+                .setStartS(0)
+                .setEndS(1)
+                .setIsMerge(false);
+        } else {
+            // signal and road lane overlap
+            laneOverlapInfo = (new OverlapProto.LaneOverlapInfo())
+                .setStartS(this.lane.length - 2.5)
+                .setEndS(this.lane.length - 1)
+                .setIsMerge(false);
+        }
         laneObject.setLaneOverlapInfo(laneOverlapInfo);
 
         const signalObject = overlap.addObject();
         signalObject.setId((new MapIDProto.Id()).setId(this.signal.id));
-        signalObject.setJunctionOverlapInfo(new OverlapProto.JunctionOverlapInfo());
+        signalObject.setSignalOverlapInfo(new OverlapProto.SignalOverlapInfo());
 
         return overlap;
     }

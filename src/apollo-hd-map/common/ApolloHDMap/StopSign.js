@@ -19,26 +19,24 @@ class StopSign {
         this.id = stopSignData.id.id;
         this.type = stopSignData.type;
         stopSignData.overlapIdList.forEach(o => {
-            const laneId = this.extractLaneId(o.id);
-            if (laneId !== null) {
-                const lane = this.graph.getLaneById(laneId);
-
-                if (lane === null) {
-                    return;
-                }
-
-                this.laneList[lane.id] = lane;
-                lane.stopSignList[this.id] = this;
+            const overlap = this.graph.graphData.overlapList.find(overlap => overlap.id.id === o.id);
+            if (!overlap) {
+                global.logE("StopSign", "Cannot find the overlap");
+                process.exit(-1);
             }
+            const laneObject = overlap.objectList.find(object => object.id.id.startsWith("lane"));
+            if (!laneObject) {
+                global.logE("StopSign", "Cannot find the lane object");
+                process.exit(-1);
+            }
+            const lane = this.graph.getLaneById(laneObject.id.id);
+            if (lane === null) {
+                return;
+            }
+            this.laneList[lane.id] = lane;
+            lane.stopSignList[this.id] = this;
         });
         return this;
-    }
-
-    extractLaneId(str) {
-        if (str.includes("lane")) {
-            return str.replace(`overlap_${this.id}_`, "");
-        }
-        return null;
     }
 }
 

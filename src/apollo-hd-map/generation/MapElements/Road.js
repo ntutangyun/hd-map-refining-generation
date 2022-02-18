@@ -37,6 +37,14 @@ class Road {
         this.backwardLaneList = backwardLaneList;
     }
 
+    getForwardLaneList() {
+        return [...this.forwardLaneList];
+    }
+
+    getBackwardLaneList() {
+        return [...this.backwardLaneList];
+    }
+
     getLaneList() {
         return [...this.forwardLaneList, ...this.backwardLaneList];
     }

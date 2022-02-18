@@ -346,6 +346,14 @@ class BezierCurve {
         return this.constructor.name;
     }
 
+    get startPoint() {
+        return this.controlPoints.first();
+    }
+
+    get endPoint() {
+        return this.controlPoints.last();
+    }
+
     pointAt(t) {
         return new Point(this.x(t), this.y(t), 0);
     }

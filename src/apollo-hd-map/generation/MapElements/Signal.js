@@ -13,6 +13,7 @@ const SignalProto = require("../../protobuf_out/modules/map/proto/map_signal_pb"
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
 const {pointDist, Point} = require("../../common/ApolloHDMap/Geometry");
+const OverlapGenerator = require("../Generators/OverlapGenerator");
 
 // signal boundary is drawn in the following order
 //
@@ -25,8 +26,6 @@ const {pointDist, Point} = require("../../common/ApolloHDMap/Geometry");
 //         |   |
 //         |   |
 //
-//
-
 class Signal {
     constructor({
                     id,
@@ -50,10 +49,15 @@ class Signal {
 
         this.subSignal = [];
         this.overlapList = [];
+        this.stopLine = stopLine;
 
         this.computeDefaultPolygon();
         this.computeDefaultSubSignal();
         this.computeOverlap();
+    }
+
+    getOverlapList() {
+        return [...this.overlapList];
     }
 
     computeDefaultPolygon() {
@@ -63,60 +67,54 @@ class Signal {
         const deltaY = this.signalWidth / 2 * Math.sin(Math.PI / 2 - this.heading);
 
         // add point 1
-        this.polygon.push(new Point(
-            this.position.x + deltaX,
-            this.position.y - deltaY,
-            this.position.z + this.heightAboveGround + this.signalHeight
-        ));
+        this.polygon.push(new Point(this.position.x + deltaX, this.position.y - deltaY, this.position.z + this.heightAboveGround + this.signalHeight));
 
         // add point 2
-        this.polygon.push(new Point(
-            this.position.x - deltaX,
-            this.position.y + deltaY,
-            this.position.z + this.heightAboveGround + this.signalHeight
-        ));
+        this.polygon.push(new Point(this.position.x - deltaX, this.position.y + deltaY, this.position.z + this.heightAboveGround + this.signalHeight));
 
         // add point 3
-        this.polygon.push(new Point(
-            this.position.x - deltaX,
-            this.position.y + deltaY,
-            this.position.z + this.heightAboveGround
-        ));
+        this.polygon.push(new Point(this.position.x - deltaX, this.position.y + deltaY, this.position.z + this.heightAboveGround));
 
         // add point 4
-        this.polygon.push(new Point(
-            this.position.x + deltaX,
-            this.position.y - deltaY,
-            this.position.z + this.heightAboveGround
-        ));
+        this.polygon.push(new Point(this.position.x + deltaX, this.position.y - deltaY, this.position.z + this.heightAboveGround));
     }
 
     computeDefaultSubSignal() {
         // assume Mix_3_vertical type
         this.subSignal.push({
             id: "0",
-            type: SignalProto.SubSignal.Type.CIRCLE,
+            type: SignalProto.Subsignal.Type.CIRCLE,
             location: new Point(this.position.x, this.position.y, this.position.z + this.heightAboveGround + this.signalHeight / 6 * 5),
         });
 
         this.subSignal.push({
             id: "1",
-            type: SignalProto.SubSignal.Type.CIRCLE,
+            type: SignalProto.Subsignal.Type.CIRCLE,
             location: new Point(this.position.x, this.position.y, this.position.z + this.heightAboveGround + this.signalHeight / 2),
         });
 
         this.subSignal.push({
             id: "2",
-            type: SignalProto.SubSignal.Type.CIRCLE,
+            type: SignalProto.Subsignal.Type.CIRCLE,
             location: new Point(this.position.x, this.position.y, this.position.z + this.heightAboveGround + this.signalHeight / 6),
         });
     }
 
     computeOverlap() {
-        this.overlapList.push()
+        // overlap with lanes
+        this.laneList.forEach(lane => {
+            const overlap = OverlapGenerator.generateSignalLaneOverlap(this, lane);
+            lane.overlapList.push(overlap);
+            this.overlapList.push(overlap);
+        });
+
+        // overlap with junction
+        const jOverlap = OverlapGenerator.generateSignalJunctionOverlap(this, this.junction);
+        this.junction.overlapList.push(jOverlap);
+        this.overlapList.push(jOverlap);
     }
 
-    serializeToProtobuf(curveSampleCount) {
+    serializeToProtobuf() {
         const signal = new SignalProto.Signal();
         signal.setId((new MapIDProto.Id()).setId(this.id));
         signal.setType(this.type);
@@ -134,6 +132,9 @@ class Signal {
                 .setType(subSignal.type)
                 .setLocation(new commonProto.PointENU().setX(subSignal.location.x).setY(subSignal.location.y).setZ(subSignal.location.z));
         });
+
+        const stopLine = this.stopLine.serializeToProtobuf();
+        signal.addStopLine(stopLine);
 
         return signal;
     }

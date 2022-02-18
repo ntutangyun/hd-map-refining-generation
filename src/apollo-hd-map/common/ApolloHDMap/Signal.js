@@ -55,9 +55,21 @@ class Signal {
         s.subsignalList.forEach(ss => this.addSubSignal(new SubSignal(this).init(ss)));
         this.type = s.type;
 
-        s.overlapIdList.forEach(ol => {
-            if (ol.id.includes("lane")) {
-                const lane = this.graph.getLaneById(this.extractLaneId(ol.id));
+        s.overlapIdList.forEach(o => {
+            const overlap = this.graph.graphData.overlapList.find(overlap => overlap.id.id === o.id);
+            if (!overlap) {
+                global.logE("StopSign", "Cannot find the overlap");
+                process.exit(-1);
+            }
+
+            if (o.id.includes("lane")) {
+                const laneObject = overlap.objectList.find(object => object.id.id.startsWith("lane"));
+                if (!laneObject) {
+                    global.logE("StopSign", "Cannot find the lane object");
+                    process.exit(-1);
+                }
+
+                const lane = this.graph.getLaneById(laneObject.id.id);
                 if (lane === null) {
                     return;
                 }
@@ -65,23 +77,19 @@ class Signal {
                 lane.addSignal(this);
             }
 
-            if (ol.id.includes("overlap_junction_I")) {
-                this.junction = this.graph.getJunctionById(this.extractJunctionId(ol.id));
+            if (o.id.includes("junction")) {
+                const junctionObject = overlap.objectList.find(object => object.id.id.startsWith("J_"));
+                if (!junctionObject) {
+                    global.logE("StopSign", "Cannot find the junction object");
+                    process.exit(-1);
+                }
+                this.junction = this.graph.getJunctionById(junctionObject.id.id);
             }
         });
 
         this.stopLineList = s.stopLineList.map(stopLine => new Curve(this).init(stopLine));
         this.signInfoList = s.signInfoList;
         return this;
-    }
-
-    extractJunctionId(olId) {
-        const split = olId.split("_J0_")[0];
-        return split.replace(`overlap_junction_I`, "J_");
-    }
-
-    extractLaneId(olId) {
-        return olId.replace(`overlap_${this.id}_`, "");
     }
 
     addSubSignal(ss) {
