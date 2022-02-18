@@ -12,22 +12,5 @@ const Graph = require("../src/apollo-hd-map/common/ApolloHDMap/Graph");
 const graph = new Graph(mapName);
 graph.init(graphData, mapData);
 
-console.log(graph);
-
-// signal types of san francisco are all type 5 --> max 3 vertical
-console.log(graph.getSignalList().filter(signal => signal.type !== 5));
-
-// all signals have stop lines.
-console.log(graph.getSignalList().filter(signal => {
-    return !signal.hasOwnProperty(`stopLineList`) || signal.stopLineList.length === 0;
-}));
-
-// all signals have no sign info.
-console.log(graph.getSignalList().filter(signal => {
-    return signal.hasOwnProperty(`signInfoList`) && signal.signInfoList.length > 0;
-}));
-
-// sub-signal types -- all sub-signal types are 2 --> circle
-console.log(graph.getSignalList().filter(signal => {
-    return Object.values(signal.subSignalList).some(ss => ss.type !== 2);
-}));
+// all stop signs of san francisco map are of type 0
+console.log(graph.getStopSignList().filter(stopSign => stopSign.type !== 0));

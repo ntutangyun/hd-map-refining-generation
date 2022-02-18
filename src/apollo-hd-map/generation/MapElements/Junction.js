@@ -19,6 +19,7 @@ class Junction {
         this.overlapList = [];
 
         this.signalList = [];
+        this.stopSignList = [];
     }
 
     get name() {
@@ -35,6 +36,10 @@ class Junction {
 
     getSignalList() {
         return [...this.signalList];
+    }
+
+    getStopSignList() {
+        return [...this.stopSignList];
     }
 
     connectRoad(road) {

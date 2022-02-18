@@ -1,6 +1,8 @@
 const JunctionLaneOverlap = require("../MapElements/JunctionLaneOverlap");
 const SignalLaneOverlap = require("../MapElements/SignalLaneOverlap");
 const SignalJunctionOverlap = require("../MapElements/SignalJunctionOverlap");
+const StopSignLaneOverlap = require("../MapElements/StopSignLaneOverlap");
+const StopSignJunctionOverlap = require("../MapElements/StopSignJunctionOverlap");
 
 class OverlapGenerator {
     static generateJunctionLaneOverlap(junction, lane) {
@@ -13,6 +15,14 @@ class OverlapGenerator {
 
     static generateSignalJunctionOverlap(signal, junction) {
         return new SignalJunctionOverlap(signal, junction);
+    }
+
+    static generateStopSignLaneOverlap(stopSign, lane) {
+        return new StopSignLaneOverlap(stopSign, lane);
+    }
+
+    static generateStopSignJunctionOverlap(stopSign, junction) {
+        return new StopSignJunctionOverlap(stopSign, junction);
     }
 }
 

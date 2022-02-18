@@ -9,6 +9,7 @@ const {
 const RoadGenerator = require("./RoadGenerator");
 const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 const Signal = require("../MapElements/Signal");
+const StopSign = require("../MapElements/StopSign");
 
 class MapGeneratorGrid {
     constructor(config, junctionGrid) {
@@ -20,6 +21,7 @@ class MapGeneratorGrid {
         this.roadCount = 0;
         this.laneCount = 0;
         this.signalCount = 0;
+        this.stopSignCount = 0;
 
         global.getNewJunctionId = () => {
             return `J_${this.junctionCount++}`;
@@ -36,6 +38,10 @@ class MapGeneratorGrid {
         global.getNewSignalId = () => {
             return `signal_${this.signalCount++}`;
         };
+
+        global.getNewStopSignId = () => {
+            return `stop_sign_${this.stopSignCount++}`;
+        };
     }
 
     get name() {
@@ -50,10 +56,12 @@ class MapGeneratorGrid {
         this.instantiateRoads();
         this.updateJunctions();
         this.instantiateSignals();
+        this.instantiateStopSigns();
 
         this.addJunctions();
         this.addLaneNRoads();
         this.addSignals();
+        this.addStopSigns();
         this.addOverlaps();
 
         return this.map;
@@ -352,6 +360,73 @@ class MapGeneratorGrid {
         });
     }
 
+    instantiateStopSigns() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            console.log(junctionPoint);
+
+            const junction = junctionPoint.junction;
+
+            const roadList = [];
+            if (junctionPoint.eastStopSign) {
+                roadList.push(junctionPoint.roadAssignment.EAST);
+            }
+            if (junctionPoint.northStopSign) {
+                roadList.push(junctionPoint.roadAssignment.NORTH);
+            }
+            if (junctionPoint.westStopSign) {
+                roadList.push(junctionPoint.roadAssignment.WEST);
+            }
+            if (junctionPoint.southStopSign) {
+                roadList.push(junctionPoint.roadAssignment.SOUTH);
+            }
+            roadList.forEach(road => {
+                const isRoadOutgoing = junction.isRoadOutgoing(road);
+
+                let stopLine, incomingLaneList;
+                if (isRoadOutgoing) {
+                    incomingLaneList = road.getBackwardLaneList();
+                } else {
+                    incomingLaneList = road.getForwardLaneList();
+                }
+
+                const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
+                const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
+                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const endHeading = startHeading;
+                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+
+                // signal for east direction is located at west
+                // since opposite not necessarily has road assignment, use the current road to calculate the signal position
+                const laneList = [];
+                if (isRoadOutgoing) {
+                    road.getBackwardLaneList().forEach(rLane => {
+                        laneList.push(rLane);
+                        rLane.getOutgoingLaneList()
+                            .filter(jLane => jLane.junction.id === junction.id)
+                            .forEach(jLane => {
+                                laneList.push(jLane);
+                            });
+                    });
+                } else {
+                    road.getForwardLaneList().forEach(rLane => {
+                        laneList.push(rLane);
+                        rLane.getOutgoingLaneList()
+                            .filter(jLane => jLane.junction.id === junction.id)
+                            .forEach(jLane => {
+                                laneList.push(jLane);
+                            });
+                    });
+                }
+
+                const stopSign = new StopSign({
+                    id: global.getNewStopSignId(), junction, laneList, stopLine
+                });
+
+                junction.stopSignList.push(stopSign);
+            });
+        });
+    }
+
     updateJunctions() {
         this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
             const junction = junctionPoint.junction;
@@ -369,6 +444,11 @@ class MapGeneratorGrid {
             });
             junctionPoint.junction.getSignalList().forEach(signal => {
                 signal.getOverlapList().forEach(overlap => {
+                    overlapList[overlap.id] = overlap;
+                });
+            });
+            junctionPoint.junction.getStopSignList().forEach(stopSign => {
+                stopSign.getOverlapList().forEach(overlap => {
                     overlapList[overlap.id] = overlap;
                 });
             });
@@ -416,6 +496,15 @@ class MapGeneratorGrid {
             const junction = junctionPoint.junction;
             junction.signalList.forEach(signal => {
                 this.map.addSignal(signal.serializeToProtobuf());
+            });
+        });
+    }
+
+    addStopSigns() {
+        this.junctionGrid.getJunctionPointList().forEach(junctionPoint => {
+            const junction = junctionPoint.junction;
+            junction.stopSignList.forEach(stopSign => {
+                this.map.addStopSign(stopSign.serializeToProtobuf());
             });
         });
     }

@@ -314,6 +314,10 @@ class Graph {
         return this.signalList.hasOwnProperty(id) ? this.signalList[id] : null;
     }
 
+    getStopSignById(id) {
+        return this.stopSignList.hasOwnProperty(id) ? this.stopSignList[id] : null;
+    }
+
     getLaneList() {
         return Object.values(this.laneList);
     }
@@ -332,6 +336,10 @@ class Graph {
 
     getSignalList() {
         return Object.values(this.signalList);
+    }
+
+    getStopSignList() {
+        return Object.values(this.stopSignList);
     }
 
     getCrosswalkList() {

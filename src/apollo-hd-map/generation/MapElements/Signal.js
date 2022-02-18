@@ -1,13 +1,3 @@
-// commonly there is only one road section per road.
-// the road section contains all the lane ids and the road boundary.
-//
-// the road boundary will have two edges (only forward lanes) or four edges (forward and reverse lanes).
-// in order of
-//      one right boundary (i.e. right most boundary of all forward lanes)
-//      one left boundary (i.e. left most boundary of all forward lanes)
-//      one left boundary (i.e. left most boundary of all reverse lanes)
-//      one right boundary (i.e. right most boundary of all reverse lanes)
-
 const commonProto = require("../../protobuf_out/modules/common/proto/geometry_pb");
 const SignalProto = require("../../protobuf_out/modules/map/proto/map_signal_pb");
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
