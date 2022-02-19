@@ -413,6 +413,10 @@ class JunctionGrid {
         return this.pointList.find(p => p.id === id);
     }
 
+    getPointByLocation(xI, yI) {
+        return this.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI));
+    }
+
     addPoint(xI, yI) {
         if (this.getPointByID(JunctionGridPoint.formatGridPointId(xI, yI))) {
             global.logI(this.name, `point at ${xI}, ${yI} already exists`);

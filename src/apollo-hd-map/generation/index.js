@@ -18,7 +18,7 @@ const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureEx
 // cluster junction based on their topology and geometry feature
 const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
 
-const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionLayoutGrid");
+const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
 const junctionGrid = buildGridLayout(graph, junctionClusters);
 
 const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
