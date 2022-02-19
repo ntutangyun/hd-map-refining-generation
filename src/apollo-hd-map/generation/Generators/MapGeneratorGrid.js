@@ -62,6 +62,19 @@ class MapGeneratorGrid {
         this.instantiateStopSigns();
         this.instantiateCrosswalks();
 
+        // temporary experiment
+        const p0 = this.junctionGrid.getPointByLocation(0, 0);
+        p0.roadAssignment.EAST.getLaneList().forEach(lane => lane.speedLimit = 2.5);
+        p0.roadAssignment.NORTH.getLaneList().forEach(lane => lane.speedLimit = 5);
+        p0.roadAssignment.WEST.getLaneList().forEach(lane => lane.speedLimit = 7.5);
+        p0.roadAssignment.SOUTH.getLaneList().forEach(lane => lane.speedLimit = 10);
+
+        const p1 = this.junctionGrid.getPointByLocation(1, 0);
+        p1.roadAssignment.WEST.getLaneList().forEach(lane => lane.speedLimit = 2.5);
+        p1.roadAssignment.SOUTH.getLaneList().forEach(lane => lane.speedLimit = 5);
+        p1.roadAssignment.EAST.getLaneList().forEach(lane => lane.speedLimit = 7.5);
+        p1.roadAssignment.NORTH.getLaneList().forEach(lane => lane.speedLimit = 10);
+
         this.addJunctions();
         this.addLaneNRoads();
         this.addSignals();
