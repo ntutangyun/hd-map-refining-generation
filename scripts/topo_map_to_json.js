@@ -1,4 +1,4 @@
-const routingBinaryPath = "/home/zhouyuan/Desktop/hd-map-generation-stack/apollo/modules/map/data/test/routing_map.bin";
+const routingBinaryPath = "/home/tangyun/Desktop/apollo/modules/map/data/test/routing_map.bin";
 
 const RoutingProto = require("../src/apollo-hd-map/protobuf_out/modules/routing/proto/topo_graph_pb");
 

@@ -1,11 +1,8 @@
 const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
 const Junction = require("../MapElements/Junction");
 const {Point, vectorHeading, vector, BezierCurve} = require("../../common/ApolloHDMap/Geometry");
-const {JunctionGridPoint} = require("../FeatureEngineering/GridLayout/JunctionGrid");
-const {getRandomIntInclusive, getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
-const {
-    DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH, MAX_LANE_COUNT_PER_ROAD, DEFAULT_ROAD_LENGTH
-} = require("../../common/constants");
+const {getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
+const {DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH, DEFAULT_ROAD_LENGTH} = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
 const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 const Signal = require("../MapElements/Signal");
@@ -98,12 +95,12 @@ class MapGeneratorGrid {
                         return;
                     }
 
-                    const {topo, rotation} = junctionPoint[direction];
-
                     // check if a road has already been instantiated or not
                     if (junctionPoint.roadAssignment[direction] !== null) {
                         return;
                     }
+
+                    const {topo, rotation} = junctionPoint[direction];
 
                     // check if the road of the direction connects the opposite junction
                     const oppositePoint = junctionPoint.getOppositeGridPoint(direction);
@@ -116,8 +113,7 @@ class MapGeneratorGrid {
                     const oppositeDirection = getOppositeDirection(direction);
 
                     if (oppositePoint.junction === null || oppositePoint[oppositeDirection].topo === null) {
-                        // create a straight road connecting to the current junction
-                        // the road will be named after current junction
+                        // create a straight road connecting to the current junction only
                         const roadId = global.getNewRoadId();
 
                         // for in-out and out, startsFromJunction is true. for in roads, startsFromJunction is false
@@ -201,7 +197,7 @@ class MapGeneratorGrid {
 
                         junctionPoint.assignRoad(direction, road);
 
-                        junctionPoint.junction.connectRoad(road);
+                        junctionPoint.junction.connectRoad(road, direction);
 
                     } else {
                         // check if a road has already been created
@@ -285,8 +281,8 @@ class MapGeneratorGrid {
                         junctionPoint.assignRoad(direction, road);
                         oppositePoint.assignRoad(oppositeDirection, road);
 
-                        junctionPoint.junction.connectRoad(road);
-                        oppositePoint.junction.connectRoad(road);
+                        junctionPoint.junction.connectRoad(road, direction);
+                        oppositePoint.junction.connectRoad(road, oppositeDirection);
                     }
                 });
             });

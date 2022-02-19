@@ -6,13 +6,16 @@ const OverlapGenerator = require("../Generators/OverlapGenerator");
 const JunctionProto = require("../../protobuf_out/modules/map/proto/map_junction_pb");
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
+const {getTurnDirection} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 
 class Junction {
     constructor({junction_id, center_point}) {
         this.id = junction_id;
         this.centerPoint = center_point;
 
-        this.connectedRoadList = [];
+        this.connectedRoadList = {
+            EAST: null, NORTH: null, WEST: null, SOUTH: null
+        };
         this.laneList = [];
         this.laneRoadList = [];
         this.polygonPointList = [];
@@ -47,72 +50,57 @@ class Junction {
         return [...this.crosswalkList];
     }
 
-    connectRoad(road) {
-        if (!this.connectedRoadList.find(r => r.id === road.id)) {
-            this.connectedRoadList.push(road);
+    connectRoad(road, direction) {
+        if (!this.getConnectedRoadList().find(r => r.id === road.id)) {
+            this.connectedRoadList[direction] = road;
         } else {
-            global.logI(this.name, `road ${road.id} is already connected to junction ${this.id}`);
+            global.logE(this.name, `road ${road.id} is already connected to junction ${this.id}`);
+            process.exit(-1);
         }
     }
 
     getConnectedRoadList() {
-        return [...this.connectedRoadList];
+        return Object.values(this.connectedRoadList).filter(r => r !== null);
     }
 
     generateJunctionLanes() {
         const laneConfigs = [];
 
-        for (let i = 0; i < this.connectedRoadList.length; i++) {
-            for (let j = 0; j < this.connectedRoadList.length; j++) {
-                if (j === i) {
+        for (const [inDirection, inRoad] of Object.entries(this.connectedRoadList)) {
+            for (const [outDirection, outRoad] of Object.entries(this.connectedRoadList)) {
+                if (inDirection === outDirection) {
                     continue;
                 }
 
-                // from road I to road J
-                const roadI = this.connectedRoadList[i];
-                const roadJ = this.connectedRoadList[j];
+                if (inRoad === null || outRoad === null) {
+                    continue;
+                }
 
-                const roadIOutgoing = this.isRoadOutgoing(roadI);
-                const roadJOutgoing = this.isRoadOutgoing(roadJ);
+                // from inRoad to outRoad
+                const inRoadOutgoing = this.isRoadOutgoing(inRoad);
+                const outRoadOutgoing = this.isRoadOutgoing(outRoad);
 
                 // find out what turn is this.
-                // assume the turning direction threshold is 45 degrees.
-
-                const roadIHeading = roadIOutgoing ? roadI.startHeading - Math.PI : roadI.endHeading;
-                const roadJHeading = roadJOutgoing ? roadJ.startHeading : roadJ.endHeading + Math.PI;
-
-                const turnAngle = angleNormalize(roadJHeading - roadIHeading);
-
-                // Currently, does not support U-turn here.
-                // If no turn or left turn, match from the road central curve
-                // if right turn, match from the right most lane
-                let turn;
-                if (turnAngle < (-Math.PI / 4)) {
-                    turn = LaneProto.Lane.LaneTurn.RIGHT_TURN;
-                } else if (turnAngle > (Math.PI * 4)) {
-                    turn = LaneProto.Lane.LaneTurn.LEFT_TURN;
-                } else {
-                    turn = LaneProto.Lane.LaneTurn.NO_TURN;
-                }
+                const turn = getTurnDirection(inDirection, outDirection);
 
                 let incomingLaneList, outgoingLaneList;
 
-                // from roadI to roadJ
+                // from inRoad to outRoad
                 // match from road central curve if left turn or no turn
-                if (roadIOutgoing) {
-                    incomingLaneList = [...roadI.backwardLaneList];
-                    if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList];
+                if (inRoadOutgoing) {
+                    incomingLaneList = [...inRoad.backwardLaneList];
+                    if (outRoadOutgoing) {
+                        outgoingLaneList = [...outRoad.forwardLaneList];
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList];
+                        outgoingLaneList = [...outRoad.backwardLaneList];
                     }
                 } else {
-                    incomingLaneList = [...roadI.forwardLaneList];
+                    incomingLaneList = [...inRoad.forwardLaneList];
 
-                    if (roadJOutgoing) {
-                        outgoingLaneList = [...roadJ.forwardLaneList];
+                    if (outRoadOutgoing) {
+                        outgoingLaneList = [...outRoad.forwardLaneList];
                     } else {
-                        outgoingLaneList = [...roadJ.backwardLaneList];
+                        outgoingLaneList = [...outRoad.backwardLaneList];
                     }
                 }
                 if (incomingLaneList.length === 0 || outgoingLaneList.length === 0) {
@@ -179,7 +167,7 @@ class Junction {
     generatePolygon() {
         // generate polygon in counter-clockwise order
         const polygonPointList = [];
-        this.connectedRoadList.forEach(road => {
+        this.getConnectedRoadList().forEach(road => {
             if (this.isRoadOutgoing(road)) {
                 if (road.forwardLaneList.length === 0) {
                     polygonPointList.push(road.centralCurve.controlPoints.first());
