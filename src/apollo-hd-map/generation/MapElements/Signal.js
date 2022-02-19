@@ -2,7 +2,7 @@ const commonProto = require("../../protobuf_out/modules/common/proto/geometry_pb
 const SignalProto = require("../../protobuf_out/modules/map/proto/map_signal_pb");
 const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
-const {pointDist, Point} = require("../../common/ApolloHDMap/Geometry");
+const {Point} = require("../../common/ApolloHDMap/Geometry");
 const OverlapGenerator = require("../Generators/OverlapGenerator");
 
 // signal boundary is drawn in the following order
@@ -53,20 +53,22 @@ class Signal {
     computeDefaultPolygon() {
         // assume heading in radian
 
-        const deltaX = this.signalWidth / 2 * Math.cos(Math.PI / 2 - this.heading);
-        const deltaY = this.signalWidth / 2 * Math.sin(Math.PI / 2 - this.heading);
+        // const deltaX = this.signalWidth / 2 * Math.cos(Math.PI / 2 - this.heading);
+        // const deltaY = this.signalWidth / 2 * Math.sin(Math.PI / 2 - this.heading);
 
         // add point 1
-        this.polygon.push(new Point(this.position.x + deltaX, this.position.y - deltaY, this.position.z + this.heightAboveGround + this.signalHeight));
+        const pA = this.position.moveTowards(this.heading + Math.PI / 2, this.signalWidth / 2);
+        const pB = this.position.moveTowards(this.heading - Math.PI / 2, this.signalWidth / 2);
+        this.polygon.push(new Point(pA.x, pA.y, pA.z + this.heightAboveGround + this.signalHeight));
 
         // add point 2
-        this.polygon.push(new Point(this.position.x - deltaX, this.position.y + deltaY, this.position.z + this.heightAboveGround + this.signalHeight));
+        this.polygon.push(new Point(pB.x, pB.y, pB.z + this.heightAboveGround + this.signalHeight));
 
         // add point 3
-        this.polygon.push(new Point(this.position.x - deltaX, this.position.y + deltaY, this.position.z + this.heightAboveGround));
+        this.polygon.push(new Point(pB.x, pB.y, pB.z + this.heightAboveGround));
 
         // add point 4
-        this.polygon.push(new Point(this.position.x + deltaX, this.position.y - deltaY, this.position.z + this.heightAboveGround));
+        this.polygon.push(new Point(pA.x, pA.y, pA.z + this.heightAboveGround));
     }
 
     computeDefaultSubSignal() {

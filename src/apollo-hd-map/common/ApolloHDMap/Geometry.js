@@ -11,9 +11,7 @@ function pointDist(p0, p1) {
 }
 
 function norm(v) {
-    return v.hasOwnProperty("z")
-        ? Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z)
-        : Math.sqrt(v.x * v.x + v.y * v.y);
+    return v.hasOwnProperty("z") ? Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z) : Math.sqrt(v.x * v.x + v.y * v.y);
 }
 
 // P0 -> P1
@@ -131,9 +129,7 @@ function pointSegmentProjection(q, p0, p1) {
     Y = (a * f - e * c) / (b * c - a * d);
 
     return {
-        x: X,
-        y: Y,
-        z: 0
+        x: X, y: Y, z: 0
     };
 }
 
@@ -161,15 +157,11 @@ function checkLineSegmentIntersect(seg1, seg2) {
     const c = seg2.start;
     const d = seg2.end;
 
-    if (Math.max(c.x, d.x) < Math.min(a.x, b.x) ||
-        Math.max(a.x, b.x) < Math.min(c.x, d.x) ||
-        Math.max(c.y, d.y) < Math.min(a.y, b.y) ||
-        Math.max(a.y, b.y) < Math.min(c.y, d.y)) {
+    if (Math.max(c.x, d.x) < Math.min(a.x, b.x) || Math.max(a.x, b.x) < Math.min(c.x, d.x) || Math.max(c.y, d.y) < Math.min(a.y, b.y) || Math.max(a.y, b.y) < Math.min(c.y, d.y)) {
         return false;
     }
 
-    return !(cross(vector(d, a), vector(d, c)) * cross(vector(d, b), vector(d, c)) > 0 ||
-        cross(vector(b, d), vector(b, a)) * cross(vector(b, c), vector(b, a)) > 0);
+    return !(cross(vector(d, a), vector(d, c)) * cross(vector(d, b), vector(d, c)) > 0 || cross(vector(b, d), vector(b, a)) * cross(vector(b, c), vector(b, a)) > 0);
 }
 
 // reference:
@@ -197,8 +189,7 @@ function findLineSegmentIntersect(seg1, seg2) {
     }
 
     return {
-        x: (B2 * C1 - B1 * C2) / det,
-        y: (A1 * C2 - A2 * C1) / det
+        x: (B2 * C1 - B1 * C2) / det, y: (A1 * C2 - A2 * C1) / det
     };
 }
 
@@ -229,8 +220,7 @@ function getPolygonPointsSegmentList(points) {
     const segList = [];
     for (let i = 0; i < points.length - 1; i++) {
         segList.push({
-            start: points[i],
-            end: points[i + 1]
+            start: points[i], end: points[i + 1]
         });
     }
     return segList;
@@ -318,11 +308,7 @@ class BezierCurve {
     //      * start point move to start heading of length (start_point - end_point) / 4
     //      * end point move to the opposite of end heading of length (start_point - end_point) / 4
     static buildBezierCurve({
-                                startPoint,
-                                startHeading,
-                                endPoint,
-                                endHeading,
-                                isJunctionLane = false
+                                startPoint, startHeading, endPoint, endHeading, isJunctionLane = false
                             }) {
         console.assert(startPoint && endPoint, "start point and end point cannot be undefined or null");
         console.assert(!isNaN(startHeading) && !isNaN(endHeading), "start heading and end heading should be defined");
@@ -337,7 +323,8 @@ class BezierCurve {
             const endLine = new StraightLine(endPoint, null, endHeading);
             const intersectPoint = StraightLine.getLineIntersect(startLine, endLine);
 
-            if (intersectPoint === null) {
+            // no need to bend the bezierCurve if the startHeading and endHeading are towards similar direction.
+            if (intersectPoint === null || Math.abs(angleNormalize(startHeading) - angleNormalize(endHeading)) <= 0.5) {
                 return new BezierCurve([startPoint, startOffsetCtrlPoint, endOffsetCtrlPoint, endPoint], startHeading, endHeading);
             } else {
                 return new BezierCurve([startPoint, intersectPoint, intersectPoint, endPoint], startHeading, endHeading);
@@ -477,8 +464,7 @@ function pointRotation(point, rotation, offset = null) {
     };
 
     return offset === null ? newPoint : {
-        x: newPoint.x + offset.x,
-        y: newPoint.y + offset.y
+        x: newPoint.x + offset.x, y: newPoint.y + offset.y
     };
 }
 

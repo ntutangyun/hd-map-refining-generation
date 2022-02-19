@@ -74,10 +74,10 @@ stopSignJunctionPoint.northStopSign = true;
 stopSignJunctionPoint.westStopSign = true;
 stopSignJunctionPoint.southStopSign = true;
 
-signalJunctionPoint.eastCrosswalk = true;
-signalJunctionPoint.northCrosswalk = true;
-signalJunctionPoint.westCrosswalk = true;
-signalJunctionPoint.southCrosswalk = true;
+stopSignJunctionPoint.eastCrosswalk = true;
+stopSignJunctionPoint.northCrosswalk = true;
+stopSignJunctionPoint.westCrosswalk = true;
+stopSignJunctionPoint.southCrosswalk = true;
 
 const config = {
     hd_map_header: require("../common/hd_map_header.json"), curveSampleCount: 20
