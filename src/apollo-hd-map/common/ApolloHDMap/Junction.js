@@ -1,6 +1,6 @@
 const {checkLineSegmentIntersect, pointDist, vectorHeading, vector} = require("./Geometry");
 const TwoWayRoad = require("./TwoWayRoad");
-const {radToDegree, angleNormalize, degreeNormalize} = require("../mathUtils");
+const {radToDegree, degreeNormalize} = require("../mathUtils");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
 const JUNCTION_LANE_SAME_END_DIST_THRESHOLD = 1;

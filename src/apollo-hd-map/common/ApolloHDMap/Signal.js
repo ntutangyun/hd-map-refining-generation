@@ -1,23 +1,23 @@
 const {Curve} = require("./Curve");
-const SIGNAL_TYPE = {
-    UNKNOWN: 1,
-    MIX_2_HORIZONTAL: 2,
-    MIX_2_VERTICAL: 3,
-    MIX_3_HORIZONTAL: 4,
-    MIX_3_VERTICAL: 5,
-    SINGLE: 6
-};
-
-const SUB_SIGNAL_TYPE = {
-    UNKNOWN: 1,
-    CIRCLE: 2,
-    ARROW_LEFT: 3,
-    ARROW_FORWARD: 4,
-    ARROW_RIGHT: 5,
-    ARROW_LEFT_AND_FORWARD: 6,
-    ARROW_RIGHT_AND_FORWARD: 7,
-    ARROW_U_TURN: 8,
-};
+// const SIGNAL_TYPE = {
+//     UNKNOWN: 1,
+//     MIX_2_HORIZONTAL: 2,
+//     MIX_2_VERTICAL: 3,
+//     MIX_3_HORIZONTAL: 4,
+//     MIX_3_VERTICAL: 5,
+//     SINGLE: 6
+// };
+//
+// const SUB_SIGNAL_TYPE = {
+//     UNKNOWN: 1,
+//     CIRCLE: 2,
+//     ARROW_LEFT: 3,
+//     ARROW_FORWARD: 4,
+//     ARROW_RIGHT: 5,
+//     ARROW_LEFT_AND_FORWARD: 6,
+//     ARROW_RIGHT_AND_FORWARD: 7,
+//     ARROW_U_TURN: 8,
+// };
 
 class SubSignal {
     constructor(signal) {

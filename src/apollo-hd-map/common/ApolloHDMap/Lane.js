@@ -1,5 +1,12 @@
 const {Curve} = require("./Curve");
-const {minDistToLineSegment, pointDist, pointSegmentProjection} = require("./Geometry");
+const {
+    minDistToLineSegment,
+    pointDist,
+    pointSegmentProjection,
+    BezierCurve,
+    vectorHeading,
+    vector
+} = require("./Geometry");
 
 const LANE_TYPES = {
     1: "NONE",
@@ -66,6 +73,8 @@ class Lane {
         // junction obstacle test
         this.intersectVector = {};
         this.jLanePairs = {};
+
+        this.centralBezierCurve = null;
     }
 
     init(laneData) {
@@ -77,6 +86,9 @@ class Lane {
         this.cost = +laneData.cost;
         this.centralCurve = new Curve(this).init(laneData.centralCurve);
         this.isVirtual = laneData.isVirtual;
+
+        this.buildCentralBezierCurve();
+
         return this;
     }
 
@@ -194,11 +206,10 @@ class Lane {
     }
 
     getParent() {
-        // returns one of road, junction, roundabout
-        if (this.road !== null) {
-            return this.road;
-        } else if (this.junction !== null) {
+        if (this.junction !== null) {
             return this.junction;
+        } else if (this.road !== null) {
+            return this.road;
         }
         return null;
     }
@@ -415,6 +426,10 @@ class Lane {
         return minDist;
     }
 
+    isPointOnLane(point, laneWidth = 3.5) {
+        return this.getClosestSegmentToPoint(point).dist < laneWidth;
+    }
+
     projectToLane(point) {
         const {segment, index, dist} = this.getClosestSegmentToPoint(point);
         if (dist === 0) {
@@ -486,6 +501,15 @@ class Lane {
             return null;
         }
         return Object.values(outgoingRoads)[0];
+    }
+
+    buildCentralBezierCurve() {
+        const pointList = this.getAllPoints();
+        const startPoint = pointList[0];
+        const startHeading = vectorHeading(vector(pointList[0], pointList[1]));
+        const endPoint = pointList.last();
+        const endHeading = vectorHeading(vector(pointList[pointList.length - 2], pointList.last()));
+        this.centralBezierCurve = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
     }
 }
 

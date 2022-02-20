@@ -1,4 +1,4 @@
-const {square, cube, angleNormalize} = require("../mathUtils");
+const {square, cube} = require("../mathUtils");
 const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
 const CommonGeoProto = require("../../protobuf_out/modules/common/proto/geometry_pb");
 
@@ -267,6 +267,10 @@ class Point {
         return this.x === point.x && this.y === point.y && this.z === point.z;
     }
 
+    toString() {
+        return `[x: ${this.x}, y: ${this.y}, z: ${this.z}]`;
+    }
+
     copy() {
         return new Point(this.x, this.y, this.z);
     }
@@ -348,6 +352,14 @@ class BezierCurve {
 
     pointAt(t) {
         return new Point(this.x(t), this.y(t), 0);
+    }
+
+    headingAt(t) {
+        if (t >= 0.95) {
+            return vectorHeading(vector(this.pointAt(t), this.pointAt(1)));
+        } else {
+            return vectorHeading(vector(this.pointAt(t), this.pointAt(t + 0.05)));
+        }
     }
 
     sample(count) {
@@ -468,11 +480,22 @@ function pointRotation(point, rotation, offset = null) {
     };
 }
 
+function angleNormalize(angle) {
+    let res = angle % (2 * Math.PI);
+    if (res > Math.PI) {
+        res -= 2 * Math.PI;
+    } else if (res <= -Math.PI) {
+        res += 2 * Math.PI;
+    }
+    return res;
+}
+
 module.exports = {
     norm,
     vector,
     angleBetween,
     pointDist,
+    pointRotation,
     minDistToLineSegment,
     pointSegmentProjection,
     checkLineSegmentIntersect,

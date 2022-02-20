@@ -1,6 +1,5 @@
 const Lane = require("./Lane");
 const {Edge, EDGE_DIRECTION_FORWARD} = require("./Edge");
-const OneWayRoad = require("./OneWayRoad");
 const TwoWayRoad = require("./TwoWayRoad");
 const Junction = require("./Junction");
 const Signal = require("./Signal");
@@ -10,7 +9,7 @@ const {Curve, LineSegment} = require("./Curve");
 
 class Graph {
     constructor(name) {
-        this.name = name;
+        this.graphName = name;
         this.hdmapVersion = null;
         this.hdmapDistrict = null;
         this.laneList = {};
@@ -74,7 +73,7 @@ class Graph {
             // add two-way roads instead of one way roads
             mapData.roadList.forEach(r => {
                 // ignore those single lane roads in junctions
-                if (r.hasOwnProperty("junctionId")) {
+                if (r["junctionId"]) {
                     return;
                 }
                 this.addRoad(new TwoWayRoad(this).init(r));
@@ -252,8 +251,7 @@ class Graph {
 
     getNearestLaneToPoint(point) {
         const laneList = this.getLaneList().map(lane => ({
-            lane,
-            minDistToPoint: lane.getMinDistToPoint(point)
+            lane, minDistToPoint: lane.getMinDistToPoint(point)
         }));
         return laneList.sort((l1, l2) => l1.minDistToPoint - l2.minDistToPoint)[0]["lane"];
     }

@@ -1,3 +1,5 @@
+const {Point} = require("./Geometry");
+
 class LineSegment {
     constructor(curve) {
         this.curve = curve;
@@ -8,7 +10,7 @@ class LineSegment {
     }
 
     init(segData) {
-        this.pointList = segData.lineSegment.pointList;
+        this.pointList = segData.lineSegment.pointList.map(p => new Point(p.x, p.y, p.z));
         this.s = +segData.s;
         this.startPosition = segData.startPosition;
         this.length = +segData.length;
