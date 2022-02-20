@@ -132,10 +132,21 @@ class Junction {
     }
 
     getSignalList() {
+        // make sure to cover all relevant signals
         let signalList = {};
         this.getLaneList().forEach(jLane => {
             signalList = {...signalList, ...jLane.signalList};
+
+            jLane.getIncomingLaneList().forEach(inLane => {
+                signalList = {...signalList, ...inLane.signalList};
+            });
         });
+        this.graph.getSignalList().forEach(signal => {
+            if (signal.junction.id === this.id) {
+                signalList[signal.id] = signal;
+            }
+        });
+
         return Object.values(signalList);
     }
 
