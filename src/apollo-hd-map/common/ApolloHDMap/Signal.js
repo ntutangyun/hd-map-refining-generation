@@ -77,7 +77,7 @@ class Signal {
                 lane.addSignal(this);
             }
 
-            if (o.id.includes("junction")) {
+            if (o.id.includes("J")) {
                 const junctionObject = overlap.objectList.find(object => object.id.id.startsWith("J_"));
                 if (!junctionObject) {
                     global.logE("signal", "Cannot find the junction object");

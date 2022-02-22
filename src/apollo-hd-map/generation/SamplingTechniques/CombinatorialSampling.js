@@ -1,6 +1,9 @@
-const {getRandomInRange, degreeNormalize} = require("../../common/mathUtils");
+const {degreeNormalize, getRandomInRange, bound} = require("../../common/mathUtils");
 
 function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxiliaryFeatures}) {
+
+    let configCount = 0;
+
     const junctionConfigs = [];
     roadFeatures.forEach(roadFeature => {
         controlFeatures.forEach(controlFeature => {
@@ -17,16 +20,17 @@ function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxi
                             },
                             {   // north
                                 topo: "IN-OUT",
-                                rotation: getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max) + 90,
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -15, 15) + 90),
                             },
                             {   // west
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max) + 180),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -15, 15) + 180),
                             },
                         ],
                         hasCrosswalk: auxFeature === "crosswalk",
                         hasSignal: controlFeature === "signal",
                         hasStopSign: controlFeature === "stop",
+                        id: `junction_config_${configCount++}`
                     };
                 } else {
                     junctionConfig = {
@@ -37,20 +41,21 @@ function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxi
                             },
                             {   // north
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max) + 90),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -15, 15) + 90),
                             },
                             {   // west
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max) + 180),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -15, 15) + 180),
                             },
                             {   // south
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(getRandomInRange(geoFeatures.SOUTH.min, geoFeatures.SOUTH.max) - 90),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.SOUTH.min, geoFeatures.SOUTH.max), -15, 15) - 90),
                             },
                         ],
                         hasCrosswalk: auxFeature === "crosswalk",
                         hasSignal: controlFeature === "signal",
                         hasStopSign: controlFeature === "stop",
+                        id: `junction_config_${configCount++}`
                     };
                 }
 
