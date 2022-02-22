@@ -13,18 +13,20 @@ const graph = new Graph(mapName);
 graph.init(graphData, mapData);
 
 // extract junction feature vectors
-const JunctionFeatureExtractor = require("./FeatureEngineering/JunctionFeatureExtractor");
+const {junctionFeatureMergeExtraction} = require("./FeatureEngineering/JunctionFeatureExtractor");
+const {combinatorialSampling} = require("./SamplingTechniques/CombinatorialSampling");
 
 // cluster junction based on their topology and geometry feature
-const junctionClusters = JunctionFeatureExtractor.junctionTopoGeoClustering(graph);
+const mergedFeatures = junctionFeatureMergeExtraction(graph);
 
-const {buildGridLayout} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
-const junctionGrid = buildGridLayout(graph, junctionClusters);
+const junctionConfigs = combinatorialSampling(mergedFeatures);
+
+const {buildGridLayoutFromJunctionConfigs} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
+const junctionGrid = buildGridLayoutFromJunctionConfigs(graph, junctionConfigs);
 
 const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
 const config = {
-    hd_map_header: require("../common/hd_map_header.json"),
-    curveSampleCount: 20
+    hd_map_header: require("../common/hd_map_header.json"), curveSampleCount: 20
 };
 const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
 

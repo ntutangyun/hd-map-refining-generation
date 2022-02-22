@@ -23,7 +23,8 @@ class JunctionGridPoint {
         this.x = xIToX(this.xI);
         this.y = yIToY(this.yI);
 
-        this.junctionCluster = null;
+        this.junction = null;
+        this.junctionConfig = null;
 
         this.EAST = null;
         this.NORTH = null;
@@ -135,9 +136,9 @@ class JunctionGridPoint {
         }
     }
 
-    computeBestJunctionAssignment(junction) {
+    computeBestJunctionConfigAssignment(junctionConfig) {
         const assignmentList = [];
-        const topoGeoInfo = JSON.parse(JSON.stringify(junction.topoGeoVector));
+        const topoGeoInfo = JSON.parse(JSON.stringify(junctionConfig.topoGeoVector));
 
         // max rotation = direction - 1;
         for (let rotation = 0; rotation < 4; rotation++) {
@@ -155,7 +156,9 @@ class JunctionGridPoint {
                 }, [rotatedDirections[3]]: {
                     topo: topoGeoInfo[3] ? topoGeoInfo[3].topo : null,
                     rotation: topoGeoInfo[3] ? degreeNormalize(topoGeoInfo[3].rotation + rotation * 90) : null
-                }, junction,
+                },
+                junctionConfig,
+                score: 0
             };
             this.validateAssignment(assignment);
 
@@ -169,17 +172,6 @@ class JunctionGridPoint {
         assignmentList.sort((a, b) => b.score - a.score);
 
         return assignmentList[0];
-    }
-
-    // find best matching score of each junction in the cluster
-    computeBestClusterAssignment(junctionCluster) {
-        const junctionAssignmentList = Object.values(junctionCluster.junctionList)
-            .map(junction => this.computeBestJunctionAssignment(junction))
-            .sort((a, b) => {
-                return b.score - a.score;
-            });
-
-        return junctionAssignmentList[0];
     }
 
     // assignment matching score
@@ -268,15 +260,15 @@ class JunctionGridPoint {
         assignment.score -= degreeToRad(angleDiff.average());
     }
 
-    assignJunctionCluster(junctionCluster, assignment) {
-        this.junctionCluster = junctionCluster;
+    assignJunctionConfig(junctionConfig, assignment) {
+        this.junctionConfig = junctionConfig;
 
         this.EAST = assignment.EAST;
         this.NORTH = assignment.NORTH;
         this.WEST = assignment.WEST;
         this.SOUTH = assignment.SOUTH;
 
-        let isSignalJunction = Math.random() <= 0.5;
+        const {hasSignal, hasCrosswalk, hasStopSign} = junctionConfig;
 
         // extend the grid
         if (this.EAST.topo) {
@@ -287,7 +279,7 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.junctionCluster) {
+            if (!point.junctionConfig) {
                 // free point, add proper assignment
                 point.westTopoRequirement = computeOppositeTopoRequirement(this.EAST.topo);
                 point.westDegreeOptimal = computeOppositeDegreeOptimal("EAST", this.EAST.rotation);
@@ -295,17 +287,17 @@ class JunctionGridPoint {
                 // do nothing as it's already assigned a topo group.
             }
 
-            // process signal
-            if (isSignalJunction) {
-                this.eastSignal = this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT";
-                this.eastStopSign = false;
-            } else {
-                // stop sign junction
-                this.eastSignal = false;
-                this.eastStopSign = this.EAST.topo === "IN" || this.EAST.topo === "IN-OUT";
+            if (hasSignal) {
+                this.eastSignal = true;
             }
 
-            this.eastCrosswalk = Math.random() <= 0.5;
+            if (hasStopSign) {
+                this.eastStopSign = true;
+            }
+
+            if (hasCrosswalk) {
+                this.eastCrosswalk = true;
+            }
         }
 
         if (this.NORTH.topo) {
@@ -316,7 +308,7 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.junctionCluster) {
+            if (!point.junctionConfig) {
                 // free point, add proper assignment
                 point.southTopoRequirement = computeOppositeTopoRequirement(this.NORTH.topo);
                 point.southDegreeOptimal = computeOppositeDegreeOptimal("NORTH", this.NORTH.rotation);
@@ -324,17 +316,17 @@ class JunctionGridPoint {
                 // do nothing as it's already assigned a topo group.
             }
 
-            // process signal
-            if (isSignalJunction) {
-                this.northSignal = this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT";
-                this.northStopSign = false;
-            } else {
-                // stop sign junction
-                this.northSignal = false;
-                this.northStopSign = this.NORTH.topo === "IN" || this.NORTH.topo === "IN-OUT";
+            if (hasSignal) {
+                this.northSignal = true;
             }
 
-            this.northCrosswalk = Math.random() <= 0.5;
+            if (hasStopSign) {
+                this.northStopSign = true;
+            }
+
+            if (hasCrosswalk) {
+                this.northCrosswalk = true;
+            }
         }
 
         if (this.WEST.topo) {
@@ -345,7 +337,7 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.junctionCluster) {
+            if (!point.junctionConfig) {
                 // free point, add proper assignment
                 point.eastTopoRequirement = computeOppositeTopoRequirement(this.WEST.topo);
                 point.eastDegreeOptimal = computeOppositeDegreeOptimal("WEST", this.WEST.rotation);
@@ -353,17 +345,17 @@ class JunctionGridPoint {
                 // do nothing as it's already assigned a topo group.
             }
 
-            // process signal
-            if (isSignalJunction) {
-                this.westSignal = this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT";
-                this.westStopSign = false;
-            } else {
-                // stop sign junction
-                this.westSignal = false;
-                this.westStopSign = this.WEST.topo === "IN" || this.WEST.topo === "IN-OUT";
+            if (hasSignal) {
+                this.westSignal = true;
             }
 
-            this.westCrosswalk = Math.random() <= 0.5;
+            if (hasStopSign) {
+                this.westStopSign = true;
+            }
+
+            if (hasCrosswalk) {
+                this.westCrosswalk = true;
+            }
         }
 
         if (this.SOUTH.topo) {
@@ -374,7 +366,7 @@ class JunctionGridPoint {
             if (!point) {
                 point = this.grid.addPoint(xI, yI);
             }
-            if (!point.junctionCluster) {
+            if (!point.junctionConfig) {
                 // free point, add proper assignment
                 point.northTopoRequirement = computeOppositeTopoRequirement(this.SOUTH.topo);
                 point.northDegreeOptimal = computeOppositeDegreeOptimal("SOUTH", this.EAST.rotation);
@@ -382,17 +374,17 @@ class JunctionGridPoint {
                 // do nothing as it's already assigned a topo group.
             }
 
-            // process signal
-            if (isSignalJunction) {
-                this.southSignal = this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT";
-                this.southStopSign = false;
-            } else {
-                // stop sign junction
-                this.southSignal = false;
-                this.southStopSign = this.SOUTH.topo === "IN" || this.SOUTH.topo === "IN-OUT";
+            if (hasSignal) {
+                this.southSignal = true;
             }
 
-            this.southCrosswalk = Math.random() <= 0.5;
+            if (hasStopSign) {
+                this.southStopSign = true;
+            }
+
+            if (hasCrosswalk) {
+                this.southCrosswalk = true;
+            }
         }
         console.log(this.grid);
     }
@@ -428,12 +420,12 @@ class JunctionGrid {
     }
 
     getFreePointList() {
-        return this.pointList.filter(p => p.junctionCluster === null);
+        return this.pointList.filter(p => p.junctionConfig === null);
     }
 
-    // find best match between free points and the junctionCluster.
+    // find best match between free points and the junctionConfig.
     // generate assignment and compute match score
-    computeBestMatch(junctionCluster) {
+    computeBestMatch(junctionConfig) {
         const freePoints = this.getFreePointList();
 
         if (freePoints.length === 0) {
@@ -443,7 +435,7 @@ class JunctionGrid {
         }
 
         const pointMatches = freePoints.map(point => ({
-            point, assignment: point.computeBestClusterAssignment(junctionCluster),
+            point, assignment: point.computeBestJunctionConfigAssignment(junctionConfig),
         })).sort((m1, m2) => {
             return m2.assignment.score - m1.assignment.score;
         });
