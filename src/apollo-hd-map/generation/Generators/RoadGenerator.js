@@ -15,7 +15,7 @@ class RoadGenerator {
                         }) {
 
         const road = new Road({
-            id: roadId, startPoint, startHeading, endPoint, endHeading,
+            id: roadId, startPoint, startHeading, endPoint, endHeading
         });
         road.buildCentralCurve();
         road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});
@@ -32,6 +32,7 @@ class RoadGenerator {
             startHeading: jLane.leftBoundaryCurve.startHeading,
             endPoint: jLane.leftBoundaryCurve.controlPoints.last(),
             endHeading: jLane.leftBoundaryCurve.endHeading,
+            speed: 10,
         });
     }
 }

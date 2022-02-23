@@ -2,7 +2,12 @@ const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
 const Junction = require("../MapElements/Junction");
 const {Point, vectorHeading, vector, BezierCurve} = require("../../common/ApolloHDMap/Geometry");
 const {getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
-const {DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH, DEFAULT_ROAD_LENGTH} = require("../../common/constants");
+const {
+    DEFAULT_ROAD_SOCKET_X_OFFSET,
+    DEFAULT_LANE_WIDTH,
+    DEFAULT_ROAD_LENGTH,
+    DEFAULT_ROAD_SPEED
+} = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
 const {getOppositeDirection, DEFAULT_DIRECTIONS} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 const Signal = require("../MapElements/Signal");
@@ -116,6 +121,8 @@ class MapGeneratorGrid {
                         // create a straight road connecting to the current junction only
                         const roadId = global.getNewRoadId();
 
+                        const roadSpeed = DEFAULT_ROAD_SPEED[direction];
+
                         // for in-out and out, startsFromJunction is true. for in roads, startsFromJunction is false
                         let startsFromJunction = true;
 
@@ -192,7 +199,15 @@ class MapGeneratorGrid {
                         }
 
                         const road = RoadGenerator.generateRoad({
-                            roadId, startPoint, startHeading, endPoint, endHeading, forwardLaneCount, backwardLaneCount,
+                            roadId,
+                            startPoint,
+                            startHeading,
+                            endPoint,
+                            endHeading,
+                            forwardLaneCount,
+                            backwardLaneCount,
+                            forwardSpeedLimit: roadSpeed,
+                            backwardSpeedLimit: roadSpeed
                         });
 
                         junctionPoint.assignRoad(direction, road);
