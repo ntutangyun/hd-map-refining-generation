@@ -231,6 +231,8 @@ class MapGeneratorGrid {
                         // road starts from and is named after the current junction.
                         const roadId = global.getNewRoadId();
 
+                        const roadSpeed = DEFAULT_ROAD_SPEED[direction];
+
                         let forwardLaneCount, backwardLaneCount;
                         if (topo === "IN-OUT") {
                             // randomly select number of total lanes in the road
@@ -290,7 +292,15 @@ class MapGeneratorGrid {
                         }
 
                         const road = RoadGenerator.generateRoad({
-                            roadId, startPoint, startHeading, endPoint, endHeading, forwardLaneCount, backwardLaneCount,
+                            roadId,
+                            startPoint,
+                            startHeading,
+                            endPoint,
+                            endHeading,
+                            forwardLaneCount,
+                            backwardLaneCount,
+                            forwardSpeedLimit: roadSpeed,
+                            backwardSpeedLimit: roadSpeed
                         });
 
                         junctionPoint.assignRoad(direction, road);
