@@ -12,8 +12,9 @@ const graph = new Graph(mapName);
 graph.init(graphData, mapData);
 
 console.log(`junction count: ${graph.getJunctionList().length}`);
-console.log(`junction count: ${graph.getJunctionList().filter(j => j.getSignalList().length > 0).length}`);
-console.log(`junction count: ${graph.getJunctionList().filter(j => j.getStopSignList().length > 0).length}`);
+console.log(`signal junction count: ${graph.getJunctionList().filter(j => j.getSignalList().length > 0).length}`);
+console.log(`stop junction count: ${graph.getJunctionList().filter(j => j.getStopSignList().length > 0).length}`);
+console.log(`crosswalk junction count: ${graph.getJunctionList().filter(j => j.getCrosswalkList().length > 0).length}`);
 
 console.log(`roads: ${graph.getRoadList().filter(r => !r.junction).length}`);
 

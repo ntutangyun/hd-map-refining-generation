@@ -1,6 +1,6 @@
 const {checkLineSegmentIntersect, pointDist, vectorHeading, vector} = require("./Geometry");
 const TwoWayRoad = require("./TwoWayRoad");
-const {radToDegree, degreeNormalize} = require("../mathUtils");
+const {radToDegree, degreeNormalize, bound} = require("../mathUtils");
 
 const JUNCTION_LANE_SAME_START_DIST_THRESHOLD = 1;
 const JUNCTION_LANE_SAME_END_DIST_THRESHOLD = 1;
@@ -287,6 +287,64 @@ class Junction {
         this.topoGeoVector = [
             eastList.length === 1 ? eastList[0] : null, northList.length === 1 ? northList[0] : null, westList.length === 1 ? westList[0] : null, southList.length === 1 ? southList[0] : null,
         ];
+
+        // const assignment = JSON.parse(JSON.stringify(this.topoGeoVector));
+
+        // calculate the angle match
+        // rotate the junction according to the angle optimal so that the sum of the error is minimum.
+        let deltaMin = Number.NEGATIVE_INFINITY, deltaMax = Number.POSITIVE_INFINITY;
+        let angleDiff = [];
+
+        if (this.topoGeoVector[0]) {
+            deltaMin = Math.max(deltaMin, degreeNormalize(-45 - this.topoGeoVector[0].rotation));
+            deltaMax = Math.min(deltaMax, degreeNormalize(45 - this.topoGeoVector[0].rotation));
+            angleDiff.push(degreeNormalize(0 - this.topoGeoVector[0].rotation));
+        }
+
+        if (this.topoGeoVector[1]) {
+            deltaMin = Math.max(deltaMin, degreeNormalize(45 - this.topoGeoVector[1].rotation));
+            deltaMax = Math.min(deltaMax, degreeNormalize(135 - this.topoGeoVector[1].rotation));
+            angleDiff.push(degreeNormalize(90 - this.topoGeoVector[1].rotation));
+        }
+
+        if (this.topoGeoVector[2]) {
+            deltaMin = Math.max(deltaMin, degreeNormalize(135 - this.topoGeoVector[2].rotation));
+            deltaMax = Math.min(deltaMax, degreeNormalize(-135 - this.topoGeoVector[2].rotation));
+            angleDiff.push(degreeNormalize(180 - this.topoGeoVector[2].rotation));
+        }
+
+        if (this.topoGeoVector[3]) {
+            deltaMin = Math.max(deltaMin, degreeNormalize(-135 - this.topoGeoVector[3].rotation));
+            deltaMax = Math.min(deltaMax, degreeNormalize(-45 - this.topoGeoVector[3].rotation));
+            angleDiff.push(degreeNormalize(-90 - this.topoGeoVector[3].rotation));
+        }
+
+        // shrink the bound further so that the road does not fall on the separation line
+        deltaMin *= 0.9;
+        deltaMax *= 0.9;
+        const degreeNorm = bound(angleDiff.average(), deltaMin, deltaMax);
+
+        angleDiff = [];
+
+        if (this.topoGeoVector[0]) {
+            this.topoGeoVector[0].rotation = degreeNormalize(degreeNorm + this.topoGeoVector[0].rotation);
+            angleDiff.push(Math.abs(degreeNormalize(0 - this.topoGeoVector[0].rotation)));
+        }
+
+        if (this.topoGeoVector[1]) {
+            this.topoGeoVector[1].rotation = degreeNormalize(degreeNorm + this.topoGeoVector[1].rotation);
+            angleDiff.push(Math.abs(degreeNormalize(90 - this.topoGeoVector[1].rotation)));
+        }
+
+        if (this.topoGeoVector[2]) {
+            this.topoGeoVector[2].rotation = degreeNormalize(degreeNorm + this.topoGeoVector[2].rotation);
+            angleDiff.push(Math.abs(degreeNormalize(180 - this.topoGeoVector[2].rotation)));
+        }
+
+        if (this.topoGeoVector[3]) {
+            this.topoGeoVector[3].rotation = degreeNormalize(degreeNorm + this.topoGeoVector[3].rotation);
+            angleDiff.push(Math.abs(degreeNormalize(-90 - this.topoGeoVector[3].rotation)));
+        }
     }
 }
 
