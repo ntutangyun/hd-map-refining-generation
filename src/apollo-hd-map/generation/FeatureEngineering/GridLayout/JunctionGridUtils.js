@@ -129,6 +129,16 @@ function getTurnDirection(inDirection, outDirection) {
         process.exit(-1);
     }
 
+    if (!DEFAULT_DIRECTIONS.includes(inDirection)) {
+        global.logW("GetTurnDirectionFunc", `Please check your direction: ${inDirection}`);
+        return LaneProto.Lane.LaneTurn.NO_TURN;
+    }
+
+    if (!DEFAULT_DIRECTIONS.includes(outDirection)) {
+        global.logW("GetTurnDirectionFunc", `Please check your direction: ${outDirection}`);
+        return LaneProto.Lane.LaneTurn.NO_TURN;
+    }
+
     switch (inDirection) {
         case "EAST": {
             switch (outDirection) {

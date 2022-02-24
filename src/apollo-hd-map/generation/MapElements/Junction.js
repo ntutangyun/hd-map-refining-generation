@@ -1,4 +1,4 @@
-const {angleNormalize, vector, Point, angleBetween, pointDist} = require("../../common/ApolloHDMap/Geometry");
+const {vector, Point, angleBetween, pointDist} = require("../../common/ApolloHDMap/Geometry");
 const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
 const LaneGenerator = require("../Generators/LaneGenerator");
 const RoadGenerator = require("../Generators/RoadGenerator");
@@ -63,11 +63,11 @@ class Junction {
         return Object.values(this.connectedRoadList).filter(r => r !== null);
     }
 
-    generateJunctionLanes() {
+    generateJunctionLanes(roadList = this.connectedRoadList) {
         const laneConfigs = [];
 
-        for (const [inDirection, inRoad] of Object.entries(this.connectedRoadList)) {
-            for (const [outDirection, outRoad] of Object.entries(this.connectedRoadList)) {
+        for (const [inDirection, inRoad] of Object.entries(roadList)) {
+            for (const [outDirection, outRoad] of Object.entries(roadList)) {
                 if (inDirection === outDirection) {
                     continue;
                 }
