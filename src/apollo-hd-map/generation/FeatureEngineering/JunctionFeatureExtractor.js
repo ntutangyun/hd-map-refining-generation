@@ -3,8 +3,7 @@ const JunctionTopoGeoCluster = require("./GridLayout/JunctionTopoGeoCluster");
 const {degreeNormalize} = require("../../common/mathUtils");
 
 const mapJunctionBlacklist = {
-    "go_mentum": ["J_0", "J_1", "J_7", "J_20", "J_29"],
-    "shalun": ["J_8"]
+    "go_mentum": ["J_0", "J_1", "J_7", "J_20", "J_29"], "shalun": ["J_8"]
 };
 
 
@@ -52,7 +51,7 @@ function junctionTopoGeoClustering(graph) {
     return junctionTopoGeoClusters;
 }
 
-function junctionFeatureMergeExtraction(graph) {
+function extractMapFeature(graph) {
     const roadFeatures = new Set();
     const geoFeatures = {
         EAST: {
@@ -137,7 +136,39 @@ function junctionFeatureMergeExtraction(graph) {
     };
 }
 
+function mergeMapFeature(rootFeature, featureToMerge) {
+    const {roadFeatures, geoFeatures, controlFeatures, auxiliaryFeatures} = featureToMerge;
+
+    // merge road features
+    Array.from(roadFeatures).forEach(roadFeature => {
+        rootFeature.roadFeatures.add(roadFeature);
+    });
+
+    // merge control features
+    Array.from(controlFeatures).forEach(controlFeature => {
+        rootFeature.controlFeatures.add(controlFeature);
+    });
+
+    // merge aux features
+    Array.from(auxiliaryFeatures).forEach(auxFeature => {
+        rootFeature.auxiliaryFeatures.add(auxFeature);
+    });
+
+    // merge geo features
+    rootFeature.geoFeatures.EAST.min = Math.min(geoFeatures.EAST.min, rootFeature.geoFeatures.EAST.min);
+    rootFeature.geoFeatures.EAST.max = Math.max(geoFeatures.EAST.max, rootFeature.geoFeatures.EAST.max);
+
+    rootFeature.geoFeatures.NORTH.min = Math.min(geoFeatures.NORTH.min, rootFeature.geoFeatures.NORTH.min);
+    rootFeature.geoFeatures.NORTH.max = Math.max(geoFeatures.NORTH.max, rootFeature.geoFeatures.NORTH.max);
+
+    rootFeature.geoFeatures.WEST.min = Math.min(geoFeatures.WEST.min, rootFeature.geoFeatures.WEST.min);
+    rootFeature.geoFeatures.WEST.max = Math.max(geoFeatures.WEST.max, rootFeature.geoFeatures.WEST.max);
+
+    rootFeature.geoFeatures.SOUTH.min = Math.min(geoFeatures.SOUTH.min, rootFeature.geoFeatures.SOUTH.min);
+    rootFeature.geoFeatures.SOUTH.max = Math.max(geoFeatures.SOUTH.max, rootFeature.geoFeatures.SOUTH.max);
+}
+
 
 module.exports = {
-    junctionTopoGeoClustering, computeRoadTopoGroups, junctionFeatureMergeExtraction
+    junctionTopoGeoClustering, computeRoadTopoGroups, extractMapFeature, mergeMapFeature
 };

@@ -1,28 +1,51 @@
 require("../common/setup");
 const fs = require("fs");
 
-const mapName = "shalun";
-
-// read existing hd map data
-const graphData = require(`../../../data/apollo/${mapName}_routing_map.json`);
-const mapData = require(`../../../data/apollo/${mapName}_base_map.json`);
-
-// parse hd map data
-const Graph = require("../common/ApolloHDMap/Graph");
-const graph = new Graph(mapName);
-graph.init(graphData, mapData);
-
-// extract junction feature vectors
-const {junctionFeatureMergeExtraction} = require("./FeatureEngineering/JunctionFeatureExtractor");
+const {buildGridLayoutFromJunctionConfigs} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
+const {extractMapFeature, mergeMapFeature} = require("./FeatureEngineering/JunctionFeatureExtractor");
 const {combinatorialSampling} = require("./SamplingTechniques/CombinatorialSampling");
 
-// cluster junction based on their topology and geometry feature
-const mergedFeatures = junctionFeatureMergeExtraction(graph);
+const mapList = [
+    "san_francisco",
+    "shalun",
+    "go_mentum"
+];
+
+const mergedFeatures = {
+    roadFeatures: new Set(),
+    geoFeatures: {
+        EAST: {
+            min: 0, max: 0
+        }, NORTH: {
+            min: 0, max: 0
+        }, WEST: {
+            min: 0, max: 0
+        }, SOUTH: {
+            min: 0, max: 0
+        }
+    },
+    controlFeatures: new Set(),
+    auxiliaryFeatures: new Set()
+};
+
+mapList.forEach(mapName => {
+
+    // read existing hd map data
+    const graphData = require(`../../../data/apollo/${mapName}_routing_map.json`);
+    const mapData = require(`../../../data/apollo/${mapName}_base_map.json`);
+
+    // parse hd map data
+    const Graph = require("../common/ApolloHDMap/Graph");
+    const graph = new Graph(mapName);
+    graph.init(graphData, mapData);
+
+    const mapFeatures = extractMapFeature(graph);
+    mergeMapFeature(mergedFeatures, mapFeatures);
+});
 
 const junctionConfigs = combinatorialSampling(mergedFeatures);
 
-const {buildGridLayoutFromJunctionConfigs} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
-const junctionGrid = buildGridLayoutFromJunctionConfigs(graph, junctionConfigs);
+const junctionGrid = buildGridLayoutFromJunctionConfigs(junctionConfigs);
 
 const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
 const config = {

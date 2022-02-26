@@ -4,7 +4,7 @@ const {TOPO_MISMATCH_PENALTY} = require("./JunctionGridUtils");
 
 // Try to add all junctions into one junction grid for now.
 // later can support multiple junction grid in a single map;
-function buildGridLayoutFromClusters(graph, junctionClusters) {
+function buildGridLayoutFromClusters(junctionClusters) {
     const junctionGrid = new JunctionGrid();
 
     // greedy match add in the highest match per iteration
@@ -37,7 +37,7 @@ function buildGridLayoutFromClusters(graph, junctionClusters) {
 
 // Try to add all junctions into one junction grid for now.
 // later can support multiple junction grid in a single map;
-function buildGridLayoutFromJunctionConfigs(graph, junctionConfigs) {
+function buildGridLayoutFromJunctionConfigs(junctionConfigs) {
     const junctionGrid = new JunctionGrid();
 
     // greedy match add in the highest match per iteration
