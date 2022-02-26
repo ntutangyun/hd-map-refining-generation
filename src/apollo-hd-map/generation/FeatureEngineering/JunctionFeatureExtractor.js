@@ -2,6 +2,11 @@ const JunctionRoadTopoGroup = require("./GridLayout/JunctionRoadTopoGroup");
 const JunctionTopoGeoCluster = require("./GridLayout/JunctionTopoGeoCluster");
 const {degreeNormalize} = require("../../common/mathUtils");
 
+const mapJunctionBlacklist = {
+    "go_mentum": ["J_0", "J_1", "J_7", "J_20", "J_29"],
+    "shalun": ["J_8"]
+};
+
 
 function computeRoadTopoGroups(graph) {
     const roadTopoGroupList = [];
@@ -63,7 +68,11 @@ function junctionFeatureMergeExtraction(graph) {
     const controlFeatures = new Set();
     const auxiliaryFeatures = new Set();
 
-    const junctionList = graph.getJunctionList().filter(junction => junction.getConnectedJunctionAndRoad().length <= 4);
+    const junctionList = graph.getJunctionList()
+        .filter(junction => junction.getConnectedJunctionAndRoad().length <= 4)
+        .filter(junction => {
+            return !(mapJunctionBlacklist.hasOwnProperty(graph.graphName) && mapJunctionBlacklist[graph.graphName].includes(junction.id));
+        });
     junctionList.forEach(j => j.computeTopoGeoVector());
 
     console.log(junctionList);

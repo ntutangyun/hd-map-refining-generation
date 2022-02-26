@@ -1,7 +1,7 @@
 require("../common/setup");
 const fs = require("fs");
 
-const mapName = "san_francisco";
+const mapName = "shalun";
 
 // read existing hd map data
 const graphData = require(`../../../data/apollo/${mapName}_routing_map.json`);
@@ -35,8 +35,7 @@ const map = mapGenerator.generate();
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
 fs.writeFileSync("./sim_map.bin", map.serializeBinary());
-//
-//
+
 // // sample new junction configurations including road socket information using the clustering results.
 // const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
 // const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 1);
