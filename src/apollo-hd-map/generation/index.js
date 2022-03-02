@@ -24,6 +24,7 @@ const mergedFeatures = {
             min: 0, max: 0
         }
     },
+    rotFeature: {},
     controlFeatures: new Set(),
     auxiliaryFeatures: new Set()
 };
