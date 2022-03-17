@@ -1,9 +1,9 @@
-require("../common/setup");
+require("../../../ApolloTestingCommon/common/setup");
 const fs = require("fs");
 
-const {JunctionGrid} = require("./FeatureEngineering/GridLayout/JunctionGrid");
-const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
-const {getDirectionAngle} = require("./FeatureEngineering/GridLayout/JunctionGridUtils");
+const {JunctionGrid} = require("../../src/apollo-hd-map/generation/FeatureEngineering/GridLayout/JunctionGrid");
+const MapGeneratorGrid = require("../../src/apollo-hd-map/generation/Generators/MapGeneratorGrid");
+const {getDirectionAngle} = require("../../src/apollo-hd-map/generation/FeatureEngineering/GridLayout/JunctionGridUtils");
 
 const junctionGrid = new JunctionGrid();
 junctionGrid.addPoint(1, 0);
@@ -60,7 +60,7 @@ stopSignJunctionPoint.westCrosswalk = true;
 stopSignJunctionPoint.southCrosswalk = true;
 
 const config = {
-    hd_map_header: require("../common/hd_map_header.json"), curveSampleCount: 20
+    hd_map_header: require("../../../ApolloTestingCommon/common/hd_map_header.json"), curveSampleCount: 20
 };
 const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
 
@@ -69,21 +69,3 @@ const map = mapGenerator.generate();
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
 fs.writeFileSync("./sim_map.bin", map.serializeBinary());
-//
-//
-// // sample new junction configurations including road socket information using the clustering results.
-// const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
-// const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 1);
-//
-// console.log(junction_samples);
-//
-// const MapGenerator = require("./Generators/MapGenerator");
-//
-
-//
-// fs.writeFileSync("./index.config.json", JSON.stringify(config));
-//
-// const mapGenerator = new MapGenerator(config);
-//
-// const map = mapGenerator.generate();
-//
