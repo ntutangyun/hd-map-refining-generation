@@ -16,7 +16,7 @@ junctionGrid.addPoint(1, -1);
 
 
 const signalJunctionPoint = junctionGrid.getPointByLocation(0, 0);
-signalJunctionPoint.junctionCluster = {};
+signalJunctionPoint.junctionConfig = {};
 signalJunctionPoint.EAST = {topo: "IN-OUT", rotation: getDirectionAngle("EAST")};
 signalJunctionPoint.NORTH = {topo: "IN-OUT", rotation: getDirectionAngle("NORTH")};
 signalJunctionPoint.WEST = {topo: "IN-OUT", rotation: getDirectionAngle("WEST")};
@@ -38,7 +38,7 @@ signalJunctionPoint.westCrosswalk = true;
 signalJunctionPoint.southCrosswalk = true;
 
 const stopSignJunctionPoint = junctionGrid.getPointByLocation(1, 0);
-stopSignJunctionPoint.junctionCluster = {};
+stopSignJunctionPoint.junctionConfig = {};
 stopSignJunctionPoint.EAST = {topo: "IN-OUT", rotation: getDirectionAngle("EAST")};
 stopSignJunctionPoint.NORTH = {topo: "IN-OUT", rotation: getDirectionAngle("NORTH")};
 stopSignJunctionPoint.WEST = {topo: "IN-OUT", rotation: getDirectionAngle("WEST")};
