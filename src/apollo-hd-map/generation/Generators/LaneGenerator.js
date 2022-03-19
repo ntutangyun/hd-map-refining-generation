@@ -1,4 +1,4 @@
-const {BezierCurve} = require("../../common/ApolloHDMap/Geometry");
+const {BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
 const Lane = require("../MapElements/Lane");
 
 

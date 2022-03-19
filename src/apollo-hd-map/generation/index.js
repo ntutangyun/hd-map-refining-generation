@@ -1,5 +1,9 @@
-require("../common/setup");
 const fs = require("fs");
+const path = require("path");
+let config = require("./config.json");
+
+global.ApolloTestingLib = (localPath) => require(path.join(config.ApolloTestingLibPath, localPath));
+global.ApolloTestingLib("common/setup");
 
 const {buildGridLayoutFromJunctionConfigs} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
 const {extractMapFeature, mergeMapFeature} = require("./FeatureEngineering/JunctionFeatureExtractor");
@@ -36,7 +40,7 @@ mapList.forEach(mapName => {
     const mapData = require(`../../../data/apollo/${mapName}_base_map.json`);
 
     // parse hd map data
-    const Graph = require("../common/ApolloHDMap/Graph");
+    const Graph = global.ApolloTestingLib("common/ApolloHDMap/Graph");
     const graph = new Graph(mapName);
     graph.init(graphData, mapData);
 
@@ -49,8 +53,10 @@ const junctionConfigs = combinatorialSampling(mergedFeatures);
 const junctionGrid = buildGridLayoutFromJunctionConfigs(junctionConfigs);
 
 const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
-const config = {
-    hd_map_header: require("../common/hd_map_header.json"), curveSampleCount: 20
+config = {
+    ...config,
+    hd_map_header: global.ApolloTestingLib("common/hd_map_header.json"),
+    curveSampleCount: 20
 };
 const mapGenerator = new MapGeneratorGrid(config, junctionGrid);
 

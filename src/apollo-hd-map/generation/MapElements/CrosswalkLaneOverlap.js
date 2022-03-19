@@ -1,7 +1,7 @@
-const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
-const OverlapProto = require("../../protobuf_out/modules/map/proto/map_overlap_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
+const OverlapProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_overlap_pb");
+const {DEFAULT_CROSSWALK_WIDTH} = global.ApolloTestingLib("common/constants");
 const Overlap = require("./Overlap");
-const {DEFAULT_CROSSWALK_WIDTH} = require("../../common/constants");
 
 class CrosswalkLaneOverlap extends Overlap {
     constructor(crosswalk, lane) {

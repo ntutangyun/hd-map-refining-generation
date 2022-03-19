@@ -1,4 +1,4 @@
-const {bound, degreeNormalize, degreeToRad} = require("../../../common/mathUtils");
+const {bound, degreeNormalize, degreeToRad} = global.ApolloTestingLib("common/mathUtils");
 const {
     DEFAULT_DIRECTION_REQUIREMENT,
     xIToX,

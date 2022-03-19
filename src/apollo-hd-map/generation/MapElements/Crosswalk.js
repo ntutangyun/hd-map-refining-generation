@@ -1,8 +1,8 @@
-const CrosswalkProto = require("../../protobuf_out/modules/map/proto/map_crosswalk_pb");
-const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
-const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
+const CrosswalkProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_crosswalk_pb");
+const MapGeoProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_geometry_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
+const {DEFAULT_CROSSWALK_WIDTH} = global.ApolloTestingLib("common/constants");
 const OverlapGenerator = require("../Generators/OverlapGenerator");
-const {DEFAULT_CROSSWALK_WIDTH} = require("../../common/constants");
 
 // stop sign has no position. it is located by default at the end of the stop line.
 class Crosswalk {

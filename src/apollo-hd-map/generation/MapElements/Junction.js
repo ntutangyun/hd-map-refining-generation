@@ -1,11 +1,11 @@
-const {vector, Point, angleBetween, pointDist} = require("../../common/ApolloHDMap/Geometry");
-const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
+const {vector, Point, angleBetween, pointDist} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
+const JunctionProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_junction_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
+const MapGeoProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_geometry_pb");
 const LaneGenerator = require("../Generators/LaneGenerator");
 const RoadGenerator = require("../Generators/RoadGenerator");
 const OverlapGenerator = require("../Generators/OverlapGenerator");
-const JunctionProto = require("../../protobuf_out/modules/map/proto/map_junction_pb");
-const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
-const MapGeoProto = require("../../protobuf_out/modules/map/proto/map_geometry_pb");
 const {getTurnDirection} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 
 class Junction {

@@ -1,7 +1,7 @@
 // junction topology is now represented by the sequence of in-out road types.
 // e.g. [in, in, inout, out] for a four road junction
 // note that all the roads are now two-way roads.
-const {matchVectorRotation} = require("../../../common/arrayUtils");
+const {matchVectorRotation} = global.ApolloTestingLib("common/arrayUtils");
 
 class JunctionRoadTopoGroup {
     constructor(firstJunction) {

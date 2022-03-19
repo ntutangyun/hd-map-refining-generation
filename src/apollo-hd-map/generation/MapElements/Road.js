@@ -8,11 +8,11 @@
 //      one left boundary (i.e. left most boundary of all reverse lanes)
 //      one right boundary (i.e. right most boundary of all reverse lanes)
 
-const LaneProto = require("../../protobuf_out/modules/map/proto/map_lane_pb");
-const RoadProto = require("../../protobuf_out/modules/map/proto/map_road_pb");
-const {BezierCurve} = require("../../common/ApolloHDMap/Geometry");
+const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
+const RoadProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_road_pb");
+const {BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
 const LaneGenerator = require("../Generators/LaneGenerator");
-const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
 
 class Road {
     constructor({

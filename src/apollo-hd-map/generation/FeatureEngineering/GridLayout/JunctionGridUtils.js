@@ -1,6 +1,6 @@
-const {MAP_START_OFFSET_X, JUNCTION_GRID_WIDTH, MAP_START_OFFSET_Y} = require("../../../common/constants");
-const {degreeNormalize} = require("../../../common/mathUtils");
-const LaneProto = require("../../../protobuf_out/modules/map/proto/map_lane_pb");
+const {MAP_START_OFFSET_X, JUNCTION_GRID_WIDTH, MAP_START_OFFSET_Y} = global.ApolloTestingLib("common/constants");
+const {degreeNormalize} = global.ApolloTestingLib("common/mathUtils");
+const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
 
 function xIToX(xI) {
     return MAP_START_OFFSET_X + JUNCTION_GRID_WIDTH * xI;

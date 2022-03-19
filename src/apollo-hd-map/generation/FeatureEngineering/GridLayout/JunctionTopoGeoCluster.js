@@ -1,4 +1,4 @@
-const {matchVectorRotation} = require("../../../common/arrayUtils");
+const {matchVectorRotation} = global.ApolloTestingLib("common/arrayUtils");
 
 class JunctionTopoGeoCluster {
     constructor(firstJunction) {

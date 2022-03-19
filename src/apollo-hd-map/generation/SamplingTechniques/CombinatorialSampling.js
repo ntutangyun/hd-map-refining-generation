@@ -1,4 +1,4 @@
-const {degreeNormalize, getRandomInRange, bound} = require("../../common/mathUtils");
+const {degreeNormalize, getRandomInRange, bound} = global.ApolloTestingLib("common/mathUtils");
 
 function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxiliaryFeatures}) {
 

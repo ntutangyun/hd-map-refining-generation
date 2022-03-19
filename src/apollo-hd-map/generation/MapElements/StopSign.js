@@ -1,5 +1,5 @@
-const StopSignProto = require("../../protobuf_out/modules/map/proto/map_stop_sign_pb");
-const MapIDProto = require("../../protobuf_out/modules/map/proto/map_id_pb");
+const StopSignProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_stop_sign_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
 const OverlapGenerator = require("../Generators/OverlapGenerator");
 
 // stop sign has no position. it is located by default at the end of the stop line.
