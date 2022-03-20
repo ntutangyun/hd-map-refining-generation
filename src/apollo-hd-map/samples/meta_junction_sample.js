@@ -1,11 +1,16 @@
-require("../common/setup");
 const fs = require("fs");
+const path = require("path");
 
-const MapGeneratorManual = require("./Generators/MapGeneratorManual");
-const {Point} = require("../common/ApolloHDMap/Geometry");
-const {degreeToRad} = require("../common/mathUtils");
-const config = {
-    hd_map_header: require("../common/hd_map_header.json"),
+let config = require("../lib/global.config.json");
+global.ApolloTestingLib = (localPath) => require(path.join(config.ApolloTestingLibPath, localPath));
+global.ApolloTestingLib("common/setup");
+
+const MapGeneratorManual = require("../lib/Generators/MapGeneratorManual");
+const {Point} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {degreeToRad} = global.ApolloTestingLib("common/mathUtils");
+config = {
+    ...config,
+    hd_map_header: global.ApolloTestingLib("common/hd_map_header.json"),
     curveSampleCount: 20,
     manual: {
         // junctionList: [

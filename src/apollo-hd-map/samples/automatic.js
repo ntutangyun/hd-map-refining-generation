@@ -1,13 +1,13 @@
 const fs = require("fs");
 const path = require("path");
-let config = require("./config.json");
+let config = require("../lib/global.config.json");
 
 global.ApolloTestingLib = (localPath) => require(path.join(config.ApolloTestingLibPath, localPath));
 global.ApolloTestingLib("common/setup");
 
-const {buildGridLayoutFromJunctionConfigs} = require("./FeatureEngineering/GridLayout/JunctionGridBuilder");
-const {extractMapFeature, mergeMapFeature} = require("./FeatureEngineering/JunctionFeatureExtractor");
-const {combinatorialSampling} = require("./SamplingTechniques/CombinatorialSampling");
+const {buildGridLayoutFromJunctionConfigs} = require("../lib/FeatureEngineering/GridLayout/JunctionGridBuilder");
+const {extractMapFeature, mergeMapFeature} = require("../lib/FeatureEngineering/JunctionFeatureExtractor");
+const {combinatorialSampling} = require("../lib/SamplingTechniques/CombinatorialSampling");
 
 const mapList = [
     "san_francisco",
@@ -52,7 +52,7 @@ const junctionConfigs = combinatorialSampling(mergedFeatures);
 
 const junctionGrid = buildGridLayoutFromJunctionConfigs(junctionConfigs);
 
-const MapGeneratorGrid = require("./Generators/MapGeneratorGrid");
+const MapGeneratorGrid = require("../lib/Generators/MapGeneratorGrid");
 config = {
     ...config,
     hd_map_header: global.ApolloTestingLib("common/hd_map_header.json"),
@@ -65,20 +65,3 @@ const map = mapGenerator.generate();
 fs.writeFileSync("./base_map.bin", map.serializeBinary());
 fs.writeFileSync("./base_map.json", JSON.stringify(map.toObject()));
 fs.writeFileSync("./sim_map.bin", map.serializeBinary());
-
-// // sample new junction configurations including road socket information using the clustering results.
-// const JunctionConfigSampler = require("./FeatureEngineering/JunctionConfigSampler");
-// const junction_samples = JunctionConfigSampler.sampleJunctionConfigsFromRoadTopoGroups(graph, roadTopoGroupList, 1);
-//
-// console.log(junction_samples);
-//
-// const MapGenerator = require("./Generators/MapGenerator");
-//
-
-//
-// fs.writeFileSync("./index.config.json", JSON.stringify(config));
-//
-// const mapGenerator = new MapGenerator(config);
-//
-// const map = mapGenerator.generate();
-//

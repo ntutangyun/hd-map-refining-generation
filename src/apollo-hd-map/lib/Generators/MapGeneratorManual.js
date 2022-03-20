@@ -1,10 +1,8 @@
-const MapProto = require("../../protobuf_out/modules/map/proto/map_pb");
+const MapProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_pb");
+const {Point, vectorHeading, vector, BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {getHypotenuse, degreeNormalize, degreeToRad} = global.ApolloTestingLib("common/mathUtils");
+const {DEFAULT_LANE_WIDTH, DEFAULT_ROAD_LENGTH} = global.ApolloTestingLib("common/constants");
 const Junction = require("../MapElements/Junction");
-const {Point, vectorHeading, vector, BezierCurve} = require("../../common/ApolloHDMap/Geometry");
-const {getHypotenuse, degreeNormalize, degreeToRad} = require("../../common/mathUtils");
-const {
-    DEFAULT_ROAD_SOCKET_X_OFFSET, DEFAULT_LANE_WIDTH, DEFAULT_ROAD_LENGTH
-} = require("../../common/constants");
 const RoadGenerator = require("./RoadGenerator");
 const Signal = require("../MapElements/Signal");
 const StopSign = require("../MapElements/StopSign");
