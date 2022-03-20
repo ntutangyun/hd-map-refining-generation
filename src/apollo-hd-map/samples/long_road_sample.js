@@ -23,8 +23,8 @@ config = {
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 4,
                 backwardLaneCount: 0,
-                forwardSpeedLimit: 5,
-                backwardSpeedLimit: 5
+                forwardSpeedLimit: 3,
+                backwardSpeedLimit: 3
             }
         ]
     }
