@@ -199,7 +199,9 @@ class MapGeneratorManual {
                 endPoint,
                 endHeading,
                 forwardLaneCount,
-                backwardLaneCount
+                backwardLaneCount,
+                forwardSpeedLimit,
+                backwardSpeedLimit
             } = roadConfig;
 
             const road = RoadGenerator.generateRoad({
@@ -210,8 +212,8 @@ class MapGeneratorManual {
                 endHeading,
                 forwardLaneCount,
                 backwardLaneCount,
-                forwardSpeedLimit: 10,
-                backwardSpeedLimit: 10
+                forwardSpeedLimit,
+                backwardSpeedLimit,
             });
 
             this.roadList.push(road);
