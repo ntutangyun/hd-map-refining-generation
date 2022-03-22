@@ -13,6 +13,8 @@ class LaneGenerator {
                             isForward = undefined,
                             speedLimit = 10,
                             turn = undefined,
+                            startOffsetRatio = 0.5,
+                            endOffsetRatio = 0.5,
                             isJunctionLane = false,
                         }) {
 
@@ -21,6 +23,8 @@ class LaneGenerator {
             startHeading,
             endPoint,
             endHeading,
+            startOffsetRatio,
+            endOffsetRatio,
             isJunctionLane
         });
 
@@ -32,6 +36,8 @@ class LaneGenerator {
             startHeading,
             endPoint: leftBoundaryEndPoint,
             endHeading,
+            startOffsetRatio,
+            endOffsetRatio,
             isJunctionLane
         });
         const rightBoundaryStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth / 2);
@@ -41,6 +47,8 @@ class LaneGenerator {
             startHeading,
             endPoint: rightBoundaryEndPoint,
             endHeading,
+            startOffsetRatio,
+            endOffsetRatio,
             isJunctionLane
         });
 

@@ -12,10 +12,12 @@ class RoadGenerator {
                             backwardLaneCount = 2,
                             forwardSpeedLimit = 10,
                             backwardSpeedLimit = 10,
+                            startOffsetRatio = 0.5,
+                            endOffsetRatio = 0.5
                         }) {
 
         const road = new Road({
-            id: roadId, startPoint, startHeading, endPoint, endHeading
+            id: roadId, startPoint, startHeading, endPoint, endHeading, startOffsetRatio, endOffsetRatio
         });
         road.buildCentralCurve();
         road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});

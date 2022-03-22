@@ -24,7 +24,9 @@ class Road {
                     startPoint = null,
                     startHeading = null,
                     endPoint = null,
-                    endHeading = null
+                    endHeading = null,
+                    startOffsetRatio = 0.5,
+                    endOffsetRatio = 0.5
                 }) {
         this.id = id;
         this.type = type;
@@ -35,6 +37,8 @@ class Road {
         this.centralCurve = centralCurve;
         this.forwardLaneList = forwardLaneList;
         this.backwardLaneList = backwardLaneList;
+        this.startOffsetRatio = startOffsetRatio;
+        this.endOffsetRatio = endOffsetRatio;
     }
 
     getForwardLaneList() {
@@ -54,7 +58,9 @@ class Road {
             startPoint: this.startPoint,
             startHeading: this.startHeading,
             endPoint: this.endPoint,
-            endHeading: this.endHeading
+            endHeading: this.endHeading,
+            startOffsetRatio: this.startOffsetRatio,
+            endOffsetRatio: this.endOffsetRatio
         });
     }
 
@@ -76,6 +82,8 @@ class Road {
                     startHeading: this.startHeading,
                     endPoint: laneCentralCurveEndPoint,
                     endHeading: this.endHeading,
+                    startOffsetRatio: this.startOffsetRatio,
+                    endOffsetRatio: this.endOffsetRatio,
                     id: global.getNewLaneId(),
                     laneWidth,
                     speedLimit: forwardSpeedLimit,
