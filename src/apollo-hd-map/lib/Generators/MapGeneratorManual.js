@@ -67,6 +67,10 @@ class MapGeneratorManual {
         this.instantiateStopSigns();
         this.instantiateCrosswalks();
 
+        if (this.config.autoLinkRoadLane) {
+            this.autoLinkRoadLane();
+        }
+
         this.addJunctions();
         this.addLaneNRoads();
         this.addSignals();
@@ -75,6 +79,29 @@ class MapGeneratorManual {
         this.addOverlaps();
 
         return this.map;
+    }
+
+    autoLinkRoadLane() {
+        const laneList = [];
+
+        this.roadList.forEach(road => {
+            road.getLaneList().forEach(lane => {
+                laneList.push(lane);
+            });
+        });
+
+        laneList.forEach(fromLane => {
+            laneList.forEach(toLane => {
+                if (fromLane.id === toLane.id) {
+                    return;
+                }
+
+                if (fromLane.centralCurve.endPoint.equalTo(toLane.centralCurve.startPoint)) {
+                    fromLane.outgoingList.push(toLane);
+                    toLane.incomingList.push(fromLane);
+                }
+            });
+        });
     }
 
     instantiateJunctions() {
@@ -221,6 +248,13 @@ class MapGeneratorManual {
             });
 
             this.roadList.push(road);
+        });
+
+        let a = {};
+        this.roadList.forEach(road => {
+            if (a.hasOwnProperty(road.id)) {
+                console.log(`found::: ${road.id}`);
+            }
         });
     }
 
@@ -468,8 +502,12 @@ class MapGeneratorManual {
 
         this.roadList.forEach(road => {
             roadList[road.id] = road;
-            this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
+            // this.map.addRoad(road.serializeToProtobuf(this.config.curveSampleCount));
         });
+
+        this.roadList.sort((a, b) => a.id.localeCompare(b.id));
+
+        console.log(roadList);
 
         Object.values(roadList).forEach(road => {
             road.getLaneList().forEach(lane => {
