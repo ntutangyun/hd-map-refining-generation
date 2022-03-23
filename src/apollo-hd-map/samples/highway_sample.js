@@ -304,6 +304,6 @@ const mapGenerator = new MapGeneratorManual(config);
 
 const map = mapGenerator.generate();
 
-fs.writeFileSync(path.join("C:\\Users\\Tang Yun\\Desktop", "base_map.bin"), map.serializeBinary());
-fs.writeFileSync(path.join("C:\\Users\\Tang Yun\\Desktop", "base_map.json"), JSON.stringify(map.toObject()));
-fs.writeFileSync(path.join("C:\\Users\\Tang Yun\\Desktop", "sim_map.bin"), map.serializeBinary());
+fs.writeFileSync(path.join("/home/tangyun/Desktop", "base_map.bin"), map.serializeBinary());
+fs.writeFileSync(path.join("/home/tangyun/Desktop", "base_map.json"), JSON.stringify(map.toObject()));
+fs.writeFileSync(path.join("/home/tangyun/Desktop", "sim_map.bin"), map.serializeBinary());
