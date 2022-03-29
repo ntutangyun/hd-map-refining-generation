@@ -217,45 +217,72 @@ class MapGeneratorManual {
             });
         });
 
-        // instantiate standalone roads
-        this.config.manual.roadList.forEach(roadConfig => {
-            const {
-                id,
-                startPoint,
-                startHeading,
-                endPoint,
-                endHeading,
-                forwardLaneCount,
-                backwardLaneCount,
-                forwardSpeedLimit,
-                backwardSpeedLimit,
-                startOffsetRatio,
-                endOffsetRatio
-            } = roadConfig;
+        if (this.config.enable3D) {
+            this.config.manual.roadList.forEach(roadConfig => {
+                const {
+                    id,
+                    startPoint,
+                    startHeading,
+                    endPoint,
+                    endHeading,
+                    forwardLaneCount,
+                    backwardLaneCount,
+                    forwardSpeedLimit,
+                    backwardSpeedLimit,
+                    startOffsetRatio,
+                    endOffsetRatio
+                } = roadConfig;
 
-            const road = RoadGenerator.generateRoad({
-                roadId: id,
-                startPoint,
-                startHeading,
-                endPoint,
-                endHeading,
-                forwardLaneCount,
-                backwardLaneCount,
-                forwardSpeedLimit,
-                backwardSpeedLimit,
-                startOffsetRatio,
-                endOffsetRatio,
+                const road = RoadGenerator.generateRoad3D({
+                    roadId: id,
+                    startPoint,
+                    startHeading,
+                    endPoint,
+                    endHeading,
+                    forwardLaneCount,
+                    backwardLaneCount,
+                    forwardSpeedLimit,
+                    backwardSpeedLimit,
+                    startOffsetRatio,
+                    endOffsetRatio,
+                });
+
+                this.roadList.push(road);
             });
+        } else {
+            // instantiate standalone roads
+            this.config.manual.roadList.forEach(roadConfig => {
+                const {
+                    id,
+                    startPoint,
+                    startHeadingVector,
+                    endPoint,
+                    endHeadingVector,
+                    forwardLaneCount,
+                    backwardLaneCount,
+                    forwardSpeedLimit,
+                    backwardSpeedLimit,
+                    startOffsetRatio,
+                    endOffsetRatio
+                } = roadConfig;
 
-            this.roadList.push(road);
-        });
+                const road = RoadGenerator.generateRoad({
+                    roadId: id,
+                    startPoint,
+                    startHeading,
+                    endPoint,
+                    endHeading,
+                    forwardLaneCount,
+                    backwardLaneCount,
+                    forwardSpeedLimit,
+                    backwardSpeedLimit,
+                    startOffsetRatio,
+                    endOffsetRatio,
+                });
 
-        let a = {};
-        this.roadList.forEach(road => {
-            if (a.hasOwnProperty(road.id)) {
-                console.log(`found::: ${road.id}`);
-            }
-        });
+                this.roadList.push(road);
+            });
+        }
     }
 
     instantiateSignals() {

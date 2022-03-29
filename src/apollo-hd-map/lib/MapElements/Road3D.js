@@ -10,11 +10,11 @@
 
 const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
 const RoadProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_road_pb");
-const {BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {BezierCurve3D} = global.ApolloTestingLib("common/Math/BezierCurve");
 const LaneGenerator = require("../Generators/LaneGenerator");
 const RoadBase = require("./RoadBase");
 
-class Road extends RoadBase {
+class Road3D extends RoadBase {
     constructor({
                     id,
                     centralCurve = null,
@@ -22,9 +22,9 @@ class Road extends RoadBase {
                     backwardLaneList = [],
                     type = RoadProto.Road.Type.CITY_ROAD,
                     startPoint = null,
-                    startHeading = null,
+                    startHeadingVector = null,
                     endPoint = null,
-                    endHeading = null,
+                    endHeadingVector = null,
                     startOffsetRatio = 0.5,
                     endOffsetRatio = 0.5
                 }) {
@@ -39,16 +39,16 @@ class Road extends RoadBase {
             startOffsetRatio,
             endOffsetRatio
         });
-        this.startHeading = startHeading;
-        this.endHeading = endHeading;
+        this.startHeadingVector = startHeadingVector.scaleCopy(1);
+        this.endHeadingVector = endHeadingVector.scaleCopy(1);
     }
 
     buildCentralCurve() {
-        this.centralCurve = BezierCurve.buildBezierCurve({
+        this.centralCurve = BezierCurve3D.buildBezierCurve({
             startPoint: this.startPoint,
-            startHeading: this.startHeading,
+            startHeadingVector: this.startHeadingVector.scaleCopy(1),
             endPoint: this.endPoint,
-            endHeading: this.endHeading,
+            endHeadingVector: this.endHeadingVector.scaleCopy(1),
             startOffsetRatio: this.startOffsetRatio,
             endOffsetRatio: this.endOffsetRatio
         });
@@ -61,14 +61,14 @@ class Road extends RoadBase {
 
         if (forwardLaneCount > 0) {
             for (let i = 1; i <= forwardLaneCount; i++) {
-                const laneCentralCurveStartPoint = this.startPoint.moveTowards(this.startHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
-                const laneCentralCurveEndPoint = this.endPoint.moveTowards(this.endHeading - Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveStartPoint = this.startPoint.moveTowards(this.startHeadingVector.heading() - Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveEndPoint = this.endPoint.moveTowards(this.endHeadingVector.heading() - Math.PI / 2, laneWidth * (0.5 + i - 1));
 
-                const lane = LaneGenerator.generateLane({
+                const lane = LaneGenerator.generateLane3D({
                     startPoint: laneCentralCurveStartPoint,
-                    startHeading: this.startHeading,
+                    startHeadingVector: this.startHeadingVector.scaleCopy(1),
                     endPoint: laneCentralCurveEndPoint,
-                    endHeading: this.endHeading,
+                    endHeadingVector: this.endHeadingVector.scaleCopy(1),
                     startOffsetRatio: this.startOffsetRatio,
                     endOffsetRatio: this.endOffsetRatio,
                     id: global.getNewLaneId(),
@@ -92,14 +92,14 @@ class Road extends RoadBase {
 
         if (backwardLaneCount > 0) {
             for (let i = 1; i <= backwardLaneCount; i++) {
-                const laneCentralCurveStartPoint = this.endPoint.moveTowards(this.endHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
-                const laneCentralCurveEndPoint = this.startPoint.moveTowards(this.startHeading + Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveStartPoint = this.endPoint.moveTowards(this.endHeadingVector.heading() + Math.PI / 2, laneWidth * (0.5 + i - 1));
+                const laneCentralCurveEndPoint = this.startPoint.moveTowards(this.startHeadingVector.heading() + Math.PI / 2, laneWidth * (0.5 + i - 1));
 
-                const lane = LaneGenerator.generateLane({
+                const lane = LaneGenerator.generateLane3D({
                     startPoint: laneCentralCurveStartPoint,
-                    startHeading: this.endHeading + Math.PI,
+                    startHeadingVector: this.endHeadingVector.scaleCopy(-1),
                     endPoint: laneCentralCurveEndPoint,
-                    endHeading: this.startHeading + Math.PI,
+                    endHeadingVector: this.startHeadingVector.scaleCopy(-1),
                     id: global.getNewLaneId(),
                     laneWidth,
                     speedLimit: backwardSpeedLimit,
@@ -137,8 +137,6 @@ class Road extends RoadBase {
             }
         }
     }
-
-
 }
 
-module.exports = Road;
+module.exports = Road3D;

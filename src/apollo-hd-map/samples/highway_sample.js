@@ -19,6 +19,7 @@ config = {
     hd_map_header: global.ApolloTestingLib("common/hd_map_header.json"),
     curveSampleCount: 20,
     autoLinkRoadLane: true,
+    enable3D: true,
     manual: {
         junctionList: [],
         roadList: [

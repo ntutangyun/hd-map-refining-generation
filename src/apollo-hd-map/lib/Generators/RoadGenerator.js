@@ -1,4 +1,5 @@
 const Road = require("../MapElements/Road");
+const Road3D = require("../MapElements/Road3D");
 
 class RoadGenerator {
     static generateRoad({
@@ -17,6 +18,29 @@ class RoadGenerator {
                         }) {
 
         const road = new Road({
+            id: roadId, startPoint, startHeading, endPoint, endHeading, startOffsetRatio, endOffsetRatio
+        });
+        road.buildCentralCurve();
+        road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});
+        return road;
+    }
+
+    static generateRoad3D({
+                              roadId,
+                              startPoint,
+                              startHeadingVector,
+                              endPoint,
+                              endHeadingVector,
+                              laneWidth = 3.5,
+                              forwardLaneCount = 2,
+                              backwardLaneCount = 2,
+                              forwardSpeedLimit = 10,
+                              backwardSpeedLimit = 10,
+                              startOffsetRatio = 0.5,
+                              endOffsetRatio = 0.5
+                          }) {
+
+        const road = new Road3D({
             id: roadId, startPoint, startHeading, endPoint, endHeading, startOffsetRatio, endOffsetRatio
         });
         road.buildCentralCurve();

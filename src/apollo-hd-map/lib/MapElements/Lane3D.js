@@ -1,6 +1,6 @@
 const LaneBase = require("./LaneBase");
 
-class Lane extends LaneBase {
+class Lane3D extends LaneBase {
     constructor({
                     id,
                     laneWidth,
@@ -14,9 +14,9 @@ class Lane extends LaneBase {
                     type,
                     turn,
                     startPoint,
-                    startHeading,
+                    startHeadingVector,
                     endPoint,
-                    endHeading,
+                    endHeadingVector,
                 }) {
         super({
             id,
@@ -33,9 +33,9 @@ class Lane extends LaneBase {
             startPoint,
             endPoint,
         });
-        this.startHeading = startHeading;
-        this.endHeading = endHeading;
+        this.startHeadingVector = startHeadingVector;
+        this.endHeadingVector = endHeadingVector;
     }
 }
 
-module.exports = Lane;
+module.exports = Lane3D;
