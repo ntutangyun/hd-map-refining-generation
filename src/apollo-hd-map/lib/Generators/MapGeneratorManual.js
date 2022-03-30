@@ -1,6 +1,12 @@
 const MapProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_pb");
-const {Point, vectorHeading, vector, BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
-const {getHypotenuse, degreeNormalize, degreeToRad} = global.ApolloTestingLib("common/mathUtils");
+const {
+    Point,
+    Vector2D,
+    BezierCurve,
+    getHypotenuse,
+    degreeNormalize,
+    degreeToRad
+} = global.ApolloTestingLib("common/Math");
 const {DEFAULT_LANE_WIDTH, DEFAULT_ROAD_LENGTH} = global.ApolloTestingLib("common/constants");
 const Junction = require("../MapElements/Junction");
 const RoadGenerator = require("./RoadGenerator");
@@ -222,9 +228,9 @@ class MapGeneratorManual {
                 const {
                     id,
                     startPoint,
-                    startHeading,
+                    startHeadingVector,
                     endPoint,
-                    endHeading,
+                    endHeadingVector,
                     forwardLaneCount,
                     backwardLaneCount,
                     forwardSpeedLimit,
@@ -236,9 +242,9 @@ class MapGeneratorManual {
                 const road = RoadGenerator.generateRoad3D({
                     roadId: id,
                     startPoint,
-                    startHeading,
+                    startHeadingVector,
                     endPoint,
-                    endHeading,
+                    endHeadingVector,
                     forwardLaneCount,
                     backwardLaneCount,
                     forwardSpeedLimit,
@@ -255,9 +261,9 @@ class MapGeneratorManual {
                 const {
                     id,
                     startPoint,
-                    startHeadingVector,
+                    startHeading,
                     endPoint,
-                    endHeadingVector,
+                    endHeading,
                     forwardLaneCount,
                     backwardLaneCount,
                     forwardSpeedLimit,
@@ -303,7 +309,7 @@ class MapGeneratorManual {
                 } else {
                     roadConnectionPoint = road.endPoint;
                 }
-                const heading = vectorHeading(vector(junction.centerPoint, roadConnectionPoint));
+                const heading = Vector2D.from(junction.centerPoint, roadConnectionPoint).heading();
                 const position = junction.centerPoint.moveTowards(heading + Math.PI, 20 / 3 * 2);
 
                 const laneList = [];
@@ -340,7 +346,7 @@ class MapGeneratorManual {
 
                 const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
-                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
                 stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 
@@ -373,7 +379,7 @@ class MapGeneratorManual {
 
                 const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
-                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
                 stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 

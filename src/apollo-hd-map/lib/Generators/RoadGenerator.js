@@ -41,7 +41,7 @@ class RoadGenerator {
                           }) {
 
         const road = new Road3D({
-            id: roadId, startPoint, startHeading, endPoint, endHeading, startOffsetRatio, endOffsetRatio
+            id: roadId, startPoint, startHeadingVector, endPoint, endHeadingVector, startOffsetRatio, endOffsetRatio
         });
         road.buildCentralCurve();
         road.buildLanes({forwardLaneCount, forwardSpeedLimit, backwardSpeedLimit, backwardLaneCount, laneWidth});

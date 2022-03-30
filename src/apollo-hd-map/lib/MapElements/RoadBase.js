@@ -1,4 +1,5 @@
 const RoadProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_road_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
 
 class RoadBase {
     constructor({

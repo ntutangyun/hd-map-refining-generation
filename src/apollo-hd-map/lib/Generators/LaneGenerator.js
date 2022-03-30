@@ -1,4 +1,4 @@
-const {BezierCurve, BezierCurve3D} = global.ApolloTestingLib("common/Math/BezierCurve");
+const {BezierCurve2D, BezierCurve3D} = global.ApolloTestingLib("common/Math");
 const Lane = require("../MapElements/Lane");
 const Lane3D = require("../MapElements/Lane3D");
 
@@ -19,7 +19,7 @@ class LaneGenerator {
                             isJunctionLane = false,
                         }) {
 
-        const centralCurve = BezierCurve.buildBezierCurve({
+        const centralCurve = BezierCurve2D.buildBezierCurve({
             startPoint,
             startHeading,
             endPoint,
@@ -32,7 +32,7 @@ class LaneGenerator {
         // build left and right boundaries
         const leftBoundaryStartPoint = startPoint.moveTowards(startHeading + Math.PI / 2, laneWidth / 2);
         const leftBoundaryEndPoint = endPoint.moveTowards(endHeading + Math.PI / 2, laneWidth / 2);
-        const leftBoundaryCurve = BezierCurve.buildBezierCurve({
+        const leftBoundaryCurve = BezierCurve2D.buildBezierCurve({
             startPoint: leftBoundaryStartPoint,
             startHeading,
             endPoint: leftBoundaryEndPoint,
@@ -43,7 +43,7 @@ class LaneGenerator {
         });
         const rightBoundaryStartPoint = startPoint.moveTowards(startHeading - Math.PI / 2, laneWidth / 2);
         const rightBoundaryEndPoint = endPoint.moveTowards(endHeading - Math.PI / 2, laneWidth / 2);
-        const rightBoundaryCurve = BezierCurve.buildBezierCurve({
+        const rightBoundaryCurve = BezierCurve2D.buildBezierCurve({
             startPoint: rightBoundaryStartPoint,
             startHeading,
             endPoint: rightBoundaryEndPoint,

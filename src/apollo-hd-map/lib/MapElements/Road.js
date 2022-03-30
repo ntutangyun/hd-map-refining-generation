@@ -10,7 +10,7 @@
 
 const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
 const RoadProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_road_pb");
-const {BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {BezierCurve2D} = global.ApolloTestingLib("common/Math");
 const LaneGenerator = require("../Generators/LaneGenerator");
 const RoadBase = require("./RoadBase");
 
@@ -44,7 +44,7 @@ class Road extends RoadBase {
     }
 
     buildCentralCurve() {
-        this.centralCurve = BezierCurve.buildBezierCurve({
+        this.centralCurve = BezierCurve2D.buildBezierCurve({
             startPoint: this.startPoint,
             startHeading: this.startHeading,
             endPoint: this.endPoint,

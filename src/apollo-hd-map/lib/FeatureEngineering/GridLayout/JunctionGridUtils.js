@@ -1,5 +1,5 @@
 const {MAP_START_OFFSET_X, JUNCTION_GRID_WIDTH, MAP_START_OFFSET_Y} = global.ApolloTestingLib("common/constants");
-const {degreeNormalize} = global.ApolloTestingLib("common/mathUtils");
+const {degreeNormalize} = global.ApolloTestingLib("common/Math");
 const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
 
 function xIToX(xI) {

@@ -6,29 +6,23 @@ global.ApolloTestingLib = (localPath) => require(path.join(config.ApolloTestingL
 global.ApolloTestingLib("common/setup");
 
 const MapGeneratorManual = require("../lib/Generators/MapGeneratorManual");
-const {Point} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
-const {degreeToRad} = global.ApolloTestingLib("common/mathUtils");
+const {Point, degreeToRad} = global.ApolloTestingLib("common/Math");
 
-// height:
-// horizontal way: 30
-// ramps: 15
-// vertical way: 0
 
 config = {
     ...config,
     hd_map_header: global.ApolloTestingLib("common/hd_map_header.json"),
     curveSampleCount: 20,
     autoLinkRoadLane: true,
-    enable3D: true,
     manual: {
         junctionList: [],
         roadList: [
             {
                 // horizontal main road
                 id: "R_h0",
-                startPoint: new Point(0, 0, 30),
+                startPoint: new Point(0, 0, 0),
                 startHeading: degreeToRad(0),
-                endPoint: new Point(200, 0, 30),
+                endPoint: new Point(200, 0, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 3,
                 backwardLaneCount: 3
@@ -36,9 +30,9 @@ config = {
             {
                 // horizontal main road
                 id: "R_h1",
-                startPoint: new Point(200, 0, 30),
+                startPoint: new Point(200, 0, 0),
                 startHeading: degreeToRad(0),
-                endPoint: new Point(500 - 3.5 - 30, 0, 30),
+                endPoint: new Point(500 - 3.5 - 30, 0, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 2,
                 backwardLaneCount: 2
@@ -46,9 +40,9 @@ config = {
             {
                 // horizontal main road
                 id: "R_h2",
-                startPoint: new Point(500 - 3.5 - 30, 0, 30),
+                startPoint: new Point(500 - 3.5 - 30, 0, 0),
                 startHeading: degreeToRad(0),
-                endPoint: new Point(500 + 3.5 + 30, 0, 30),
+                endPoint: new Point(500 + 3.5 + 30, 0, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 2,
                 backwardLaneCount: 2
@@ -56,9 +50,9 @@ config = {
             {
                 // horizontal main road
                 id: "R_h3",
-                startPoint: new Point(500 + 3.5 + 30, 0, 30),
+                startPoint: new Point(500 + 3.5 + 30, 0, 0),
                 startHeading: degreeToRad(0),
-                endPoint: new Point(800, 0, 30),
+                endPoint: new Point(800, 0, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 2,
                 backwardLaneCount: 2
@@ -66,9 +60,9 @@ config = {
             {
                 // horizontal main road
                 id: "R_h4",
-                startPoint: new Point(800, 0, 30),
+                startPoint: new Point(800, 0, 0),
                 startHeading: degreeToRad(0),
-                endPoint: new Point(1000, 0, 30),
+                endPoint: new Point(1000, 0, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 3,
                 backwardLaneCount: 3
@@ -128,7 +122,7 @@ config = {
                 id: "Ramp_v0_h4_0",
                 startPoint: new Point(507, -300, 0),
                 startHeading: degreeToRad(90),
-                endPoint: new Point(556.53, -101, 10),
+                endPoint: new Point(556.53, -101, 0),
                 endHeading: degreeToRad(60),
                 startOffsetRatio: 0.3,
                 endOffsetRatio: 0.3,
@@ -138,9 +132,9 @@ config = {
             {
                 // ramp
                 id: "Ramp_v0_h4_1",
-                startPoint: new Point(556.53, -101, 10),
+                startPoint: new Point(556.53, -101, 0),
                 startHeading: degreeToRad(60),
-                endPoint: new Point(673.85, -20.73, 20),
+                endPoint: new Point(673.85, -20.73, 0),
                 endHeading: degreeToRad(15),
                 startOffsetRatio: 0.3,
                 endOffsetRatio: 0.3,
@@ -152,11 +146,11 @@ config = {
             {
                 // ramp
                 id: "Ramp_v0_h4_2",
-                startPoint: new Point(673.85, -20.73, 20),
+                startPoint: new Point(673.85, -20.73, 0),
                 startHeading: degreeToRad(15),
                 startOffsetRatio: 0.3,
                 endOffsetRatio: 0.3,
-                endPoint: new Point(800, -7, 30),
+                endPoint: new Point(800, -7, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -164,7 +158,7 @@ config = {
             {
                 // ramp
                 id: "Ramp_h0_v0",
-                startPoint: new Point(200, -7, 30),
+                startPoint: new Point(200, -7, 0),
                 startHeading: degreeToRad(0),
                 startOffsetRatio: 0.5,
                 endOffsetRatio: 0.5,
@@ -176,11 +170,11 @@ config = {
             {
                 // ramp
                 id: "Ramp_h2_v2_0",
-                startPoint: new Point(530 + 3.5, -3.5, 30),
+                startPoint: new Point(530 + 3.5, -3.5, 0),
                 startHeading: degreeToRad(0),
                 startOffsetRatio: 0.7,
                 endOffsetRatio: 0.7,
-                endPoint: new Point(530 + 3.5, -63.5, 10),
+                endPoint: new Point(530 + 3.5, -63.5, 0),
                 endHeading: degreeToRad(180),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -190,7 +184,7 @@ config = {
                 id: "Ramp_h2_v2_1",
                 startOffsetRatio: 0.4,
                 endOffsetRatio: 0.4,
-                startPoint: new Point(530 + 3.5, -63.5, 10),
+                startPoint: new Point(530 + 3.5, -63.5, 0),
                 startHeading: degreeToRad(180),
                 endPoint: new Point(503.5, -33.5, 0),
                 endHeading: degreeToRad(90),
@@ -202,7 +196,7 @@ config = {
                 id: "Ramp_h4_v4",
                 startOffsetRatio: 0.5,
                 endOffsetRatio: 0.5,
-                startPoint: new Point(800, 7, 30),
+                startPoint: new Point(800, 7, 0),
                 startHeading: degreeToRad(180),
                 endPoint: new Point(507, 300, 0),
                 endHeading: degreeToRad(90),
@@ -215,7 +209,7 @@ config = {
                 endOffsetRatio: 0.3,
                 startPoint: new Point(500 - 7, 300, 0),
                 startHeading: degreeToRad(-90),
-                endPoint: new Point(476, 183.2, 10),
+                endPoint: new Point(476, 183.2, 0),
                 endHeading: degreeToRad(-110),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -224,9 +218,9 @@ config = {
                 id: "Ramp_v4_h0_1",
                 startOffsetRatio: 0.3,
                 endOffsetRatio: 0.3,
-                startPoint: new Point(476, 183.2, 10),
+                startPoint: new Point(476, 183.2, 0),
                 startHeading: degreeToRad(-110),
-                endPoint: new Point(500 - 114.73, 43.46, 20),
+                endPoint: new Point(500 - 114.73, 43.46, 0),
                 endHeading: degreeToRad(-150),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -235,9 +229,9 @@ config = {
                 id: "Ramp_v4_h0_2",
                 startOffsetRatio: 0.3,
                 endOffsetRatio: 0.3,
-                startPoint: new Point(500 - 114.73, 43.46, 20),
+                startPoint: new Point(500 - 114.73, 43.46, 0),
                 startHeading: degreeToRad(-150),
-                endPoint: new Point(200, 7, 30),
+                endPoint: new Point(200, 7, 0),
                 endHeading: degreeToRad(180),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -247,9 +241,9 @@ config = {
                 id: "Ramp_h2_v2_2",
                 startOffsetRatio: 0.7,
                 endOffsetRatio: 0.7,
-                startPoint: new Point(500 - 3.5 - 30, 3.5, 30),
+                startPoint: new Point(500 - 3.5 - 30, 3.5, 0),
                 startHeading: degreeToRad(180),
-                endPoint: new Point(500 - 3.5 - 30, 3.5 + 60, 10),
+                endPoint: new Point(500 - 3.5 - 30, 3.5 + 60, 0),
                 endHeading: degreeToRad(0),
                 forwardLaneCount: 1,
                 backwardLaneCount: 0
@@ -259,7 +253,7 @@ config = {
                 id: "Ramp_h2_v2_3",
                 startOffsetRatio: 0.4,
                 endOffsetRatio: 0.4,
-                startPoint: new Point(500 - 3.5 - 30, 3.5 + 60, 10),
+                startPoint: new Point(500 - 3.5 - 30, 3.5 + 60, 0),
                 startHeading: degreeToRad(0),
                 endPoint: new Point(500 - 3.5, 3.5 + 30, 0),
                 endHeading: degreeToRad(-90),
@@ -269,9 +263,9 @@ config = {
             {
                 // ramp
                 id: "Ramp_v0_h0_0",
-                startPoint: new Point(556.53, -101, 10),
+                startPoint: new Point(556.53, -101, 0),
                 startHeading: degreeToRad(60),
-                endPoint: new Point(500 - 114.73, 43.46, 20),
+                endPoint: new Point(500 - 114.73, 43.46, 0),
                 endHeading: degreeToRad(-150),
                 startOffsetRatio: 0.6,
                 endOffsetRatio: 0.6,
@@ -280,7 +274,7 @@ config = {
             },
             {
                 // ramp
-                id: "Ramp_v4_h4_0 ",
+                id: "Ramp_v4_h4_0",
                 startPoint: new Point(476, 183.2, 0),
                 startHeading: degreeToRad(-110),
                 endPoint: new Point(557.36, 47.85, 0),

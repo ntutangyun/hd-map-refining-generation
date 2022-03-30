@@ -1,4 +1,5 @@
 const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
+const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
 
 const WIDTH_SAMPLE_COUNT = 3;
 
