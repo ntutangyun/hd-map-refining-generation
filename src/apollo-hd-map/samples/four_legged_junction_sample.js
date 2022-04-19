@@ -15,30 +15,26 @@ config = {
             {
                 id: "J_0",
                 center: {
-                    x: 1000,
-                    y: 1000
+                    x: 100,
+                    y: 100
                 },
                 roadList: {
                     "EAST": {
                         topo: "IN-OUT",
                         rotation: 0,
                     },
-                    "EAST-NORTH": {
+                    "NORTH": {
                         topo: "IN-OUT",
-                        rotation: 72,
+                        rotation: 90,
                     },
-                    "WEST-NORTH": {
+                    "WEST": {
                         topo: "IN-OUT",
-                        rotation: 144,
-                    },
-                    "WEST-SOUTH": {
-                        topo: "IN-OUT",
-                        rotation: -144,
+                        rotation: 180,
                     },
                     "SOUTH": {
                         topo: "IN-OUT",
-                        rotation: -72,
-                    }
+                        rotation: -90,
+                    },
                 },
                 signal: true,
                 stopSign: false,

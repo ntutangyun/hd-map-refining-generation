@@ -1,4 +1,4 @@
-const {vector, Point, angleBetween, pointDist} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {Vector2D, Point} = global.ApolloTestingLib("common/Math");
 const LaneProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_lane_pb");
 const JunctionProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_junction_pb");
 const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
@@ -196,11 +196,11 @@ class Junction {
         });
 
         polygonPointList.sort((pa, pb) => {
-            const vectorZero = vector(this.centerPoint, new Point(this.centerPoint.x + 10, this.centerPoint.y, this.centerPoint.z));
-            const vectorA = vector(this.centerPoint, pa);
-            const vectorB = vector(this.centerPoint, pb);
+            const vectorZero = Vector2D.from(this.centerPoint, new Point(this.centerPoint.x + 10, this.centerPoint.y, this.centerPoint.z));
+            const vectorA = Vector2D.from(this.centerPoint, pa);
+            const vectorB = Vector2D.from(this.centerPoint, pb);
 
-            return angleBetween(vectorZero, vectorA) - angleBetween(vectorZero, vectorB);
+            return Vector2D.angleBetween(vectorZero, vectorA) - Vector2D.angleBetween(vectorZero, vectorB);
         });
 
         this.polygonPointList = polygonPointList;
@@ -215,7 +215,7 @@ class Junction {
     }
 
     isRoadOutgoing(road) {
-        return (pointDist(this.centerPoint, road.startPoint) < pointDist(this.centerPoint, road.endPoint));
+        return Point.dist(this.centerPoint, road.startPoint) < Point.dist(this.centerPoint, road.endPoint);
     }
 
     serializeToProtobuf() {

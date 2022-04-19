@@ -2,7 +2,7 @@ const MapProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_pb"
 const {
     Point,
     Vector2D,
-    BezierCurve,
+    BezierCurve2D,
     getHypotenuse,
     degreeNormalize,
     degreeToRad
@@ -348,7 +348,7 @@ class MapGeneratorManual {
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
                 const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
-                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+                stopLine = BezierCurve2D.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 
                 const signal = new Signal({
                     id: global.getNewSignalId(), position, heading, junction, laneList, stopLine
@@ -381,7 +381,7 @@ class MapGeneratorManual {
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
                 const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
-                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+                stopLine = BezierCurve2D.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 
                 // signal for east direction is located at west
                 // since opposite not necessarily has road assignment, use the current road to calculate the signal position

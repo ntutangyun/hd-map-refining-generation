@@ -13,32 +13,24 @@ config = {
     manual: {
         junctionList: [
             {
-                id: "J_0",
+                id: "J_1",
                 center: {
-                    x: 1000,
-                    y: 1000
+                    x: 1100,
+                    y: 1100
                 },
                 roadList: {
-                    "EAST": {
-                        topo: "IN-OUT",
+                    "A": {
+                        topo: "IN",
                         rotation: 0,
                     },
-                    "EAST-NORTH": {
-                        topo: "IN-OUT",
-                        rotation: 72,
+                    "B": {
+                        topo: "OUT",
+                        rotation: 90,
                     },
-                    "WEST-NORTH": {
+                    "C": {
                         topo: "IN-OUT",
-                        rotation: 144,
+                        rotation: -150,
                     },
-                    "WEST-SOUTH": {
-                        topo: "IN-OUT",
-                        rotation: -144,
-                    },
-                    "SOUTH": {
-                        topo: "IN-OUT",
-                        rotation: -72,
-                    }
                 },
                 signal: true,
                 stopSign: false,

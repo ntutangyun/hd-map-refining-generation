@@ -2,7 +2,7 @@ const commonProto = global.ApolloTestingLib("protobuf_out/modules/common/proto/g
 const SignalProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_signal_pb");
 const MapIDProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_id_pb");
 const MapGeoProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_geometry_pb");
-const {Point} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
+const {Point} = global.ApolloTestingLib("common/Math");
 const OverlapGenerator = require("../Generators/OverlapGenerator");
 
 // signal boundary is drawn in the following order
