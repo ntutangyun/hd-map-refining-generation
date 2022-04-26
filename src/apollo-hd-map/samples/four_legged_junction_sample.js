@@ -21,20 +21,24 @@ config = {
                 roadList: {
                     "EAST": {
                         topo: "IN-OUT",
-                        rotation: 30,
+                        rotation: 0,
                     },
                     "NORTH": {
-                        topo: "OUT",
+                        topo: "IN-OUT",
                         rotation: 90,
                     },
+                    "WEST": {
+                        topo: "IN-OUT",
+                        rotation: 180,
+                    },
                     "SOUTH": {
-                        topo: "IN",
-                        rotation: -110,
+                        topo: "IN-OUT",
+                        rotation: -90,
                     },
                 },
-                signal: false,
-                stopSign: true,
-                crosswalk: false
+                signal: true,
+                stopSign: false,
+                crosswalk: true
             },
         ],
         roadList: []
