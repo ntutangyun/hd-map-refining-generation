@@ -377,6 +377,10 @@ class MapGeneratorManual {
                     incomingLaneList = road.getForwardLaneList();
                 }
 
+                if (incomingLaneList.length === 0) {
+                    return;
+                }
+
                 const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
                 const startHeading = Vector2D.from(startPoint, endPoint).heading();
