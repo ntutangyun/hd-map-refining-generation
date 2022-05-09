@@ -15,8 +15,8 @@ config = {
             {
                 id: "J_0",
                 center: {
-                    x: 1000,
-                    y: 1000
+                    x: 500,
+                    y: 500
                 },
                 roadList: {
                     "EAST": {
@@ -43,8 +43,8 @@ config = {
             {
                 id: "J_1",
                 center: {
-                    x: 2000,
-                    y: 1000
+                    x: 1000,
+                    y: 500
                 },
                 roadList: {
                     "EAST": {
@@ -71,8 +71,8 @@ config = {
             {
                 id: "J_2",
                 center: {
-                    x: 3000,
-                    y: 1000
+                    x: 1500,
+                    y: 500
                 },
                 roadList: {
                     "EAST": {
@@ -99,8 +99,8 @@ config = {
             {
                 id: "J_3",
                 center: {
-                    x: 4000,
-                    y: 1000
+                    x: 2000,
+                    y: 500
                 },
                 roadList: {
                     // "EAST": {
@@ -127,8 +127,8 @@ config = {
             {
                 id: "J_4",
                 center: {
-                    x: 1000,
-                    y: 2000
+                    x: 500,
+                    y: 1000
                 },
                 roadList: {
                     "EAST": {
@@ -155,8 +155,8 @@ config = {
             {
                 id: "J_5",
                 center: {
-                    x: 2000,
-                    y: 2000
+                    x: 1000,
+                    y: 1000
                 },
                 roadList: {
                     "EAST": {
@@ -183,8 +183,8 @@ config = {
             {
                 id: "J_6",
                 center: {
-                    x: 3000,
-                    y: 2000
+                    x: 1500,
+                    y: 1000
                 },
                 roadList: {
                     "EAST": {
@@ -211,8 +211,8 @@ config = {
             {
                 id: "J_7",
                 center: {
-                    x: 4000,
-                    y: 2000
+                    x: 2000,
+                    y: 1000
                 },
                 roadList: {
                     // "EAST": {
@@ -239,8 +239,8 @@ config = {
             {
                 id: "J_8",
                 center: {
-                    x: 1000,
-                    y: 3000
+                    x: 500,
+                    y: 1500
                 },
                 roadList: {
                     "EAST": {
@@ -267,8 +267,8 @@ config = {
             {
                 id: "J_9",
                 center: {
-                    x: 2000,
-                    y: 3000
+                    x: 1000,
+                    y: 1500
                 },
                 roadList: {
                     "EAST": {
@@ -295,8 +295,8 @@ config = {
             {
                 id: "J_10",
                 center: {
-                    x: 3000,
-                    y: 3000
+                    x: 1500,
+                    y: 1500
                 },
                 roadList: {
                     "EAST": {
@@ -323,8 +323,8 @@ config = {
             {
                 id: "J_11",
                 center: {
-                    x: 4000,
-                    y: 3000
+                    x: 2000,
+                    y: 1500
                 },
                 roadList: {
                     // "EAST": {
