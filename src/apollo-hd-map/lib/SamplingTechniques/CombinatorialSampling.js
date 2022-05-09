@@ -1,4 +1,4 @@
-const {degreeNormalize, getRandomInRange, bound} = global.ApolloTestingLib("common/mathUtils");
+const {degreeNormalize, getRandomInRange, bound} = global.ApolloTestingLib("common/Math");
 
 function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxiliaryFeatures}) {
 
@@ -20,11 +20,11 @@ function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxi
                             },
                             {   // north
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -15, 15) + 90),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -10, 10) + 90),
                             },
                             {   // west
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -15, 15) + 180),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -10, 10) + 180),
                             },
                         ],
                         hasCrosswalk: auxFeature === "crosswalk",
@@ -41,15 +41,15 @@ function combinatorialSampling({roadFeatures, geoFeatures, controlFeatures, auxi
                             },
                             {   // north
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -15, 15) + 90),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.NORTH.min, geoFeatures.NORTH.max), -10, 10) + 90),
                             },
                             {   // west
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -15, 15) + 180),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.WEST.min, geoFeatures.WEST.max), -10, 10) + 180),
                             },
                             {   // south
                                 topo: "IN-OUT",
-                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.SOUTH.min, geoFeatures.SOUTH.max), -15, 15) - 90),
+                                rotation: degreeNormalize(bound(getRandomInRange(geoFeatures.SOUTH.min, geoFeatures.SOUTH.max), -10, 10) - 90),
                             },
                         ],
                         hasCrosswalk: auxFeature === "crosswalk",

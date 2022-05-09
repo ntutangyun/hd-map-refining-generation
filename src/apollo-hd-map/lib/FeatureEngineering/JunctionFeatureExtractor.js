@@ -1,6 +1,6 @@
 const JunctionRoadTopoGroup = require("./GridLayout/JunctionRoadTopoGroup");
 const JunctionTopoGeoCluster = require("./GridLayout/JunctionTopoGeoCluster");
-const {degreeNormalize} = global.ApolloTestingLib("common/mathUtils");
+const {degreeNormalize} = global.ApolloTestingLib("common/Math");
 
 const mapJunctionBlacklist = {
     "go_mentum": ["J_0", "J_1", "J_7", "J_20", "J_29"], "shalun": ["J_8"]

@@ -1,7 +1,6 @@
 const MapProto = global.ApolloTestingLib("protobuf_out/modules/map/proto/map_pb");
 const Junction = require("../MapElements/Junction");
-const {Point, vectorHeading, vector, BezierCurve} = global.ApolloTestingLib("common/ApolloHDMap/Geometry");
-const {getHypotenuse, degreeNormalize, degreeToRad} = global.ApolloTestingLib("common/mathUtils");
+const {Point, Vector2D, getHypotenuse, degreeNormalize, degreeToRad, BezierCurve2D} = global.ApolloTestingLib("common/Math");
 const {
     DEFAULT_ROAD_SOCKET_X_OFFSET,
     DEFAULT_LANE_WIDTH,
@@ -131,15 +130,15 @@ class MapGeneratorGrid {
                             // randomly select number of total lanes in the road
                             // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
                             // backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
-                            forwardLaneCount = 1;
-                            backwardLaneCount = 1;
+                            forwardLaneCount = 2;
+                            backwardLaneCount = 2;
                         } else if (topo === "OUT") {
                             // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
-                            forwardLaneCount = 1;
+                            forwardLaneCount = 4;
                             backwardLaneCount = 0;
                         } else if (topo === "IN") {
                             startsFromJunction = false;
-                            forwardLaneCount = 1;
+                            forwardLaneCount = 4;
                             // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
                             backwardLaneCount = 0;
                         } else {
@@ -238,11 +237,11 @@ class MapGeneratorGrid {
                             // randomly select number of total lanes in the road
                             // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - 1);
                             // backwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD - forwardLaneCount);
-                            forwardLaneCount = 1;
-                            backwardLaneCount = 1;
+                            forwardLaneCount = 2;
+                            backwardLaneCount = 2;
                         } else if (topo === "OUT") {
                             // forwardLaneCount = getRandomIntInclusive(1, MAX_LANE_COUNT_PER_ROAD);
-                            forwardLaneCount = 1;
+                            forwardLaneCount = 4;
                             backwardLaneCount = 0;
                         } else {
                             global.logE(this.name, `Unknown topo: ${topo}`);
@@ -343,7 +342,7 @@ class MapGeneratorGrid {
                 } else {
                     roadConnectionPoint = road.endPoint;
                 }
-                const heading = vectorHeading(vector(junction.centerPoint, roadConnectionPoint));
+                const heading = Vector2D.from(junction.centerPoint, roadConnectionPoint).heading();
                 const position = junction.centerPoint.moveTowards(heading + Math.PI, DEFAULT_ROAD_SOCKET_X_OFFSET / 3 * 2);
 
                 const laneList = [];
@@ -376,9 +375,9 @@ class MapGeneratorGrid {
 
                 const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
-                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
-                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+                stopLine = BezierCurve2D.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 
                 const signal = new Signal({
                     id: global.getNewSignalId(), position, heading, junction, laneList, stopLine
@@ -420,9 +419,9 @@ class MapGeneratorGrid {
 
                 const startPoint = incomingLaneList.first().leftBoundaryCurve.endPoint;
                 const endPoint = incomingLaneList.last().rightBoundaryCurve.endPoint;
-                const startHeading = vectorHeading(vector(startPoint, endPoint));
+                const startHeading = Vector2D.from(startPoint, endPoint).heading();
                 const endHeading = startHeading;
-                stopLine = BezierCurve.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
+                stopLine = BezierCurve2D.buildBezierCurve({startPoint, startHeading, endPoint, endHeading});
 
                 // signal for east direction is located at west
                 // since opposite not necessarily has road assignment, use the current road to calculate the signal position
