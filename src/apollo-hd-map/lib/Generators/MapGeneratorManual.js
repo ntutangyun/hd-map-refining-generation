@@ -191,8 +191,8 @@ class MapGeneratorManual {
                     startPoint = junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
                     startHeading = directionAngle;
 
-                    endPoint = startPoint.moveTowards(startHeading, 500 - 2 * junctionCenterDistance);
-                    // endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
+                    // endPoint = startPoint.moveTowards(startHeading, 500 - 2 * junctionCenterDistance);
+                    endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
                     endHeading = startHeading;
                 } else {
                     const yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
@@ -204,8 +204,8 @@ class MapGeneratorManual {
                     endPoint = junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
                     endHeading = directionOppositeAngle;
 
-                    // startPoint = endPoint.moveTowards(directionAngle, DEFAULT_ROAD_LENGTH);
-                    startPoint = endPoint.moveTowards(directionAngle, 500 - 2 * junctionCenterDistance);
+                    startPoint = endPoint.moveTowards(directionAngle, DEFAULT_ROAD_LENGTH);
+                    // startPoint = endPoint.moveTowards(directionAngle, 500 - 2 * junctionCenterDistance);
                     startHeading = endHeading;
                 }
 
