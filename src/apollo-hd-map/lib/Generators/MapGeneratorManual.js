@@ -13,6 +13,7 @@ const RoadGenerator = require("./RoadGenerator");
 const Signal = require("../MapElements/Signal");
 const StopSign = require("../MapElements/StopSign");
 const Crosswalk = require("../MapElements/Crosswalk");
+const {getOppositeDirection} = require("../FeatureEngineering/GridLayout/JunctionGridUtils");
 
 class MapGeneratorManual {
     constructor(config) {
@@ -126,6 +127,23 @@ class MapGeneratorManual {
             junction.connectedRoadList = {};
             const {roadList} = junction.config;
             Object.entries(roadList).forEach(([direction, roadConfig]) => {
+                // merge road if asked, to eliminate duplicates.
+                if (this.config.mergeRoadBetweenJunctions) {
+                    // check if any road has already been created to the opposite direction
+                    const neighbors = junction.config.neighbor;
+                    const neighborJunctionId = neighbors[direction];
+                    if (neighborJunctionId) {
+                        const neighborJunction = this.junctionList.find(junction => junction.id === neighborJunctionId);
+                        const oppositeDirection = getOppositeDirection(direction);
+
+                        const existingRoad = neighborJunction.connectedRoadList[oppositeDirection];
+                        if (existingRoad) {
+                            junction.connectRoad(existingRoad, direction);
+                            return;
+                        }
+                    }
+                }
+
                 const {topo, rotation} = roadConfig;
                 // create a straight road connecting to the current junction only
                 const roadId = global.getNewRoadId();
@@ -191,8 +209,8 @@ class MapGeneratorManual {
                     startPoint = junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
                     startHeading = directionAngle;
 
-                    // endPoint = startPoint.moveTowards(startHeading, 500 - 2 * junctionCenterDistance);
-                    endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
+                    endPoint = startPoint.moveTowards(startHeading, 500 - 2 * junctionCenterDistance);
+                    // endPoint = startPoint.moveTowards(startHeading, DEFAULT_ROAD_LENGTH);
                     endHeading = startHeading;
                 } else {
                     const yOffset = (0.5 * backwardLaneCount - 0.5 * forwardLaneCount) * DEFAULT_LANE_WIDTH;
@@ -204,8 +222,8 @@ class MapGeneratorManual {
                     endPoint = junction.centerPoint.moveTowards(junctionCenterAngle, junctionCenterDistance);
                     endHeading = directionOppositeAngle;
 
-                    startPoint = endPoint.moveTowards(directionAngle, DEFAULT_ROAD_LENGTH);
-                    // startPoint = endPoint.moveTowards(directionAngle, 500 - 2 * junctionCenterDistance);
+                    // startPoint = endPoint.moveTowards(directionAngle, DEFAULT_ROAD_LENGTH);
+                    startPoint = endPoint.moveTowards(directionAngle, 500 - 2 * junctionCenterDistance);
                     startHeading = endHeading;
                 }
 
